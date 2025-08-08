@@ -1,0 +1,56 @@
+{
+  "intro": [
+    {
+      "id": "intro1",
+      "title": "Number Line Animation",
+      "type": "visual",
+      "duration": "10 mins"
+    },
+    {
+      "id": "intro2",
+      "title": "Pizza Slices Demo",
+      "type": "kinesthetic",
+      "duration": "15 mins"
+    },
+    {
+      "id": "intro3",
+      "title": "Tutor Verbal Script",
+      "type": "verbal",
+      "duration": "8 mins"
+    }
+  ],
+  "practice": [
+    {
+      "id": "practice1",
+      "title": "Fractions Ninja Game",
+      "type": "game",
+      "duration": "10 mins"
+    },
+    {
+      "id": "practice2",
+      "title": "Drag & Drop Worksheet",
+      "type": "visual",
+      "duration": "12 mins"
+    },
+    {
+      "id": "practice3",
+      "title": "Story Word Problems",
+      "type": "verbal",
+      "duration": "12 mins"
+    }
+  ],
+  "assessment": [
+    {
+      "id": "assess1",
+      "title": "AI Adaptive Quiz",
+      "type": "quiz",
+      "duration": "5 mins"
+    },
+    {
+      "id": "assess2",
+      "title": "1-min Verbal Explanation",
+      "type": "verbal",
+      "duration": "3 mins"
+    }
+  ]
+}
