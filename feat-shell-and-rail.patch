@@ -1,0 +1,279 @@
+*** a/tailwind.config.js
+--- b/tailwind.config.js
+@@
+ /** @type {import('tailwindcss').Config} */
+ module.exports = {
+   content: ["./index.html", "./src/**/*.{js,jsx,ts,tsx}"],
+   theme: {
+-    extend: {},
++    extend: {
++      colors: {
++        bg: { DEFAULT: '#0f172a', soft: '#111827' },
++        text: { DEFAULT: '#e5e7eb', muted: '#9ca3af' },
++        card: { DEFAULT: '#111827', ring: '#1f2937' },
++        accent: { DEFAULT: '#22d3ee', dim: '#0891b2' },
++        danger: '#ef4444', success: '#22c55e', warn: '#f59e0b',
++      },
++      borderRadius: { xl: '0.9rem', '2xl': '1.25rem' },
++      boxShadow: { card: '0 6px 24px rgba(0,0,0,0.25)' },
++    },
+   },
+   plugins: [],
+ }
+*** a/src/index.css
+--- b/src/index.css
+@@
+-@tailwind base;
+-@tailwind components;
+-@tailwind utilities;
+-
+-body { @apply bg-gray-50 text-gray-900; }
++@tailwind base;
++@tailwind components;
++@tailwind utilities;
++
++body { @apply bg-bg text-text; }
++
++@layer components {
++  .card { @apply rounded-2xl bg-card shadow-card ring-1 ring-card-ring; }
++  .panel-title { @apply text-lg font-semibold; }
++  .muted { @apply text-text-muted; }
++  .btn { @apply inline-flex items-center justify-center rounded-full px-3 py-1.5 text-sm; }
++  .btn-primary { @apply btn bg-accent text-black hover:bg-accent/90; }
++  .btn-ghost { @apply btn border border-card-ring hover:bg-bg/40; }
++}
+*** a/src/App.jsx
+--- b/src/App.jsx
+@@
+-import { useState } from 'react'
+-import StudentProfile from './components/StudentProfile'
+-import LessonBlockPicker from './components/LessonBlockPicker'
+-import PlanPreview from './components/PlanPreview'
+-import AITipsPanel from './components/AITipsPanel'
+-import FooterActions from './components/FooterActions'
+-
+-export default function App() {
+-  const [plan, setPlan] = useState({ intro: [], practice: [], assessment: [] })
+-
+-  const onAdd = (stage, item) => {
+-    setPlan(prev => {
+-      if (prev[stage].some(x => x.id === item.id)) return prev
+-      return { ...prev, [stage]: [...prev[stage], item] }
+-    })
+-  }
+-
+-  const onRemove = (stage, id) => {
+-    setPlan(prev => ({ ...prev, [stage]: prev[stage].filter(x => x.id !== id) }))
+-  }
+-
+-  const onSend = () => {
+-    alert('Lesson sent to student!\\n' + JSON.stringify(plan, null, 2))
+-  }
+-
+-  return (
+-    <div className="p-6 max-w-6xl mx-auto space-y-4">
+-      <h1 className="text-2xl font-bold">📘 SOTF Tutor Lesson Planner</h1>
+-      <StudentProfile />
+-      <AITipsPanel style="visual" gaps={['equivalent fractions', 'verbal recall']} />
+-      <LessonBlockPicker onAdd={onAdd} />
+-      <PlanPreview plan={plan} onRemove={onRemove} />
+-      <FooterActions onSend={onSend} />
+-    </div>
+-  )
+-}
++import { useState } from 'react'
++import Shell from './layouts/Shell'
++import { Card } from './ui/Card'
++import StudentProfile from './components/StudentProfile'
++import LessonBlockPicker from './components/LessonBlockPicker'
++import PlanPreview from './components/PlanPreview'
++import AITipsPanel from './components/AITipsPanel'
++import InsightsRail from './components/InsightsRail'
++import insights from './data/insights'
++import { createTask } from './store/tasks'
++
++export default function App() {
++  const [plan, setPlan] = useState({ intro: [], practice: [], assessment: [] })
++
++  const onAdd = (stage, item) => {
++    setPlan(prev => prev[stage].some(x => x.id === item.id) ? prev
++      : ({ ...prev, [stage]: [...prev[stage], item] }))
++  }
++  const onRemove = (stage, id) => {
++    setPlan(prev => ({ ...prev, [stage]: prev[stage].filter(x => x.id !== id) }))
++  }
++  const onSend = () => {
++    alert('Lesson sent to student!\\n' + JSON.stringify(plan, null, 2))
++  }
++  const handleAction = (ins, action) => {
++    const task = createTask({ action, createdBy: 'teacher' })
++    alert(`✅ Action queued: ${action.label}\\nTask: ${task.id}`)
++  }
++
++  const rightRail = (<InsightsRail insights={insights} onAction={handleAction} />)
++
++  return (
++    <Shell rightRail={rightRail}>
++      <Card title="Tutor · Lesson Planner">
++        <StudentProfile />
++        <AITipsPanel style="visual" gaps={['equivalent fractions', 'verbal recall']} />
++      </Card>
++      <LessonBlockPicker onAdd={onAdd} />
++      <PlanPreview plan={plan} onRemove={onRemove} />
++      <div className="card p-4 flex justify-end gap-2">
++        <button className="btn-ghost">Revise</button>
++        <button className="btn-primary" onClick={onSend}>Send to Student</button>
++      </div>
++    </Shell>
++  )
++}
+*** /dev/null
+--- b/src/layouts/Shell.jsx
+@@
++export default function Shell({ children, rightRail }) {
++  return (
++    <div className="min-h-screen bg-bg text-text">
++      <header className="sticky top-0 z-30 border-b border-card-ring bg-bg/80 backdrop-blur">
++        <div className="mx-auto max-w-7xl px-4 h-14 flex items-center gap-4">
++          <div className="font-semibold">School of the Future PoC</div>
++          <nav className="flex gap-1 text-sm">
++            {['assessment','grading','practice','tutor','admin','parent'].map(tab =>
++              <a key={tab} href={`/${tab}`} className="px-3 py-1.5 rounded hover:bg-card">
++                {tab[0].toUpperCase()+tab.slice(1)}
++              </a>
++            )}
++          </nav>
++          <div className="ml-auto flex items-center gap-2 text-sm">
++            <span className="muted">Demo · Mock Data</span>
++            <select className="bg-card rounded px-2 py-1 border border-card-ring">
++              <option>Grade 8</option><option>Grade 7</option>
++            </select>
++            <select className="bg-card rounded px-2 py-1 border border-card-ring">
++              <option>Open as…</option>
++              <option>Teacher</option><option>Student</option>
++              <option>Admin</option><option>Parent</option>
++            </select>
++          </div>
++        </div>
++      </header>
++      <main className="mx-auto max-w-7xl px-4 py-6 grid grid-cols-1 lg:grid-cols-12 gap-4">
++        <section className="lg:col-span-8 space-y-4">{children}</section>
++        <aside className="lg:col-span-4 space-y-4">{rightRail}</aside>
++      </main>
++    </div>
++  )
++}
+*** /dev/null
+--- b/src/ui/Card.jsx
+@@
++export function Card({ title, actions, children }) {
++  return (
++    <div className="card p-4">
++      {title && (
++        <div className="mb-3 flex items-center justify-between">
++          <h3 className="panel-title">{title}</h3>
++          <div className="flex gap-2">{actions}</div>
++        </div>
++      )}
++      {children}
++    </div>
++  );
++}
+*** /dev/null
+--- b/src/ui/Button.jsx
+@@
++export function Button({ children, variant='primary', ...props }) {
++  const cls = variant === 'primary' ? 'btn-primary' : 'btn-ghost';
++  return <button className={cls} {...props}>{children}</button>;
++}
+*** /dev/null
+--- b/src/components/InsightsRail.jsx
+@@
++import { Card } from '../ui/Card'
++import { Button } from '../ui/Button'
++
++export default function InsightsRail({ insights = [], onAction }) {
++  return (
++    <div className="space-y-4">
++      <Card title="AI Insights & Actions">
++        {insights.length === 0 ? (
++          <div className="muted text-sm">No insights yet.</div>
++        ) : (
++          <ul className="space-y-3">
++            {insights.map(ins => (
++              <li key={ins.id} className="rounded-xl border border-card-ring p-3 bg-bg/30">
++                <div className="font-medium">{ins.title}</div>
++                <div className="muted text-sm mt-1">{ins.detail}</div>
++                <div className="flex flex-wrap gap-2 mt-3">
++                  {ins.suggestedActions.map(a => (
++                    <Button key={a.id} variant="primary"
++                      onClick={() => onAction && onAction(ins, a)}>
++                      {a.label}
++                    </Button>
++                  ))}
++                </div>
++              </li>
++            ))}
++          </ul>
++        )}
++      </Card>
++    </div>
++  )
++}
+*** /dev/null
+--- b/src/data/insights.js
+@@
++const insights = [
++  {
++    id: 'ins-001',
++    scope: 'student',
++    audience: 'parent',
++    title: 'Math engagement dropped in Week 3',
++    detail: 'Time-on-task fell by 32%. Consider a booster session.',
++    severity: 'warn',
++    suggestedActions: [
++      { id: 'act-1', label: 'Schedule Extra Class', kind: 'schedule', targets: ['teacher','student'], payload: { duration: 45 } },
++      { id: 'act-2', label: 'Send Progress Letter', kind: 'share', targets: ['parent'] },
++      { id: 'act-3', label: 'Request Teacher Meeting', kind: 'schedule', targets: ['teacher','parent'] }
++    ]
++  },
++  {
++    id: 'ins-002',
++    scope: 'student',
++    audience: 'teacher',
++    title: 'Struggle in equivalent fractions',
++    detail: 'Accuracy < 60% over last 3 attempts. Swap in a visual intro.',
++    severity: 'warn',
++    suggestedActions: [
++      { id: 'act-4', label: 'Add Visual Intro', kind: 'generate', targets: ['teacher'] },
++      { id: 'act-5', label: 'Assign Practice Set', kind: 'assign', targets: ['student'] }
++    ]
++  }
++]
++
++export default insights
+*** /dev/null
+--- b/src/store/tasks.js
+@@
++const KEY = 'tasks:v2'
++
++export function listTasks() {
++  try { return JSON.parse(localStorage.getItem(KEY) || '[]') } catch { return [] }
++}
++
++export function createTask({ action, createdBy='system' }) {
++  const tasks = listTasks()
++  const t = {
++    id: 'tsk-' + Date.now(),
++    action,
++    createdBy,
++    createdAt: new Date().toISOString(),
++    state: 'queued',
++    channel: action.kind === 'schedule' ? 'calendar' :
++             action.kind === 'share' ? 'email' : 'in-app'
++  }
++  tasks.unshift(t)
++  localStorage.setItem(KEY, JSON.stringify(tasks))
++  return t
++}
+

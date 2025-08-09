@@ -2,4 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
-body { @apply bg-gray-50 text-gray-900; }
+body { @apply bg-bg text-text; }
+
+@layer components {
+  .card { @apply rounded-2xl bg-card shadow-card ring-1 ring-card-ring; }
+  .panel-title { @apply text-lg font-semibold; }
+  .muted { @apply text-text-muted; }
+  .btn { @apply inline-flex items-center justify-center rounded-full px-3 py-1.5 text-sm; }
+  .btn-primary { @apply btn bg-accent text-black hover:bg-accent/90; }
+  .btn-ghost { @apply btn border border-card-ring hover:bg-bg/40; }
+}
