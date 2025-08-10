@@ -1,0 +1,61 @@
+:root, .theme-dark {
+  --bg: #0b1020;            /* app background */
+  --card: #0f172a;          /* panels/cards */
+  --card-ring: #1e293b;     /* borders */
+  --text: #e5e7eb;          /* primary text */
+  --muted: #94a3b8;         /* secondary text */
+  --accent: #22d3ee;        /* cyan buttons you already use */
+  --accent-attn: #f43f5e;   /* red highlight for active tabs */
+  --shadow: 0 6px 20px rgba(2,8,23,.35);
+}
+
+/* Utility classes used throughout the app (keeps Tailwind light) */
+.bg-bg { background-color: var(--bg); }
+.bg-card { background-color: var(--card); }
+.text-text { color: var(--text); }
+.muted { color: var(--muted); }
+.border-card-ring { border-color: var(--card-ring); }
+.ring-accent { --tw-ring-color: var(--accent); }
+.text-attn { color: var(--accent-attn); }
+.bg-attn { background-color: var(--accent-attn); }
+
+/* Buttons & cards (subtle polish) */
+.btn-primary {
+  background: var(--accent);
+  color: #000;
+  border-radius: 9999px;
+  padding: .55rem .9rem;
+  font-weight: 600;
+}
+.btn-ghost {
+  background: transparent;
+  color: var(--text);
+  border: 1px solid var(--card-ring);
+  border-radius: 9999px;
+  padding: .5rem .8rem;
+}
+.card {
+  background: var(--card);
+  border: 1px solid var(--card-ring);
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+}
+.panel-title { font-weight: 700; }
+
+/* Tabs (thin red underline on active) */
+.tabs {
+  display: flex; gap: .5rem; border-bottom: 1px solid var(--card-ring);
+  padding: .25rem;
+}
+.tab {
+  position: relative;
+  padding: .5rem .9rem; border-radius: 9999px;
+  color: var(--muted);
+}
+.tab:hover { background: rgba(255,255,255,.03); color: var(--text); }
+.tab.active { color: var(--text); }
+.tab.active::after {
+  content: "";
+  position: absolute; left: 10px; right: 10px; bottom: -1px;
+  height: 2px; background: var(--accent-attn); border-radius: 2px;
+}

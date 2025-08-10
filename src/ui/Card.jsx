@@ -1,13 +1,13 @@
 export function Card({ title, actions, children }) {
   return (
     <div className="card p-4">
-      {title && (
-        <div className="mb-3 flex items-center justify-between">
-          <h3 className="panel-title">{title}</h3>
-          <div className="flex gap-2">{actions}</div>
+      {(title || actions) && (
+        <div className="flex items-center justify-between mb-3">
+          {title && <div className="panel-title">{title}</div>}
+          {actions}
         </div>
       )}
       {children}
     </div>
-  );
+  )
 }
