@@ -84,16 +84,15 @@ function TeachersLessonPlanner() {
   )
 }
 
-
 function MainArea() {
-  const { path } = useHashRoute('/teachers/dashboard');
-  // console.log('[route path]', path);
+  const { path } = useHashRoute('/teachers/dashboard')
+  console.log('[route path]', path);
 
-  const [selected, setSelected] = useState([]);
-  const { scope, setScope, Directory } = useScope();
+  const [selected, setSelected] = useState([])
+  const { scope, setScope, Directory } = useScope()
 
   // Derive top section from hash route
-  const section = path.split('/').filter(Boolean)[0] || 'teachers';
+  const section = path.split('/').filter(Boolean)[0] || 'teachers'
 
   // Auto-sync Scope with top section
   useEffect(() => {
@@ -101,89 +100,75 @@ function MainArea() {
       section === 'teachers' ? 'teacherGroup' :
       section === 'students' ? 'student' :
       section === 'admin'    ? 'school' :
-      section === 'parent'   ? 'parentGroup' : 'school';
+      section === 'parent'   ? 'parentGroup' : 'school'
 
-    if (scope.kind === desiredKind) return;
+    if (scope.kind === desiredKind) return
 
     if (desiredKind === 'student') {
-      setScope({ kind: 'student', studentId: (Directory.students[0] || {}).id });
+      setScope({ kind: 'student', studentId: (Directory.students[0] || {}).id })
     } else if (desiredKind === 'teacherGroup') {
-      setScope({ kind: 'teacherGroup', groupId: (Directory.teacherGroups[0] || {}).id });
+      setScope({ kind: 'teacherGroup', groupId: (Directory.teacherGroups[0] || {}).id })
     } else if (desiredKind === 'parentGroup') {
-      setScope({ kind: 'parentGroup', groupId: (Directory.parentGroups[0] || {}).id });
+      setScope({ kind: 'parentGroup', groupId: (Directory.parentGroups[0] || {}).id })
     } else {
-      setScope({ kind: 'school' });
+      setScope({ kind: 'school' })
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [section]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [section])
 
-  const onToggle = (ins) =>
-    setSelected(prev => prev.some(x => x.id === ins.id) ? prev.filter(x => x.id !== ins.id) : [...prev, ins]);
-  const onClear = () => setSelected([]);
+  const onToggle = (ins) => setSelected(prev => prev.some(x=>x.id===ins.id) ? prev.filter(x=>x.id!==ins.id) : [...prev, ins])
+  const onClear = () => setSelected([])
 
-  // Menus (Dashboard first; Playback is deep-linked only)
   const teacherMenu = [
-    { label: 'Dashboard',        href: '/teachers/dashboard' },
-    { label: 'Lesson Planning',  href: '/teachers/lesson-planning' },
-    { label: 'Assessment',       href: '/teachers/assessment' },
-    { label: 'Grading',          href: '/teachers/grading' },
+    { label: 'Dashboard', href: '/teachers/dashboard' },
+    { label: 'Lesson Planning', href: '/teachers/lesson-planning' },
+    { label: 'Assessment', href: '/teachers/assessment' },
+    { label: 'Grading', href: '/teachers/grading' },
     { label: 'Faculty Evaluation', href: '/teachers/faculty-eval' },
-  ];
+  ]
   const studentMenu = [
-    { label: 'Dashboard',  href: '/students/dashboard' },
+    { label: 'Dashboard', href: '/students/dashboard' },
+    { label: 'Playback', href: '/students/play/plan_demo_001' },
     { label: 'Tutor Plan', href: '/students/tutor-plan' },
-    { label: 'Practice',   href: '/students/practice' },
-  ];
+    { label: 'Practice', href: '/students/practice' },
+  ]
   const adminMenu = [
-    { label: 'Overview',   href: '/admin/overview' },
+    { label: 'Overview', href: '/admin/overview' },
     { label: 'Predictive', href: '/admin/predictive' },
-  ];
+  ]
   const parentMenu = [
     { label: 'Portal', href: '/parent/portal' },
-    { label: 'Comms',  href: '/parent/comms' },
-  ];
+    { label: 'Comms', href: '/parent/comms' },
+  ]
 
-  let menu = teacherMenu;
-  if (path.startsWith('/students')) menu = studentMenu;
-  else if (path.startsWith('/admin')) menu = adminMenu;
-  else if (path.startsWith('/parent')) menu = parentMenu;
+  let menu = teacherMenu
+  if (path.startsWith('/students')) menu = studentMenu
+  else if (path.startsWith('/admin')) menu = adminMenu
+  else if (path.startsWith('/parent')) menu = parentMenu
 
-  // -------- Routing --------
-  let page = null;
+  let page = <TeachersDashboard />
+  if (path === '/teachers/lesson-planning') page = <TeachersLessonPlanner />
+  else if (path === '/teachers/assessment') page = <Assessment />
+  else if (path === '/teachers/grading') page = <Grading />
+  else if (path === '/teachers/faculty-eval') page = <FacultyEval />
+  else if (path === '/teachers/dashboard') page = <TeachersDashboard />
 
-  // Teachers
-  if (path === '/teachers/lesson-planning') page = <TeachersLessonPlanner />;
-  else if (path === '/teachers/assessment') page = <Assessment />;
-  else if (path === '/teachers/grading') page = <Grading />;
-  else if (path === '/teachers/faculty-eval') page = <FacultyEval />;
-  else if (path === '/teachers/dashboard') page = <TeachersDashboard />;
+  else if (path === '/students/tutor-plan') page = <TutorPlan />
+  else if (path === '/students/practice') page = <Practice />
+  else if (path === '/students/dashboard') page = <StudentDash />
 
-  // Students (order matters: playback before dashboard)
-  else if (path.startsWith('/students/play/')) {
-    const planId = path.split('/').pop();
-    page = <StudentPlayback planId={planId} />;
-  }
-  else if (path === '/students/tutor-plan') page = <TutorPlan />;
-  else if (path === '/students/practice') page = <Practice />;
-  else if (path === '/students/dashboard') page = <StudentDash />;
+  else if (path === '/admin/overview') page = <AdminOverview />
+  else if (path === '/admin/predictive') page = <Predictive />
 
-  // Admin
-  else if (path === '/admin/overview') page = <AdminOverview />;
-  else if (path === '/admin/predictive') page = <Predictive />;
-
-  // Parent
-  else if (path === '/parent/portal') page = <ParentPortal />;
-  else if (path === '/parent/comms') page = <ParentComms />;
-
-  // Fallback (default)
-  if (!page) page = <TeachersDashboard />;
+  else if (path === '/parent/portal') page = <ParentPortal />
+  else if (path === '/parent/comms') page = <ParentComms />
 
   return (
     <Shell rightRail={<RightRail selected={selected} onToggle={onToggle} onClear={onClear} />}>
       <ModuleSwitcher current={path} items={menu} />
       {page}
     </Shell>
-  );
+  )
 }
 
 export default function App() {
