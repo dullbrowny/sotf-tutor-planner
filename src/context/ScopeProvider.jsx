@@ -10,6 +10,12 @@ const Directory = {
   teachers: [
     { id: 't-1', name: 'Ms. Mehta', classIds: ['7B'] },
   ],
+  teacherGroups: [
+    { id: 'tg-math', name: 'Math Teachers (G7)' },
+  ],
+  parentGroups: [
+    { id: 'pg-7b', name: 'Parents of 7B' },
+  ],
 }
 
 const ScopeContext = createContext(null)

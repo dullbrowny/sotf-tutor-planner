@@ -14,6 +14,8 @@ export default function ScopeBar() {
             if (kind === 'student') setScope({ kind, studentId: Directory.students[0].id })
             else if (kind === 'class') setScope({ kind, classId: Directory.classes[0].id })
             else if (kind === 'grade') setScope({ kind, grade: Directory.classes[0].grade })
+            else if (kind === 'teacherGroup') setScope({ kind, groupId: Directory.teacherGroups[0].id })
+            else if (kind === 'parentGroup') setScope({ kind, groupId: Directory.parentGroups[0].id })
             else setScope({ kind: 'school' })
           }}
           className="bg-card rounded px-2 py-1 border border-card-ring text-sm"
@@ -21,36 +23,48 @@ export default function ScopeBar() {
           <option value="student">Student</option>
           <option value="class">Class</option>
           <option value="grade">Grade</option>
+          <option value="teacherGroup">Teacher Group</option>
+          <option value="parentGroup">Parent Group</option>
           <option value="school">School</option>
         </select>
 
         {scope.kind === 'student' && (
-          <select
-            value={scope.studentId}
+          <select value={scope.studentId}
             onChange={(e)=> setScope({ kind: 'student', studentId: e.target.value })}
-            className="bg-card rounded px-2 py-1 border border-card-ring text-sm"
-          >
+            className="bg-card rounded px-2 py-1 border border-card-ring text-sm">
             {Directory.students.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
           </select>
         )}
 
         {scope.kind === 'class' && (
-          <select
-            value={scope.classId}
+          <select value={scope.classId}
             onChange={(e)=> setScope({ kind: 'class', classId: e.target.value })}
-            className="bg-card rounded px-2 py-1 border border-card-ring text-sm"
-          >
+            className="bg-card rounded px-2 py-1 border border-card-ring text-sm">
             {Directory.classes.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
           </select>
         )}
 
         {scope.kind === 'grade' && (
-          <select
-            value={scope.grade}
+          <select value={scope.grade}
             onChange={(e)=> setScope({ kind: 'grade', grade: e.target.value })}
-            className="bg-card rounded px-2 py-1 border border-card-ring text-sm"
-          >
+            className="bg-card rounded px-2 py-1 border border-card-ring text-sm">
             {[...new Set(Directory.classes.map(c=>c.grade))].map(g => <option key={g} value={g}>{g}</option>)}
+          </select>
+        )}
+
+        {scope.kind === 'teacherGroup' && (
+          <select value={scope.groupId}
+            onChange={(e)=> setScope({ kind: 'teacherGroup', groupId: e.target.value })}
+            className="bg-card rounded px-2 py-1 border border-card-ring text-sm">
+            {Directory.teacherGroups.map(g => <option key={g.id} value={g.id}>{g.name}</option>)}
+          </select>
+        )}
+
+        {scope.kind === 'parentGroup' && (
+          <select value={scope.groupId}
+            onChange={(e)=> setScope({ kind: 'parentGroup', groupId: e.target.value })}
+            className="bg-card rounded px-2 py-1 border border-card-ring text-sm">
+            {Directory.parentGroups.map(g => <option key={g.id} value={g.id}>{g.name}</option>)}
           </select>
         )}
 
@@ -58,6 +72,8 @@ export default function ScopeBar() {
           {scope.kind === 'student' && `Student: ${Directory.students.find(s=>s.id===scope.studentId)?.name}`}
           {scope.kind === 'class' && `Class: ${Directory.classes.find(c=>c.id===scope.classId)?.name}`}
           {scope.kind === 'grade' && `Grade: ${scope.grade}`}
+          {scope.kind === 'teacherGroup' && `Group: ${Directory.teacherGroups.find(g=>g.id===scope.groupId)?.name}`}
+          {scope.kind === 'parentGroup' && `Group: ${Directory.parentGroups.find(g=>g.id===scope.groupId)?.name}`}
           {scope.kind === 'school' && `School-wide`}
         </div>
       </div>
