@@ -37,22 +37,20 @@ function suggestionsFor(contextKey = 'teachers/dashboard') {
   return m[contextKey] || ['Help me with the current page.'];
 }
 
-export default function ChatPanel({ selectedInsights = [], onAction, placeholder }) {
+// Added prop: contextKey
+export default function ChatPanel({
+  selectedInsights = [],
+  onAction,
+  placeholder,
+  contextKey
+}) {
   const [text, setText] = useState('')
   const [showMenu, setShowMenu] = useState(false)
   const hint = placeholder || 'Ask anything...'
 
-  const contextKey = useMemo(() => {
-    if (/playback/i.test(hint)) return 'students/playback'
-    if (/progress|next step/i.test(hint)) return 'students/dashboard'
-    if (/refine|generate blocks/i.test(hint)) return 'teachers/lesson-planning'
-    if (/classes|grading|suggest/i.test(hint)) return 'teachers/dashboard'
-    if (/kpi|trend/i.test(hint)) return 'admin/overview'
-    if (/your child|updates/i.test(hint)) return 'parent/portal'
-    return 'teachers/dashboard'
-  }, [hint])
-
-  const sugg = suggestionsFor(contextKey)
+  // TRUST the explicit contextKey from parent; do not infer from placeholder
+  const key = useMemo(() => contextKey || 'teachers/dashboard', [contextKey])
+  const sugg = suggestionsFor(key)
 
   const onSend = () => {
     if (!text.trim()) return;
@@ -107,3 +105,4 @@ export default function ChatPanel({ selectedInsights = [], onAction, placeholder
     </Card>
   )
 }
+

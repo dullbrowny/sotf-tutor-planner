@@ -1,12 +1,11 @@
 import { generateInsights } from './insights/generators'
-import { computeContext, filterInsights } from './utils/insightFilter'
+import { computeContext } from './utils/insightFilter'
 import { ScopeProvider, useScope } from './context/ScopeProvider'
 import Shell from './layouts/Shell'
 import ModuleSwitcher from './components/ModuleSwitcher'
 import InsightsRail from './components/InsightsRail'
 import ChatPanel from './components/ChatPanel'
 import ClassFeedCard from './components/ClassFeedCard'
-import insights from './data/insights'
 import { dispatchAction } from './agents/dispatcher'
 import { useEffect, useState } from 'react'
 import { useHashRoute } from './router/useHashRoute'
@@ -28,7 +27,6 @@ import FacultyEval from './pages/teachers/FacultyEval'
 // Students pages
 import TutorPlan from './pages/students/TutorPlan'
 import Practice from './pages/students/Practice'
-
 import StudentDash from './pages/students/Dashboard'
 import StudentPlayback from './pages/students/Playback'
 
@@ -40,17 +38,20 @@ import Predictive from './pages/admin/Predictive'
 import ParentPortal from './pages/parent/Portal'
 import ParentComms from './pages/parent/Comms'
 
-
+// Map current route/hash → a stable chat context key
+function routeToContextKey(r = '') {
+  const route = r.startsWith('#') ? r : `#${r}`; // normalize "/parent/portal" → "#/parent/portal"
+  if (route.startsWith('#/students/play')) return 'students/playback';
+  if (route.startsWith('#/students'))      return 'students/dashboard';
+  if (route.startsWith('#/teachers/plan')) return 'teachers/lesson-planning';
+  if (route.startsWith('#/teachers'))      return 'teachers/dashboard';
+  if (route.startsWith('#/admin'))         return 'admin/overview';
+  if (route.startsWith('#/parent'))        return 'parent/portal';
+  return 'teachers/dashboard';
+}
 
 function RightRail({ path, scopeKind, selected, onToggle, onClear }) {
   const ctx = computeContext(path, scopeKind);
-
-  // derive audience
-  const audienceHint =
-    ctx.section === 'teachers' ? 'teachers' :
-    ctx.section === 'students' ? 'students' :
-    ctx.section === 'admin'    ? 'admin'    :
-    ctx.section === 'parent'   ? 'parents'  : undefined;
 
   const filtered = generateInsights(ctx);
 
@@ -91,11 +92,14 @@ function RightRail({ path, scopeKind, selected, onToggle, onClear }) {
         onAction={doAction}
         onBulkAction={doBulkAction}
       />
+
       <ChatPanel
-        selectedInsights={selected.length ? selected : filtered.slice(0,1)}
-        onAction={doAction}
-        placeholder={chatPlaceholder}
-      />
+       selectedInsights={selected}
+       onAction={doAction}
+       placeholder={chatPlaceholder}
+       contextKey={routeToContextKey(path)}
+     />
+
       <ClassFeedCard classId="7B" />
     </>
   );
@@ -103,8 +107,10 @@ function RightRail({ path, scopeKind, selected, onToggle, onClear }) {
 
 function TeachersLessonPlanner() {
   const [plan, setPlan] = useState({ intro: [], practice: [], assessment: [] })
-  const onAdd = (stage, item) => setPlan(p => p[stage].some(x=>x.id===item.id)?p:{...p,[stage]:[...p[stage],item]})
-  const onRemove = (stage, id) => setPlan(p => ({...p,[stage]:p[stage].filter(x=>x.id!==id)}))
+  const onAdd = (stage, item) =>
+    setPlan(p => p[stage].some(x => x.id === item.id) ? p : { ...p, [stage]: [...p[stage], item] })
+  const onRemove = (stage, id) =>
+    setPlan(p => ({ ...p, [stage]: p[stage].filter(x => x.id !== id) }))
   const onSend = () => alert('Lesson sent to student!\n' + JSON.stringify(plan, null, 2))
   return (
     <>
@@ -123,10 +129,8 @@ function TeachersLessonPlanner() {
   )
 }
 
-
 function MainArea() {
   const { path } = useHashRoute('/teachers/dashboard');
-  // console.log('[route path]', path);
 
   const [selected, setSelected] = useState([]);
   const { scope, setScope, Directory } = useScope();
@@ -232,3 +236,4 @@ export default function App() {
     </ScopeProvider>
   )
 }
+
