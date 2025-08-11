@@ -51,8 +51,20 @@ export function generateInsights(ctx, scopeMeta = {}) {
         ['Schedule Dept Review', 'Create Intervention Plan'],
         ['admin'], ['admin/overview'], ['school'])
     );
+    out.push(
+      base('g_adm_ovw_2', 'Attendance dip on Wednesdays',
+        'Median −3% across grades; correlates with club timings.',
+        ['Adjust Timetable', 'Notify Grade Coordinators'],
+        ['admin'], ['admin/overview'], ['school'])
+    );
+    out.push(
+      base('g_adm_ovw_3', 'Submissions backlog rising in 3 cohorts',
+        '7B/7C Science, 7A Math show >20 pending each.',
+        ['Open Grading Queue', 'Send Reminder to Teachers'],
+        ['admin'], ['admin/overview'], ['school'])
+    );
   }
-
+  
   if (k === 'parent/portal') {
     out.push(
       base('g_par_port_1', 'Homework missing twice this week',
@@ -60,8 +72,20 @@ export function generateInsights(ctx, scopeMeta = {}) {
         ['Send Parent Nudge', 'Schedule Teacher Call'],
         ['parents'], ['parent/portal'], ['parentGroup','student'])
     );
+    out.push(
+      base('g_par_port_2', '3 items to review before Monday',
+        'Quick refresh: LCM/GCD, Triangles perimeter, Word problems.',
+        ['Build 20-min plan', 'Generate 6 mixed questions'],
+        ['parents'], ['parent/portal'], ['parentGroup','student'])
+    );
+    out.push(
+      base('g_par_port_3', 'Attendance is solid',
+        '94% this term. Keep the streak with a light routine.',
+        ['Suggest Light Weekend Plan', 'Share Progress with Family'],
+        ['parents'], ['parent/portal'], ['parentGroup','student'])
+    );
   }
-
+  
   if (!out.length) {
     out.push(
       base('g_generic_1', 'No new insights yet',
