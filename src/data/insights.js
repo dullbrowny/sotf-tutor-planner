@@ -1,30 +1,67 @@
+// src/data/insights.js
 const insights = [
+  // Students · Playback
   {
-    id: 'ins-001',
-    scope: 'student',
-    audience: 'parent',
-    title: 'Math engagement dropped in Week 3',
-    detail: 'Time-on-task fell by 32%. Consider a booster session.',
-    severity: 'warn',
-    suggestedActions: [
-      { id: 'act-1', label: 'Schedule Extra Class', kind: 'schedule', targets: ['teacher','student'], payload: { duration: 45 }, channel:'calendar' },
-      { id: 'act-2', label: 'Send Progress Letter', kind: 'share', targets: ['parent'], channel:'email' },
-      { id: 'act-3', label: 'Request Teacher Meeting', kind: 'schedule', targets: ['teacher','parent'], channel:'calendar' }
-    ]
+    id: 'stu_pbk_001',
+    title: 'Time-on-task dipped in Step 2',
+    detail: 'Student paused twice during game step; consider a shorter retry.',
+    actions: ['Assign Practice Set', 'Draft Message to Teacher'],
+    audience: ['students'],
+    contexts: ['students/playback'],
+    scopes: ['student'],
   },
   {
-    id: 'ins-002',
-    scope: 'class',
-    audience: 'teacher',
-    title: 'Struggle in equivalent fractions (Class 7B)',
-    detail: 'Accuracy < 60% for 41% of students. Swap in a visual intro and announce booster.',
-    severity: 'warn',
-    suggestedActions: [
-      { id: 'act-4', label: 'Add Visual Intro', kind: 'generate', targets: ['teacher'] },
-      { id: 'act-5', label: 'Assign Practice Set', kind: 'assign', targets: ['student'] },
-      { id: 'act-6', label: 'Post to Class Feed', kind: 'post', targets: ['class'], channel:'class-feed', payload:{ message:'Booster session Tue 4pm. Bring notebooks.' } }
-    ]
-  }
-]
+    id: 'stu_pbk_002',
+    title: 'Struggle in equivalent fractions',
+    detail: 'Accuracy < 60% in the last 2 attempts. Offer a visual-first intro.',
+    actions: ['Add Visual Intro', 'Open Mini-lesson'],
+    audience: ['students','teachers'],
+    contexts: ['students/playback','teachers/lesson-planning'],
+    scopes: ['student','class'],
+  },
 
-export default insights
+  // Teachers · Lesson Planning
+  {
+    id: 'tch_plan_001',
+    title: 'Many students weak on equivalent fractions',
+    detail: '41% below mastery in 7B. Start with visual intro.',
+    actions: ['Add Visual Intro', 'Post to Class Feed'],
+    audience: ['teachers'],
+    contexts: ['teachers/lesson-planning'],
+    scopes: ['class','teacherGroup'],
+  },
+  {
+    id: 'tch_plan_002',
+    title: 'Math engagement dropped in Week 3',
+    detail: 'Time-on-task fell by 32%. Consider a booster session.',
+    actions: ['Schedule Extra Class', 'Send Progress Letter', 'Request Teacher Meeting'],
+    audience: ['teachers','admin'],
+    contexts: ['teachers/dashboard','admin/overview'],
+    scopes: ['class','school','teacherGroup'],
+  },
+
+  // Admin · Overview
+  {
+    id: 'adm_ovw_001',
+    title: 'Grade 7 Science pass-rate trending down',
+    detail: '−8% vs last term; cluster in sections 7B/7C.',
+    actions: ['Schedule Dept Review', 'Create Intervention Plan'],
+    audience: ['admin'],
+    contexts: ['admin/overview'],
+    scopes: ['school'],
+  },
+
+  // Parent · Portal
+  {
+    id: 'par_port_001',
+    title: 'Homework missing twice this week',
+    detail: 'Suggest a 15-min evening check-in routine.',
+    actions: ['Send Parent Nudge', 'Schedule Teacher Call'],
+    audience: ['parents'],
+    contexts: ['parent/portal'],
+    scopes: ['parentGroup','student'],
+  },
+];
+
+export default insights;
+

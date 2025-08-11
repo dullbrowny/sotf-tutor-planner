@@ -1,3 +1,4 @@
+import { computeContext, filterInsights } from './utils/insightFilter'
 import { ScopeProvider, useScope } from './context/ScopeProvider'
 import Shell from './layouts/Shell'
 import ModuleSwitcher from './components/ModuleSwitcher'
@@ -38,29 +39,65 @@ import Predictive from './pages/admin/Predictive'
 import ParentPortal from './pages/parent/Portal'
 import ParentComms from './pages/parent/Comms'
 
-function RightRail({ selected, onToggle, onClear }) {
+
+
+function RightRail({ path, scopeKind, selected, onToggle, onClear }) {
+  const ctx = computeContext(path, scopeKind);
+
+  // derive audience
+  const audienceHint =
+    ctx.section === 'teachers' ? 'teachers' :
+    ctx.section === 'students' ? 'students' :
+    ctx.section === 'admin'    ? 'admin'    :
+    ctx.section === 'parent'   ? 'parents'  : undefined;
+
+  const filtered = filterInsights(insights, ctx, audienceHint);
+
+  // context-aware chat hint
+  const chatHintMap = {
+    'students/playback': 'Ask about this step or your plan…',
+    'students/dashboard': 'Ask about your progress or next steps…',
+    'teachers/lesson-planning': 'Ask to refine this lesson or generate blocks…',
+    'teachers/dashboard': 'Ask about classes, grading queue, or suggestions…',
+    'admin/overview': 'Ask about KPIs, trends, or at-risk flags…',
+    'parent/portal': 'Ask about your child’s progress or schedule…',
+  };
+  const chatPlaceholder = chatHintMap[ctx.key] || 'Ask anything…';
+
   const doAction = async (_ins, action) => {
-    const task = await dispatchAction({}, action)
-    alert(`✅ Action queued: ${action.label}\nTask: ${task.id}`)
-  }
+    const task = await dispatchAction({}, action);
+    alert(`✅ Action queued: ${action.label}\nTask: ${task.id}`);
+  };
   const doBulkAction = async (insightsArr, action) => {
-    for (const _ of insightsArr) await dispatchAction({}, action)
-    alert(`✅ Applied "${action.label}" to ${insightsArr.length} selected insights`)
-  }
+    for (const _ of insightsArr) await dispatchAction({}, action);
+    alert(`✅ Applied "${action.label}" to ${insightsArr.length} selected insights`);
+  };
+
   return (
     <>
+      <div className="px-2 py-1 text-xs text-slate-300" data-testid="rail-context">
+        <span className="opacity-70">Context:</span>{' '}
+        <span className="font-medium">{ctx.section}</span>
+        <span className="opacity-50"> · </span>
+        <span className="font-medium capitalize">{ctx.page}</span>
+      </div>
+
       <InsightsRail
-        insights={insights}
+        insights={filtered.length ? filtered : []}
         selected={selected}
         onToggle={onToggle}
         onClear={onClear}
         onAction={doAction}
         onBulkAction={doBulkAction}
       />
-      <ChatPanel selectedInsights={selected.length ? selected : [insights[0]]} onAction={doAction} />
+      <ChatPanel
+        selectedInsights={selected.length ? selected : filtered.slice(0,1)}
+        onAction={doAction}
+        placeholder={chatPlaceholder}
+      />
       <ClassFeedCard classId="7B" />
     </>
-  )
+  );
 }
 
 function TeachersLessonPlanner() {
@@ -70,6 +107,7 @@ function TeachersLessonPlanner() {
   const onSend = () => alert('Lesson sent to student!\n' + JSON.stringify(plan, null, 2))
   return (
     <>
+      <div data-testid="page-title" className="sr-only">Lesson Planning</div>
       <Card title="Tutor · Lesson Planner">
         <StudentProfile />
         <AITipsPanel style="visual" gaps={['equivalent fractions','verbal recall']} />
@@ -179,7 +217,7 @@ function MainArea() {
   if (!page) page = <TeachersDashboard />;
 
   return (
-    <Shell rightRail={<RightRail selected={selected} onToggle={onToggle} onClear={onClear} />}>
+    <Shell rightRail={<RightRail path={path} scopeKind={scope.kind} selected={selected} onToggle={onToggle} onClear={onClear} />}>
       <ModuleSwitcher current={path} items={menu} />
       {page}
     </Shell>
