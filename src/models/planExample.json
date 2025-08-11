@@ -1,0 +1,11 @@
+{
+  "id": "plan_demo_001",
+  "studentId": "s-arya",
+  "title": "Fractions · Visual-first Microplan",
+  "steps": [
+    { "id": "intro-1", "stage": "Intro", "type": "visual",   "label": "Number Line Animation", "estMins": 10, "content": "Watch the short animation; note how fractions map to the number line." },
+    { "id": "practice-1", "stage": "Practice", "type": "game", "label": "Fractions Ninja Game", "estMins": 10, "content": "Play 2 rounds. Focus on comparing fractions quickly." },
+    { "id": "practice-2", "stage": "Practice", "type": "worksheet", "label": "Drag & Drop Worksheet", "estMins": 12, "content": "Complete the first 6 items; check hints for mistakes." },
+    { "id": "assessment-1", "stage": "Assessment", "type": "quiz", "label": "AI Adaptive Quiz", "estMins": 5, "content": "5 quick questions to check mastery." }
+  ]
+}
