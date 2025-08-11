@@ -1,3 +1,4 @@
+import { generateInsights } from './insights/generators'
 import { computeContext, filterInsights } from './utils/insightFilter'
 import { ScopeProvider, useScope } from './context/ScopeProvider'
 import Shell from './layouts/Shell'
@@ -51,7 +52,7 @@ function RightRail({ path, scopeKind, selected, onToggle, onClear }) {
     ctx.section === 'admin'    ? 'admin'    :
     ctx.section === 'parent'   ? 'parents'  : undefined;
 
-  const filtered = filterInsights(insights, ctx, audienceHint);
+  const filtered = generateInsights(ctx);
 
   // context-aware chat hint
   const chatHintMap = {
