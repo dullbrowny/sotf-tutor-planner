@@ -14,6 +14,8 @@ import { Card } from './ui/Card'
 import { api } from './api';
 import CitationLink from './components/CitationLink';
 import { assignMicroplan } from './state/assignments'
+import CbseAudit from './pages/dev/CbseAudit';
+
 
 // Teachers: dashboard + planner bits
 import TeachersDashboard from './pages/teachers/Dashboard'
@@ -317,6 +319,7 @@ function MainArea() {
 
   else if (path === '/parent/portal') page = <ParentPortal />;
   else if (path === '/parent/comms') page = <ParentComms />;
+  else if (path === '/dev/cbse-audit') page = <CbseAudit />;
 
   if (!page) page = <TeachersDashboard />;
 

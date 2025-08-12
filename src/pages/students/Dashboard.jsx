@@ -4,6 +4,8 @@ import { getAssignmentsForClass, getAssignmentsForStudent, getItemStatus, record
 import CitationLink from "../../components/CitationLink";
 import { api } from "../../api";
 import { Card } from "../../ui/Card";
+import { getFlagsForStudent } from "../../state/flags";
+import { getNudgesForStudent } from "../../state/nudges";
 
 function isDueToday(iso) {
   const d = new Date(iso), now = new Date();
@@ -18,7 +20,6 @@ export default function StudentDashboard() {
   const [today, setToday] = useState([]);
 
   useEffect(() => {
-    // Prefer explicit class scope if user drilled into a class; else map from student → class
     let list = [];
     if (scope?.kind === "class" && scope.classId) {
       list = getAssignmentsForClass(scope.classId);
@@ -28,10 +29,10 @@ export default function StudentDashboard() {
     setAssigned(list.filter(a => isDueToday(a.dueISO)));
   }, [scope?.kind, scope?.classId, studentId, classes]);
 
-  // keep existing fallback "Today's 20"
+  // Existing fallback “Today’s 20”
   useEffect(() => {
     const los = api.cbse?.getLOs({ klass: 8, subject: "Math" }) || [];
-    const loIds = los.slice(0,2).map(x=>x.id);
+    const loIds = los.slice(0, 2).map(x => x.id);
     const ex = api.cbse?.getExercisesByLO(loIds, { limit: 6 }) || [];
     setToday(ex);
   }, []);
@@ -47,16 +48,18 @@ export default function StudentDashboard() {
                 <div key={it.id} className="card p-3">
                   <div className="text-sm font-medium">{it.qno} · {it.preview}</div>
                   <div className="mt-1 flex items-center justify-between">
-                    <div className="text-xs text-slate-400">Est. {it.estMinutes} min · <span className="capitalize">{st}</span></div>
+                    <div className="text-xs text-slate-400">
+                      Est. {it.estMinutes} min · <span className="capitalize">{st}</span>
+                    </div>
                     {it?.citation && <CitationLink refObj={it.citation} />}
                   </div>
                   <div className="mt-2 flex gap-2">
                     <button className="btn-secondary"
-                      onClick={()=>{ recordAttempt({assignmentId:a.id, itemId:it.id, status:"inprogress"}); setAssigned(prev=>[...prev]); }}>
+                      onClick={() => { recordAttempt({ assignmentId: a.id, itemId: it.id, status: "inprogress" }); setAssigned(prev => [...prev]); }}>
                       Start
                     </button>
                     <button className="btn-primary"
-                      onClick={()=>{ recordAttempt({assignmentId:a.id, itemId:it.id, status:"done"}); setAssigned(prev=>[...prev]); }}>
+                      onClick={() => { recordAttempt({ assignmentId: a.id, itemId: it.id, status: "done" }); setAssigned(prev => [...prev]); }}>
                       Mark Done
                     </button>
                   </div>
@@ -80,6 +83,34 @@ export default function StudentDashboard() {
           ))}
         </div>
       </Card>
+
+      {import.meta.env.VITE_USE_MOCKS === '1' && (
+        <>
+          <Card title="Alerts (stub) · At-risk flags">
+            {(() => {
+              const flags = getFlagsForStudent(studentId);
+              if (!flags.length) return <div className="text-sm text-slate-400">No alerts.</div>;
+              return (
+                <ul className="list-disc pl-5 text-sm">
+                  {flags.map(f => <li key={f.id}>{f.kind}: {f.text}</li>)}
+                </ul>
+              );
+            })()}
+          </Card>
+
+          <Card title="Nudges from Parents (stub)">
+            {(() => {
+              const nudges = getNudgesForStudent(studentId);
+              if (!nudges.length) return <div className="text-sm text-slate-400">No nudges yet.</div>;
+              return (
+                <ul className="list-disc pl-5 text-sm">
+                  {nudges.map(n => <li key={n.id}>{n.text}</li>)}
+                </ul>
+              );
+            })()}
+          </Card>
+        </>
+      )}
     </>
   );
 }
