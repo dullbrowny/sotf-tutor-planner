@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Card } from "../../ui/Card";
 import { api } from "../../api";
 import { getParentRequests } from "../../state/nudges";
+import { annotateWithChapter } from "../../services/chapterRef";
 
 const CLASSES = [8, 9, 10];
 const SUBJECTS = ["Math", "Science"];
@@ -35,14 +36,13 @@ export default function AdminOverview() {
     const subject = "Math";
     const now = new Date();
 
-    // Build 1 assignment from CBSE pack (fallbacks if pack missing)
     const los = api.cbse?.getLOs({ klass: 8, subject }) || [];
     const loIds = los.slice(0, 2).map(l => l.id);
     const ex = (loIds.length ? (api.cbse?.getExercisesByLO(loIds, { limit: 6 }) || []) : []).slice(0, 2);
 
-    const items = (ex.length ? ex : [
+    const baseItems = (ex.length ? ex : [
       { qno: "8.1 Q3", preview: "Percentage increase word problem.", estMinutes: 5, citation: null },
-      { qno: "8.2 Q5", preview: "Profit percent word problem.", estMinutes: 7, citation: null },
+      { qno: "8.2 Q5", preview: "Profit percent word problem.",     estMinutes: 7, citation: null },
     ]).map((x, i) => ({
       id: `it${i + 1}`,
       qno: x.qno,
@@ -51,13 +51,18 @@ export default function AdminOverview() {
       citation: x.citation || null,
     }));
 
+    const annotated = annotateWithChapter(baseItems, loIds).map((x, i) => ({
+      ...x,
+      phase: ["warmup","teach","practice","reflect"][Math.min(i,3)] || "practice",
+    }));
+
     const a = {
       id: `dbg_${Date.now()}`,
       classId,
       subject,
       createdAt: now.toISOString(),
       dueISO: endOfTodayISO(),
-      items,
+      items: annotated,
     };
 
     const AKEY = "sotf.assignments.v1";
@@ -72,13 +77,11 @@ export default function AdminOverview() {
     flags.unshift({ id: `flag_${Date.now()}_s`, ts: Date.now(), target: "student", studentId: "s-arya", kind: "Concept", text: "Revisit Comparing Quantities." });
     localStorage.setItem(FKEY, JSON.stringify(flags));
 
-    // Parent → Student nudge
     const NKEY = "sotf.nudges.v1";
     const nudges = JSON.parse(localStorage.getItem(NKEY) || "[]");
     nudges.unshift({ id: `n_${Date.now()}`, ts: Date.now(), fromParentGroup: "pg-8a", toStudentId: "s-arya", text: "Let’s finish today’s plan by 8pm!" });
     localStorage.setItem(NKEY, JSON.stringify(nudges));
 
-    // Parent → Admin request
     const RKEY = "sotf.requests.v1";
     const reqs = JSON.parse(localStorage.getItem(RKEY) || "[]");
     reqs.unshift({ id: `req_${Date.now()}`, ts: Date.now(), fromParentGroup: "pg-8a", classId, text: "Request teacher feedback on progress.", status: "open" });

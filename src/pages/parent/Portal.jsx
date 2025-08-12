@@ -28,6 +28,19 @@ function resolveParentClassId({ scope, parentGroups = [], classes = [] }) {
   return classes[0]?.id || "8A";
 }
 
+function Donut({ done, total }) {
+  const r = 14, c = 2*Math.PI*r;
+  const frac = total ? done/total : 0;
+  const dash = `${Math.max(frac*c,0.01)} ${c}`;
+  return (
+    <svg width="40" height="40" viewBox="0 0 40 40">
+      <circle cx="20" cy="20" r={r} className="fill-none stroke-slate-700" strokeWidth="4" />
+      <circle cx="20" cy="20" r={r} className="fill-none stroke-emerald-400" strokeWidth="4" strokeDasharray={dash} transform="rotate(-90 20 20)" />
+      <text x="20" y="22" textAnchor="middle" className="fill-slate-200 text-xs">{done}/{total}</text>
+    </svg>
+  );
+}
+
 export default function ParentPortal() {
   const { scope, parentGroups = [], classes = [] } = useScope();
   const groupId = scope?.groupId || "pg-8a";
@@ -39,7 +52,6 @@ export default function ParentPortal() {
     setDue(list[0] || null);
   }, [classId]);
 
-  // demo: assume single student
   const studentId = "s-arya";
 
   function doSendNudge() {
@@ -50,25 +62,61 @@ export default function ParentPortal() {
     const r = escalateToAdmin({ fromParentGroup: groupId, classId, text: "Request teacher feedback on progress." });
     alert(`✅ Request sent to Admin (${r.id})`);
   }
+  function doPraise() {
+    const n = sendNudge({ fromParentGroup: groupId, toStudentId: studentId, text: "Great work today! Proud of you 👏" });
+    alert(`🎉 Praise sent (${n.id})`);
+  }
+
+  const totals = useMemo(() => {
+    if (!due) return { done: 0, total: 0 };
+    const m = JSON.parse(localStorage.getItem("sotf.attempts.v1") || "{}");
+    let done = 0, total = due.items.length;
+    due.items.forEach(it => { if (m[`${due.id}:${it.id}`] === "done") done++; });
+    return { done, total };
+  }, [due]);
 
   return (
     <>
       <Card title="Home Plan (~20 min)">
         {!due && <div className="text-sm text-slate-400">No assigned plan for today yet.</div>}
         {due && (
-          <div className="space-y-2">
-            {due.items.map(x => (
-              <div key={x.id} className="card p-3">
-                <div className="text-sm font-medium">{x.qno} · {x.preview}</div>
-                <div className="mt-1 flex items-center justify-between">
-                  <span className="text-xs text-slate-400">
-                    Est. {x.estMinutes} min · {getItemStatus(due.id, x.id)}
-                  </span>
-                  {x?.citation && <CitationLink refObj={x.citation} />}
-                </div>
+          <>
+            <div className="mb-3 flex items-center gap-3">
+              <Donut done={totals.done} total={totals.total} />
+              <div className="text-sm text-slate-300">
+                Completion today: <b>{totals.done}/{totals.total}</b>
               </div>
-            ))}
-          </div>
+              {import.meta.env.VITE_USE_MOCKS === '1' && totals.total>0 && totals.done===totals.total && (
+                <button className="btn-secondary ml-auto" onClick={doPraise}>Send praise</button>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              {due.items.map(x => (
+                <div key={x.id} className="card p-3">
+                  <div className="text-sm font-medium">{x.qno} · {x.preview}</div>
+                  {(x?.phase) && (
+                    <span className="inline-block text-[10px] px-2 py-[2px] rounded-full border border-slate-600 text-slate-300 uppercase tracking-wide mt-1">
+                      {x.phase}
+                    </span>
+                  )}
+                  {x.chapterRef && (
+                    <div className="text-[11px] text-slate-400 mt-1">
+                      Chapter: <span className="font-medium">{x.chapterRef.chapterName}</span>
+                      {x.chapterRef.page ? <> · p.{x.chapterRef.page}</> : null}
+                      {x.chapterRef.url ? <> · <a className="underline" href={x.chapterRef.url} target="_blank" rel="noreferrer">source</a></> : null}
+                    </div>
+                  )}
+                  <div className="mt-1 flex items-center justify-between">
+                    <span className="text-xs text-slate-400">
+                      Est. {x.estMinutes} min · {getItemStatus(due.id, x.id)}
+                    </span>
+                    {x?.citation && <CitationLink refObj={x.citation} />}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
         )}
       </Card>
 

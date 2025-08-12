@@ -14,37 +14,32 @@ import { Card } from './ui/Card'
 import { api } from './api';
 import CitationLink from './components/CitationLink';
 import { assignMicroplan } from './state/assignments'
-import CbseAudit from './pages/dev/CbseAudit';
+import { generateSequence, suggestSequenceLLM } from './services/planSequencer'
 
-
-// Teachers: dashboard + planner bits
+// Teachers pages
 import TeachersDashboard from './pages/teachers/Dashboard'
 import StudentProfile from './components/StudentProfile'
 import LessonBlockPicker from './components/LessonBlockPicker'
 import PlanPreview from './components/PlanPreview'
 import AITipsPanel from './components/AITipsPanel'
-
-// Teachers pages
 import LessonPlanning from './pages/teachers/LessonPlanning'
 import Assessment from './pages/teachers/Assessment'
 import Grading from './pages/teachers/Grading'
 import FacultyEval from './pages/teachers/FacultyEval'
 
-// Students pages
+// Students
 import TutorPlan from './pages/students/TutorPlan'
 import Practice from './pages/students/Practice'
 import StudentDash from './pages/students/Dashboard'
 import StudentPlayback from './pages/students/Playback'
 
-// Admin pages
+// Admin / Parent / Dev
 import AdminOverview from './pages/admin/Overview'
 import Predictive from './pages/admin/Predictive'
-
-// Parent pages
 import ParentPortal from './pages/parent/Portal'
 import ParentComms from './pages/parent/Comms'
+import CbseAudit from './pages/dev/CbseAudit'
 
-// Map current route/hash → a stable chat context key
 function routeToContextKey(r = '') {
   const route = r.startsWith('#') ? r : `#${r}`;
   if (route.startsWith('#/students/play')) return 'students/playback';
@@ -121,17 +116,11 @@ function TeachersLessonPlanner() {
     try { return api.cbse?.getLOs({ klass, subject }) || []; } catch { return []; }
   }, [klass, subject]);
 
-  function generateMicroplan() {
+  async function generateMicroplan() {
     if (!selectedLOs.length) return setPlan([]);
-    try {
-      const ex = api.cbse?.getExercisesByLO(selectedLOs, { limit: 12 }) || [];
-      let sum = 0; const picked = [];
-      for (const x of ex) {
-        if (sum >= 19) break;
-        picked.push(x); sum += x.estMinutes || 6;
-      }
-      setPlan(picked);
-    } catch { setPlan([]); }
+    const llm = await suggestSequenceLLM({ klass, subject, loIds: selectedLOs, target: 20 });
+    const seq = llm || await generateSequence({ klass, subject, loIds: selectedLOs, target: 20 });
+    setPlan(seq.items);
   }
 
   function toggleLO(id) {
@@ -216,6 +205,18 @@ function TeachersLessonPlanner() {
           {plan.map(x => (
             <div key={x.id} className="card p-3">
               <div className="text-sm font-medium">{x.qno} · {x.preview}</div>
+              {(x?.phase) && (
+                <span className="inline-block text-[10px] px-2 py-[2px] rounded-full border border-slate-600 text-slate-300 uppercase tracking-wide mt-1">
+                  {x.phase}
+                </span>
+              )}
+              {x.chapterRef && (
+                <div className="text-[11px] text-slate-400 mt-1">
+                  Chapter: <span className="font-medium">{x.chapterRef.chapterName}</span>
+                  {x.chapterRef.page ? <> · p.{x.chapterRef.page}</> : null}
+                  {x.chapterRef.url ? <> · <a className="underline" href={x.chapterRef.url} target="_blank" rel="noreferrer">source</a></> : null}
+                </div>
+              )}
               <div className="mt-1 flex items-center justify-between">
                 <span className="text-xs text-slate-400">Est. {x.estMinutes} min</span>
                 <CitationLink refObj={x.citation} />
@@ -226,11 +227,7 @@ function TeachersLessonPlanner() {
         </div>
 
         <div className="mt-3 flex justify-end">
-          <button
-            className="btn-primary"
-            disabled={!plan.length}
-            onClick={sendToStudents}
-          >
+          <button className="btn-primary" disabled={!plan.length} onClick={sendToStudents}>
             Send to Students
           </button>
         </div>
@@ -241,7 +238,6 @@ function TeachersLessonPlanner() {
 
 function MainArea() {
   const { path } = useHashRoute('/teachers/dashboard');
-
   const [selected, setSelected] = useState([]);
   const { scope, setScope, classes, teacherGroups, parentGroups } = useScope();
 
@@ -287,6 +283,7 @@ function MainArea() {
   const adminMenu = [
     { label: 'Overview',   href: '/admin/overview' },
     { label: 'Predictive', href: '/admin/predictive' },
+    { label: 'CBSE QA',    href: '/dev/cbse-audit' },
   ];
   const parentMenu = [
     { label: 'Portal', href: '/parent/portal' },
@@ -299,13 +296,11 @@ function MainArea() {
   else if (path.startsWith('/parent')) menu = parentMenu;
 
   let page = null;
-
   if (path === '/teachers/lesson-planning') page = <TeachersLessonPlanner />;
   else if (path === '/teachers/assessment') page = <Assessment />;
   else if (path === '/teachers/grading') page = <Grading />;
   else if (path === '/teachers/faculty-eval') page = <FacultyEval />;
   else if (path === '/teachers/dashboard') page = <TeachersDashboard />;
-
   else if (path.startsWith('/students/play/')) {
     const planId = path.split('/').pop();
     page = <StudentPlayback planId={planId} />;
@@ -313,14 +308,11 @@ function MainArea() {
   else if (path === '/students/tutor-plan') page = <TutorPlan />;
   else if (path === '/students/practice') page = <Practice />;
   else if (path === '/students/dashboard') page = <StudentDash />;
-
   else if (path === '/admin/overview') page = <AdminOverview />;
   else if (path === '/admin/predictive') page = <Predictive />;
-
+  else if (path === '/dev/cbse-audit') page = <CbseAudit />;
   else if (path === '/parent/portal') page = <ParentPortal />;
   else if (path === '/parent/comms') page = <ParentComms />;
-  else if (path === '/dev/cbse-audit') page = <CbseAudit />;
-
   if (!page) page = <TeachersDashboard />;
 
   return (

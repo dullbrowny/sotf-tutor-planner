@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { api } from "../../api";
 import { Card } from "../../ui/Card";
 import CitationLink from "../../components/CitationLink";
+import { annotateWithChapter } from "../../services/chapterRef";
 
 const CLASSES = [8, 9, 10];
 const SUBJECTS = ["Math", "Science"];
@@ -57,9 +58,9 @@ export default function CbseAudit() {
     const loIds = los.slice(0, 2).map(l => l.id);
     const ex = (loIds.length ? (api.cbse?.getExercisesByLO(loIds, { limit: 6 }) || []) : []).slice(0, 2);
 
-    const items = (ex.length ? ex : [
+    const baseItems = (ex.length ? ex : [
       { qno: "8.1 Q3", preview: "Percentage increase word problem.", estMinutes: 5, citation: null },
-      { qno: "8.2 Q5", preview: "Profit percent word problem.", estMinutes: 7, citation: null },
+      { qno: "8.2 Q5", preview: "Profit percent word problem.",     estMinutes: 7, citation: null },
     ]).map((x, i) => ({
       id: `it${i + 1}`,
       qno: x.qno,
@@ -68,7 +69,20 @@ export default function CbseAudit() {
       citation: x.citation || null,
     }));
 
-    const a = { id: `dbg_${Date.now()}`, classId, subject, createdAt: now.toISOString(), dueISO: endOfTodayISO(), items };
+    const annotated = annotateWithChapter(baseItems, loIds).map((x, i) => ({
+      ...x,
+      phase: ["warmup","teach","practice","reflect"][Math.min(i,3)] || "practice",
+    }));
+
+    const a = {
+      id: `dbg_${Date.now()}`,
+      classId,
+      subject,
+      createdAt: now.toISOString(),
+      dueISO: endOfTodayISO(),
+      items: annotated,
+    };
+
     const AKEY = "sotf.assignments.v1";
     const assignments = JSON.parse(localStorage.getItem(AKEY) || "[]");
     assignments.unshift(a);

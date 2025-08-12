@@ -1,19 +1,54 @@
+import React from "react";
+
+/**
+ * Accepts either a citation object or a chapterRef:
+ * {
+ *   title?, chapterName?, chapterId?, url?/href?,
+ *   page?, p?
+ * }
+ */
 export default function CitationLink({ refObj, className = "" }) {
   if (!refObj) return null;
-  const { url, page, chapterName } = refObj;
-  const label = chapterName ? `${chapterName}${page ? ` · p.${page}` : ''}` : (page ? `p.${page}` : 'Source');
+
+  const labelBase =
+    refObj.title ||
+    refObj.chapterName ||
+    "Textbook";
+
+  const page = Number(refObj.page ?? refObj.p) || undefined;
+
+  let href = refObj.url || refObj.href || "";
+
+  // If no URL but we have a chapterId, try to construct one from env/base.
+  if (!href && refObj.chapterId) {
+    const base = import.meta.env.VITE_CBSE_PDF_BASE || "/cbse-pdf";
+    href = `${base}/${refObj.chapterId}.pdf`;
+  }
+
+  // Add page parameter for PDFs if missing.
+  if (href) {
+    const isPdf = /\.pdf($|\?)/i.test(href);
+    const alreadyHasPage = /[#?]page=\d+/.test(href);
+    if (isPdf && page && !alreadyHasPage) {
+      // Google Drive/Docs viewers tend to prefer ?page=, direct PDFs prefer #page=
+      const useQuery = /google\.com|drive\.google\.com|docs\.google\.com/.test(href);
+      href = href + (href.includes("#") || (href.includes("?") && !useQuery)
+        ? `&page=${page}`
+        : (useQuery ? `?page=${page}` : `#page=${page}`));
+    }
+  }
+
+  const label = `Source: ${labelBase}${page ? ` · p.${page}` : ""}`;
+
   return (
     <a
-      href={url}
+      className={`text-xs inline-flex items-center gap-1 text-sky-300 hover:text-sky-200 underline ${className}`}
+      href={href || "#"}
       target="_blank"
       rel="noreferrer"
-      className={
-        "inline-flex items-center text-xs px-2 py-0.5 rounded-full bg-slate-800 hover:bg-slate-700 border border-slate-700 " +
-        "text-sky-300 hover:text-sky-200 " + className
-      }
-      title="Open NCERT source (ePathshala)"
+      title={label}
     >
-      Source: {label}
+      {label}
     </a>
   );
 }
