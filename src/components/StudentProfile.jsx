@@ -3,7 +3,7 @@ export default function StudentProfile() {
     <div className="space-y-2">
       <div className="grid grid-cols-2 gap-2 text-sm">
         <div>👤 <b>Name:</b> Arya Kapoor</div>
-        <div>🎓 <b>Grade:</b> 7B</div>
+        <div>🎓 <b>Class:</b> 8A</div>
         <div>🧠 <b>Learning Style:</b> Visual</div>
         <div>📊 <b>Mastery:</b> Low (Fractions)</div>
       </div>

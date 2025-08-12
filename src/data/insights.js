@@ -43,7 +43,7 @@ const insights = [
   // Admin · Overview
   {
     id: 'adm_ovw_001',
-    title: 'Grade 7 Science pass-rate trending down',
+    title: 'Class 8 Science pass-rate trending down',
     detail: '−8% vs last term; cluster in sections 7B/7C.',
     actions: ['Schedule Dept Review', 'Create Intervention Plan'],
     audience: ['admin'],

@@ -16,7 +16,7 @@ export default function Shell({ children, rightRail }) {
             <TasksButton onClick={()=>setDrawerOpen(true)} />
             <span className="muted">Demo · Mock Data</span>
             <select className="bg-card rounded px-2 py-1 border border-card-ring">
-              <option>Grade 8</option><option>Grade 7</option>
+              <option>Class 8</option><option>Class 9</option><option>Class 10</option>
             </select>
             <select className="bg-card rounded px-2 py-1 border border-card-ring">
               <option>Open as…</option>

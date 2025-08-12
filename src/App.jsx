@@ -1,6 +1,7 @@
 import { generateInsights } from './insights/generators'
 import { computeContext } from './utils/insightFilter'
-import { ScopeProvider, useScope } from './context/ScopeProvider'
+import { ScopeProvider } from "./context/ScopeProvider";
+import { useScopeCompat as useScope } from "./context/scopeCompat";
 import Shell from './layouts/Shell'
 import ModuleSwitcher from './components/ModuleSwitcher'
 import InsightsRail from './components/InsightsRail'
@@ -12,7 +13,7 @@ import { useHashRoute } from './router/useHashRoute'
 import { Card } from './ui/Card'
 import { api } from './api';
 import CitationLink from './components/CitationLink';
-
+import { assignMicroplan } from './state/assignments'
 
 // Teachers: dashboard + planner bits
 import TeachersDashboard from './pages/teachers/Dashboard'
@@ -43,10 +44,10 @@ import ParentComms from './pages/parent/Comms'
 
 // Map current route/hash → a stable chat context key
 function routeToContextKey(r = '') {
-  const route = r.startsWith('#') ? r : `#${r}`; // normalize "/parent/portal" → "#/parent/portal"
+  const route = r.startsWith('#') ? r : `#${r}`;
   if (route.startsWith('#/students/play')) return 'students/playback';
   if (route.startsWith('#/students'))      return 'students/dashboard';
-  if (route.startsWith('#/teachers/plan')) return 'teachers/lesson-planning';
+  if (route.startsWith('#/teachers/lesson')) return 'teachers/lesson-planning';
   if (route.startsWith('#/teachers'))      return 'teachers/dashboard';
   if (route.startsWith('#/admin'))         return 'admin/overview';
   if (route.startsWith('#/parent'))        return 'parent/portal';
@@ -55,10 +56,8 @@ function routeToContextKey(r = '') {
 
 function RightRail({ path, scopeKind, selected, onToggle, onClear }) {
   const ctx = computeContext(path, scopeKind);
-
   const filtered = generateInsights(ctx);
 
-  // context-aware chat hint
   const chatHintMap = {
     'students/playback': 'Ask about this step or your plan…',
     'students/dashboard': 'Ask about your progress or next steps…',
@@ -97,35 +96,33 @@ function RightRail({ path, scopeKind, selected, onToggle, onClear }) {
       />
 
       <ChatPanel
-       selectedInsights={selected}
-       onAction={doAction}
-       placeholder={chatPlaceholder}
-       contextKey={routeToContextKey(path)}
-     />
+        selectedInsights={selected}
+        onAction={doAction}
+        placeholder={chatPlaceholder}
+        contextKey={routeToContextKey(path)}
+      />
 
-      <ClassFeedCard classId="7B" />
+      <ClassFeedCard classId="8A" />
     </>
   );
 }
 
-
 function TeachersLessonPlanner() {
-  const [klass, setKlass] = useState(8);                 // 8–10 only
-  const [subject, setSubject] = useState('Math');        // 'Math' | 'Science'
+  const [klass, setKlass] = useState(8);
+  const [subject, setSubject] = useState('Math');
   const [selectedLOs, setSelectedLOs] = useState([]);
-  const [plan, setPlan] = useState([]);                  // [{ qno, preview, estMinutes, citation }]
+  const [plan, setPlan] = useState([]);
 
-  // Fetch LOs for the chosen class/subject (grounded to CBSE pack)
+  const { scope, classes = [], teacherGroups = [] } = useScope();
+
   const los = useMemo(() => {
     try { return api.cbse?.getLOs({ klass, subject }) || []; } catch { return []; }
   }, [klass, subject]);
 
-  // Pick ~20 min of exercises from selected LOs
   function generateMicroplan() {
     if (!selectedLOs.length) return setPlan([]);
     try {
       const ex = api.cbse?.getExercisesByLO(selectedLOs, { limit: 12 }) || [];
-      // greedy pack ≈ 20 min
       let sum = 0; const picked = [];
       for (const x of ex) {
         if (sum >= 19) break;
@@ -141,13 +138,31 @@ function TeachersLessonPlanner() {
 
   const totalMinutes = plan.reduce((a, b) => a + (b.estMinutes || 6), 0);
 
+  function resolveClassId() {
+    if (scope?.kind === 'class' && scope.classId) return scope.classId;
+    if (scope?.kind === 'teacherGroup' && scope.groupId) {
+      const g = teacherGroups.find(t => t.id === scope.groupId);
+      if (g?.classId) return g.classId;
+    }
+    const byGrade = classes.find(c => String(c.grade) === String(klass));
+    return byGrade?.id || classes[0]?.id || (klass === 8 ? '8A' : klass === 9 ? '9A' : '10A');
+  }
+
+  function sendToStudents() {
+    if (!plan.length) { alert('No items in plan.'); return; }
+    const classId = resolveClassId();
+    const now = new Date();
+    const dueISO = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 0).toISOString();
+    const a = assignMicroplan({ classId, subject, items: plan, dueISO });
+    alert(`✅ Assigned ${plan.length} items (${totalMinutes} min) to ${classId}\nAssignment: ${a.id}`);
+  }
+
   return (
     <>
       <div data-testid="page-title" className="sr-only">Lesson Planning (CBSE)</div>
 
       <Card title="Tutor · Lesson Planner (CBSE · Class 8–10)">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-          {/* Class / Subject (locked to CBSE 8–10) */}
           <div className="space-y-1">
             <div className="text-xs text-slate-300">Class</div>
             <select className="bg-slate-900 border border-slate-700 rounded px-2 py-1 text-sm"
@@ -170,7 +185,6 @@ function TeachersLessonPlanner() {
           </div>
         </div>
 
-        {/* LO picker */}
         <div className="mt-4">
           <div className="text-xs text-slate-300 mb-1">Learning Objectives</div>
           <div className="flex flex-wrap gap-2">
@@ -195,8 +209,7 @@ function TeachersLessonPlanner() {
         </div>
       </Card>
 
-      {/* Generated plan */}
-      <Card title={`Auto‑Microplan ${plan.length ? `· ${totalMinutes} min` : ''}`}>
+      <Card title={`Auto-Microplan ${plan.length ? `· ${totalMinutes} min` : ''}`}>
         <div className="space-y-2">
           {plan.map(x => (
             <div key={x.id} className="card p-3">
@@ -214,7 +227,7 @@ function TeachersLessonPlanner() {
           <button
             className="btn-primary"
             disabled={!plan.length}
-            onClick={() => alert('Plan sent to students (demo).')}
+            onClick={sendToStudents}
           >
             Send to Students
           </button>
@@ -224,17 +237,14 @@ function TeachersLessonPlanner() {
   )
 }
 
-
 function MainArea() {
   const { path } = useHashRoute('/teachers/dashboard');
 
   const [selected, setSelected] = useState([]);
-  const { scope, setScope, Directory } = useScope();
+  const { scope, setScope, classes, teacherGroups, parentGroups } = useScope();
 
-  // Derive top section from hash route
   const section = path.split('/').filter(Boolean)[0] || 'teachers';
 
-  // Auto-sync Scope with top section
   useEffect(() => {
     const desiredKind =
       section === 'teachers' ? 'teacherGroup' :
@@ -245,11 +255,11 @@ function MainArea() {
     if (scope.kind === desiredKind) return;
 
     if (desiredKind === 'student') {
-      setScope({ kind: 'student', studentId: (Directory.students[0] || {}).id });
+      setScope({ kind: 'student', studentId: (classes[0]?.studentIds?.[0]) || 's-arya' });
     } else if (desiredKind === 'teacherGroup') {
-      setScope({ kind: 'teacherGroup', groupId: (Directory.teacherGroups[0] || {}).id });
+      setScope({ kind: 'teacherGroup', groupId: (teacherGroups[0]?.id) || 'tg-8a' });
     } else if (desiredKind === 'parentGroup') {
-      setScope({ kind: 'parentGroup', groupId: (Directory.parentGroups[0] || {}).id });
+      setScope({ kind: 'parentGroup', groupId: (parentGroups[0]?.id) || 'pg-8a' });
     } else {
       setScope({ kind: 'school' });
     }
@@ -260,7 +270,6 @@ function MainArea() {
     setSelected(prev => prev.some(x => x.id === ins.id) ? prev.filter(x => x.id !== ins.id) : [...prev, ins]);
   const onClear = () => setSelected([]);
 
-  // Menus (Dashboard first; Playback is deep-linked only)
   const teacherMenu = [
     { label: 'Dashboard',        href: '/teachers/dashboard' },
     { label: 'Lesson Planning',  href: '/teachers/lesson-planning' },
@@ -287,17 +296,14 @@ function MainArea() {
   else if (path.startsWith('/admin')) menu = adminMenu;
   else if (path.startsWith('/parent')) menu = parentMenu;
 
-  // -------- Routing --------
   let page = null;
 
-  // Teachers
   if (path === '/teachers/lesson-planning') page = <TeachersLessonPlanner />;
   else if (path === '/teachers/assessment') page = <Assessment />;
   else if (path === '/teachers/grading') page = <Grading />;
   else if (path === '/teachers/faculty-eval') page = <FacultyEval />;
   else if (path === '/teachers/dashboard') page = <TeachersDashboard />;
 
-  // Students (order matters: playback before dashboard)
   else if (path.startsWith('/students/play/')) {
     const planId = path.split('/').pop();
     page = <StudentPlayback planId={planId} />;
@@ -306,15 +312,12 @@ function MainArea() {
   else if (path === '/students/practice') page = <Practice />;
   else if (path === '/students/dashboard') page = <StudentDash />;
 
-  // Admin
   else if (path === '/admin/overview') page = <AdminOverview />;
   else if (path === '/admin/predictive') page = <Predictive />;
 
-  // Parent
   else if (path === '/parent/portal') page = <ParentPortal />;
   else if (path === '/parent/comms') page = <ParentComms />;
 
-  // Fallback (default)
   if (!page) page = <TeachersDashboard />;
 
   return (
