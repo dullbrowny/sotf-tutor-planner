@@ -1,0 +1,45 @@
+{
+  "exercises": [
+    {
+      "id": "EX8M-CQ-01",
+      "chapterId": "c8_math_chap08",
+      "qno": "8.1 Q3",
+      "lo": ["LO8M-CQ-01"],
+      "difficulty": 1,
+      "estMinutes": 5,
+      "anchor": { "page": 111 },
+      "preview": "The price of a shirt increases from ₹500 to ₹575. Find the percentage increase."
+    },
+    {
+      "id": "EX8M-CQ-02",
+      "chapterId": "c8_math_chap08",
+      "qno": "8.2 Q5",
+      "lo": ["LO8M-CQ-02"],
+      "difficulty": 2,
+      "estMinutes": 7,
+      "anchor": { "page": 116 },
+      "preview": "A shopkeeper buys a toy for ₹240 and sells it for ₹300. Find the profit percent."
+    },
+    {
+      "id": "EX9S-FM-01",
+      "chapterId": "c9_sci_chap09",
+      "qno": "9.1 Q2",
+      "lo": ["LO9S-FM-02"],
+      "difficulty": 2,
+      "estMinutes": 6,
+      "anchor": { "page": 122 },
+      "preview": "A 2 kg object experiences a net force of 10 N. Calculate its acceleration."
+    },
+    {
+      "id": "EX10M-QE-01",
+      "chapterId": "c10_math_chap04",
+      "qno": "4.1 Q1",
+      "lo": ["LO10M-QE-01"],
+      "difficulty": 1,
+      "estMinutes": 6,
+      "anchor": { "page": 82 },
+      "preview": "Which of the following is a quadratic equation? (a) 2x + 3 = 0 (b) x² − 5x + 6 = 0"
+    }
+  ]
+}
+

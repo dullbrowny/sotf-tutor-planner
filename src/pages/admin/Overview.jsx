@@ -1,5 +1,7 @@
 import { useMemo } from 'react'
 import { Card } from '../../ui/Card'
+import { api } from '../../api'
+import CitationLink from '../../components/CitationLink'
 
 const kpis = {
   passRate: { label: 'Pass rate (G7 Science)', value: 72, delta: -8 },
@@ -17,6 +19,12 @@ const interventions = [
   { id: 'iv-001', title: 'Equivalent Fractions – visual-first block', owner: 'Dept: Science', status: 'Queued' },
   { id: 'iv-002', title: 'Attendance outreach – 7B/7C', owner: 'Counsellor', status: 'In progress' },
   { id: 'iv-003', title: 'After-school clinic – Tuesday/Thursday', owner: 'Admin', status: 'Queued' },
+]
+
+// Demo LO chips shown in Risk section (grounded to CBSE pack)
+const adminRiskLOs = [
+  { loId: 'LO8M-CQ-01', label: 'Percent change' },
+  { loId: 'LO9S-FM-02', label: 'F = ma' }
 ]
 
 function Delta({ n }) {
@@ -45,6 +53,16 @@ function Spark({ points = [72,70,69,73,74,72], height = 28 }) {
 export default function AdminOverview() {
   const trend = useMemo(() => [74,73,75,74,73,72], [])
 
+  // Nearest NCERT anchor for demo (pull 1 exercise for an at-risk LO)
+  const adminAnchor = useMemo(() => {
+    try {
+      const ex = api.cbse?.getExercisesByLO(['LO8M-CQ-01'], { limit: 1 }) || []
+      return ex[0]?.citation || null
+    } catch {
+      return null
+    }
+  }, [])
+
   return (
     <>
       <div data-testid="page-title" className="sr-only">Admin · Overview</div>
@@ -72,6 +90,22 @@ export default function AdminOverview() {
           <div className="text-xs text-slate-400 mt-1">Flagged by mastery/attendance</div>
         </Card>
       </div>
+
+      {/* Risk Radar grounding: LO chips + Source */}
+      <Card title="Cohort Risk Radar (grounded)">
+        <div className="text-sm mb-2">At‑risk Learning Objectives</div>
+        <div className="flex flex-wrap gap-2 mb-3">
+          {adminRiskLOs.map(x => (
+            <span key={x.loId} className="text-xs px-2 py-0.5 rounded-full bg-rose-700/30 text-rose-200 border border-rose-700/30">
+              {x.label}
+            </span>
+          ))}
+        </div>
+        <div className="flex items-center justify-between">
+          <div className="text-xs text-slate-400">Nearest NCERT reference</div>
+          <CitationLink refObj={adminAnchor} />
+        </div>
+      </Card>
 
       {/* Watchlist */}
       <Card title="Cohort watchlist">

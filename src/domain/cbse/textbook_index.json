@@ -1,0 +1,26 @@
+{
+  "chapters": [
+    {
+      "chapterId": "c8_math_chap08",
+      "class": 8,
+      "subject": "Math",
+      "chapterName": "Comparing Quantities",
+      "baseUrl": "https://ncert.nic.in/textbook/pdf/iemh108.pdf"
+    },
+    {
+      "chapterId": "c9_sci_chap09",
+      "class": 9,
+      "subject": "Science",
+      "chapterName": "Force and Laws of Motion",
+      "baseUrl": "https://ncert.nic.in/textbook/pdf/iesc109.pdf"
+    },
+    {
+      "chapterId": "c10_math_chap04",
+      "class": 10,
+      "subject": "Math",
+      "chapterName": "Quadratic Equations",
+      "baseUrl": "https://ncert.nic.in/textbook/pdf/jemh104.pdf"
+    }
+  ]
+}
+

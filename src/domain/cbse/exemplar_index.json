@@ -1,0 +1,15 @@
+{
+  "exemplars": [
+    {
+      "id": "EXEM10M-QE-Fact-01",
+      "chapterId": "c10_math_chap04",
+      "qno": "QE Exemplar 2",
+      "lo": ["LO10M-QE-02"],
+      "difficulty": 2,
+      "estMinutes": 7,
+      "anchor": { "page": 88 },
+      "preview": "Solve x² − 7x + 12 = 0 by factorisation."
+    }
+  ]
+}
+

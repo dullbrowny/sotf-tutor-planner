@@ -7,9 +7,12 @@ import InsightsRail from './components/InsightsRail'
 import ChatPanel from './components/ChatPanel'
 import ClassFeedCard from './components/ClassFeedCard'
 import { dispatchAction } from './agents/dispatcher'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { useHashRoute } from './router/useHashRoute'
 import { Card } from './ui/Card'
+import { api } from './api';
+import CitationLink from './components/CitationLink';
+
 
 // Teachers: dashboard + planner bits
 import TeachersDashboard from './pages/teachers/Dashboard'
@@ -105,29 +108,122 @@ function RightRail({ path, scopeKind, selected, onToggle, onClear }) {
   );
 }
 
+
 function TeachersLessonPlanner() {
-  const [plan, setPlan] = useState({ intro: [], practice: [], assessment: [] })
-  const onAdd = (stage, item) =>
-    setPlan(p => p[stage].some(x => x.id === item.id) ? p : { ...p, [stage]: [...p[stage], item] })
-  const onRemove = (stage, id) =>
-    setPlan(p => ({ ...p, [stage]: p[stage].filter(x => x.id !== id) }))
-  const onSend = () => alert('Lesson sent to student!\n' + JSON.stringify(plan, null, 2))
+  const [klass, setKlass] = useState(8);                 // 8–10 only
+  const [subject, setSubject] = useState('Math');        // 'Math' | 'Science'
+  const [selectedLOs, setSelectedLOs] = useState([]);
+  const [plan, setPlan] = useState([]);                  // [{ qno, preview, estMinutes, citation }]
+
+  // Fetch LOs for the chosen class/subject (grounded to CBSE pack)
+  const los = useMemo(() => {
+    try { return api.cbse?.getLOs({ klass, subject }) || []; } catch { return []; }
+  }, [klass, subject]);
+
+  // Pick ~20 min of exercises from selected LOs
+  function generateMicroplan() {
+    if (!selectedLOs.length) return setPlan([]);
+    try {
+      const ex = api.cbse?.getExercisesByLO(selectedLOs, { limit: 12 }) || [];
+      // greedy pack ≈ 20 min
+      let sum = 0; const picked = [];
+      for (const x of ex) {
+        if (sum >= 19) break;
+        picked.push(x); sum += x.estMinutes || 6;
+      }
+      setPlan(picked);
+    } catch { setPlan([]); }
+  }
+
+  function toggleLO(id) {
+    setSelectedLOs(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
+  }
+
+  const totalMinutes = plan.reduce((a, b) => a + (b.estMinutes || 6), 0);
+
   return (
     <>
-      <div data-testid="page-title" className="sr-only">Lesson Planning</div>
-      <Card title="Tutor · Lesson Planner">
-        <StudentProfile />
-        <AITipsPanel style="visual" gaps={['equivalent fractions','verbal recall']} />
+      <div data-testid="page-title" className="sr-only">Lesson Planning (CBSE)</div>
+
+      <Card title="Tutor · Lesson Planner (CBSE · Class 8–10)">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          {/* Class / Subject (locked to CBSE 8–10) */}
+          <div className="space-y-1">
+            <div className="text-xs text-slate-300">Class</div>
+            <select className="bg-slate-900 border border-slate-700 rounded px-2 py-1 text-sm"
+                    value={klass} onChange={e => setKlass(Number(e.target.value))}>
+              {[8,9,10].map(n => <option key={n} value={n}>Class {n}</option>)}
+            </select>
+          </div>
+          <div className="space-y-1">
+            <div className="text-xs text-slate-300">Subject</div>
+            <select className="bg-slate-900 border border-slate-700 rounded px-2 py-1 text-sm"
+                    value={subject} onChange={e => setSubject(e.target.value)}>
+              <option>Math</option>
+              <option>Science</option>
+            </select>
+          </div>
+          <div className="flex items-end">
+            <button className="btn-primary ml-auto" onClick={generateMicroplan}>
+              Generate Microplan (≈20 min)
+            </button>
+          </div>
+        </div>
+
+        {/* LO picker */}
+        <div className="mt-4">
+          <div className="text-xs text-slate-300 mb-1">Learning Objectives</div>
+          <div className="flex flex-wrap gap-2">
+            {los.map(lo => (
+              <label key={lo.id} className={
+                "text-xs px-2 py-1 rounded border cursor-pointer " +
+                (selectedLOs.includes(lo.id)
+                  ? "bg-sky-700/30 border-sky-600 text-sky-200"
+                  : "bg-slate-800/60 border-slate-700 text-slate-200")
+              }>
+                <input
+                  type="checkbox"
+                  checked={selectedLOs.includes(lo.id)}
+                  onChange={() => toggleLO(lo.id)}
+                  className="mr-1 align-middle accent-sky-500"
+                />
+                {lo.label}
+              </label>
+            ))}
+            {!los.length && <span className="text-xs text-slate-400">No LOs found for this selection.</span>}
+          </div>
+        </div>
       </Card>
-      <LessonBlockPicker onAdd={onAdd} />
-      <PlanPreview plan={plan} onRemove={onRemove} />
-      <div className="card p-4 flex justify-end gap-2">
-        <button className="btn-ghost">Revise</button>
-        <button className="btn-primary" onClick={onSend}>Send to Student</button>
-      </div>
+
+      {/* Generated plan */}
+      <Card title={`Auto‑Microplan ${plan.length ? `· ${totalMinutes} min` : ''}`}>
+        <div className="space-y-2">
+          {plan.map(x => (
+            <div key={x.id} className="card p-3">
+              <div className="text-sm font-medium">{x.qno} · {x.preview}</div>
+              <div className="mt-1 flex items-center justify-between">
+                <span className="text-xs text-slate-400">Est. {x.estMinutes} min</span>
+                <CitationLink refObj={x.citation} />
+              </div>
+            </div>
+          ))}
+          {!plan.length && <div className="text-sm text-slate-400">Select LO(s) and click “Generate Microplan”.</div>}
+        </div>
+
+        <div className="mt-3 flex justify-end">
+          <button
+            className="btn-primary"
+            disabled={!plan.length}
+            onClick={() => alert('Plan sent to students (demo).')}
+          >
+            Send to Students
+          </button>
+        </div>
+      </Card>
     </>
   )
 }
+
 
 function MainArea() {
   const { path } = useHashRoute('/teachers/dashboard');

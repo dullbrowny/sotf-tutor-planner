@@ -1,4 +1,7 @@
+import { useEffect, useState } from 'react'
 import { Card } from '../../ui/Card'
+import { api } from '../../api'
+import CitationLink from '../../components/CitationLink'
 
 const kpis = {
   concepts: { label: 'Concepts mastered (this week)', value: 2 },
@@ -20,6 +23,19 @@ const events = [
 ]
 
 export default function ParentPortal() {
+  const [homePlan, setHomePlan] = useState([])
+
+  // Map “gaps” → CBSE LOs and fetch 1–2 exercises with citations
+  useEffect(() => {
+    let out = []
+    try {
+      const ex1 = api.cbse?.getExercisesByLO(['LO8M-CQ-01'], { limit: 1 }) || []
+      const ex2 = api.cbse?.getExercisesByLO(['LO8M-CQ-02'], { limit: 1 }) || []
+      out = [...ex1, ...ex2]
+    } catch {}
+    setHomePlan(out)
+  }, [])
+
   return (
     <>
       <div data-testid="page-title" className="sr-only">Parent · Portal</div>
@@ -86,6 +102,24 @@ export default function ParentPortal() {
               <button className="btn-primary">Add reminder</button>
             </div>
           ))}
+        </div>
+      </Card>
+
+      {/* Home Plan grounded to NCERT (≈20 min) */}
+      <Card title="Home Plan (≈ 20 min)">
+        <div className="space-y-2">
+          {homePlan.map(x => (
+            <div key={x.id} className="card p-3">
+              <div className="text-sm font-medium">{x.qno} · {x.preview}</div>
+              <div className="mt-1 flex items-center justify-between">
+                <span className="text-xs text-slate-400">Est. {x.estMinutes} min</span>
+                <CitationLink refObj={x.citation} />
+              </div>
+            </div>
+          ))}
+          {!homePlan.length && (
+            <div className="text-sm text-slate-400">No recommended items right now.</div>
+          )}
         </div>
       </Card>
     </>
