@@ -19,3 +19,24 @@ yarn-error.log*
 .vscode/
 .idea/
 
+
+# local keys
+.env.local
+public/cbse-pdf/rag/
+
+# local env
+.env
+.env.*
+.env.local
+.env.*.local
+# build output
+/dist
+# editor & scratch
+*.bak
+*.bkp
+*.log
+*.DS_Store
+# local-only utilities
+rag_copy.sh
+test_embed.sh
+together.logs

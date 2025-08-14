@@ -8,6 +8,8 @@
     "preview": "vite preview",
     "ingest:ncert": "node scripts/ingest-ncert.mjs",
     "enrich:ncert": "node scripts/enrich-ncert.mjs",
+    "enrich:ncert:llm": "DOTENV_CONFIG_PATH=.env.local node -r dotenv/config scripts/llm-enrich-ncert.mjs",
+    "rag:build": "DOTENV_CONFIG_PATH=.env.local node -r dotenv/config scripts/build-rag.mjs",
     "cy:open": "cypress open",
     "cy:run": "cypress run"
   },
@@ -19,6 +21,7 @@
     "@vitejs/plugin-react": "^4.3.1",
     "autoprefixer": "^10.4.19",
     "cypress": "^14.5.4",
+    "dotenv": "^17.2.1",
     "pdf-parse": "^1.1.1",
     "postcss": "^8.4.39",
     "tailwindcss": "^3.4.10",

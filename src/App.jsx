@@ -105,7 +105,7 @@ function RightRail({ path, scopeKind, selected, onToggle, onClear }) {
   );
 }
 
-function TeachersLessonPlanner() {
+function LegacyLessonPlanning() {
   const [klass, setKlass] = useState(8);
   const [subject, setSubject] = useState('Math');
   const [selectedLOs, setSelectedLOs] = useState([]);
@@ -299,7 +299,7 @@ function MainArea() {
   else if (path.startsWith('/parent')) menu = parentMenu;
 
   let page = null;
-  if (path === '/teachers/lesson-planning') page = <TeachersLessonPlanner />;
+  if (path === '/teachers/lesson-planning') page = <LessonPlanning />;
   else if (path === '/teachers/assessment') page = <Assessment />;
   else if (path === '/teachers/grading') page = <Grading />;
   else if (path === '/teachers/faculty-eval') page = <FacultyEval />;

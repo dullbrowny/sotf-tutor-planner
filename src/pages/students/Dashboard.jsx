@@ -1,136 +1,85 @@
-import React, { useEffect, useState } from "react";
-import { useScope } from "../../context/ScopeProvider";
-import { getAssignmentsForClass, getAssignmentsForStudent, getItemStatus, recordAttempt } from "../../state/assignments";
-import CitationLink from "../../components/CitationLink";
-import { api } from "../../api";
-import { Card } from "../../ui/Card";
-import { getFlagsForStudent } from "../../state/flags";
-import { getNudgesForStudent } from "../../state/nudges";
 
-function isDueToday(iso) {
-  const d = new Date(iso), now = new Date();
-  return d.getFullYear()===now.getFullYear() && d.getMonth()===now.getMonth() && d.getDate()===now.getDate();
-}
+import React, { useEffect, useMemo, useState } from "react";
+import CitationLink from "../../components/CitationLink.jsx";
+import { list as listAssignments } from "../../services/assignments.js";
 
-export default function StudentDashboard() {
-  const { scope, classes = [] } = useScope();
-  const studentId = scope?.studentId || "s-arya";
+/**
+ * Student Dashboard (v2)
+ * - Shows published assignments from localStorage store.
+ * - Adds on-page filters so it works even if global scope isn't wired.
+ * - Displays AI-enriched content when present (Q/A).
+ */
 
-  const [assigned, setAssigned] = useState([]);
-  const [today, setToday] = useState([]);
+export default function StudentDashboard(){
+  const all = listAssignments(); // all statuses
+  const published = all.filter(a => a.status === "published");
+
+  // derive filters
+  const grades = Array.from(new Set(published.map(a => a.grade))).sort((a,b)=>a-b);
+  const subjects = Array.from(new Set(published.map(a => a.subject)));
+
+  const [grade, setGrade] = useState(grades[0] || 9);
+  const [subject, setSubject] = useState(subjects[0] || "Science");
+
+  const items = useMemo(() => {
+    return published.filter(a =>
+      (grade ? a.grade === Number(grade) : true) &&
+      (subject ? a.subject === subject : true)
+    ).sort((a,b)=> (b.publishedAt||"").localeCompare(a.publishedAt||""));
+  }, [published, grade, subject]);
 
   useEffect(() => {
-    let list = [];
-    if (scope?.kind === "class" && scope.classId) {
-      list = getAssignmentsForClass(scope.classId);
-    } else {
-      list = getAssignmentsForStudent(studentId, classes);
+    // If current selection has no items, broaden automatically
+    if (!items.length && (grades.length || subjects.length)) {
+      if (grades.length && grade !== grades[0]) setGrade(grades[0]);
+      if (subjects.length && subject !== subjects[0]) setSubject(subjects[0]);
     }
-    setAssigned(list.filter(a => isDueToday(a.dueISO)));
-  }, [scope?.kind, scope?.classId, studentId, classes]);
-
-  useEffect(() => {
-    const los = api.cbse?.getLOs({ klass: 8, subject: "Math" }) || [];
-    const loIds = los.slice(0, 2).map(x => x.id);
-    const ex = api.cbse?.getExercisesByLO(loIds, { limit: 6 }) || [];
-    setToday(ex);
+    // eslint-disable-next-line
   }, []);
 
-  function startSession(a) {
-    if (a.items?.[0]) recordAttempt({ assignmentId: a.id, itemId: a.items[0].id, status: "inprogress" });
-    window.location.hash = `#/students/play/${a.id}`;
-  }
-
   return (
-    <>
-      {assigned.map(a => (
-        <Card key={a.id} title={`Assigned · due today · ${a.subject}`}>
-          <div className="flex justify-end">
-            <button className="btn-primary mb-2" onClick={() => startSession(a)}>Start session</button>
-          </div>
-          <div className="space-y-2">
-            {a.items.map(it => {
-              const st = getItemStatus(a.id, it.id);
-              return (
-                <div key={it.id} className="card p-3">
-                  <div className="text-sm font-medium">{it.qno} · {it.preview}</div>
-                  {(it?.phase) && (
-                    <span className="inline-block text-[10px] px-2 py-[2px] rounded-full border border-slate-600 text-slate-300 uppercase tracking-wide mt-1">
-                      {it.phase}
-                    </span>
-                  )}
-                  {it.chapterRef && (
-                    <div className="text-[11px] text-slate-400 mt-1">
-                      Chapter: <span className="font-medium">{it.chapterRef.chapterName}</span>
-                      {it.chapterRef.page ? <> · p.{it.chapterRef.page}</> : null}
-                      {it.chapterRef.url ? <> · <a className="underline" href={it.chapterRef.url} target="_blank" rel="noreferrer">source</a></> : null}
-                    </div>
-                  )}
-                  <div className="mt-1 flex items-center justify-between">
-                    <div className="text-xs text-slate-400">
-                      Est. {it.estMinutes} min · <span className="capitalize">{st}</span>
-                    </div>
-                    {it?.citation && <CitationLink refObj={it.citation} />}
-                  </div>
-                  <div className="mt-2 flex gap-2">
-                    <button className="btn-secondary"
-                      onClick={() => { recordAttempt({ assignmentId: a.id, itemId: it.id, status: "inprogress" }); setAssigned(prev => [...prev]); }}>
-                      Start
-                    </button>
-                    <button className="btn-primary"
-                      onClick={() => { recordAttempt({ assignmentId: a.id, itemId: it.id, status: "done" }); setAssigned(prev => [...prev]); }}>
-                      Mark Done
-                    </button>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </Card>
-      ))}
-
-      <Card title="Today’s 20 (CBSE)">
-        <div className="space-y-2">
-          {today.map(x => (
-            <div key={x.id} className="card p-3">
-              <div className="text-sm font-medium">{x.qno} · {x.preview}</div>
-              <div className="mt-1 flex items-center justify-between">
-                <span className="text-xs text-slate-400">Est. {x.estMinutes} min</span>
-                {x?.citation && <CitationLink refObj={x.citation} />}
-              </div>
-            </div>
-          ))}
+    <div className="p-4 flex flex-col gap-4">
+      <div className="flex gap-3 items-end">
+        <div>
+          <label className="text-xs block mb-1 opacity-75">Class</label>
+          <select className="rounded bg-slate-900 border border-slate-700 p-2" value={grade} onChange={e=>setGrade(Number(e.target.value))}>
+            {grades.length ? grades.map(g => <option key={g} value={g}>Class {g}</option>) : <option>Class 9</option>}
+          </select>
         </div>
-      </Card>
+        <div>
+          <label className="text-xs block mb-1 opacity-75">Subject</label>
+          <select className="rounded bg-slate-900 border border-slate-700 p-2" value={subject} onChange={e=>setSubject(e.target.value)}>
+            {subjects.length ? subjects.map(s => <option key={s} value={s}>{s}</option>) : <option>Science</option>}
+          </select>
+        </div>
+      </div>
 
-      {import.meta.env.VITE_USE_MOCKS === '1' && (
-        <>
-          <Card title="Alerts (stub) · At-risk flags">
-            {(() => {
-              const flags = getFlagsForStudent(studentId);
-              if (!flags.length) return <div className="text-sm text-slate-400">No alerts.</div>;
-              return (
-                <ul className="list-disc pl-5 text-sm">
-                  {flags.map(f => <li key={f.id}>{f.kind}: {f.text}</li>)}
-                </ul>
-              );
-            })()}
-          </Card>
+      {!items.length ? (
+        <div className="text-sm opacity-70">No assignments yet.</div>
+      ) : (
+        items.map(a => (
+          <div key={a.id} className="rounded-xl border border-slate-700 p-3 bg-slate-800/40">
+            <div className="text-xs opacity-70 mb-1">
+              {new Date(a.publishedAt || a.createdAt).toLocaleString()} · {a.subject} · {a.targetMin} min
+            </div>
+            <div className="font-medium mb-2">{a.chapterId} · {a.topic}</div>
 
-          <Card title="Nudges from Parents (stub)">
-            {(() => {
-              const nudges = getNudgesForStudent(studentId);
-              if (!nudges.length) return <div className="text-sm text-slate-400">No nudges yet.</div>;
-              return (
-                <ul className="list-disc pl-5 text-sm">
-                  {nudges.map(n => <li key={n.id}>{n.text}</li>)}
-                </ul>
-              );
-            })()}
-          </Card>
-        </>
+            <ul className="list-disc ml-5 text-sm space-y-3">
+              {a.items.map(it => (
+                <li key={it.id} className="flex flex-col gap-1">
+                  <div className="flex items-center justify-between gap-2">
+                    <span>{it.text}</span>
+                    <CitationLink className="underline" refObj={{ chapterId: it.chapterId, anchor: it.anchor, title: it.chapterName }} />
+                  </div>
+                  {it.ai && (
+                    <pre className="text-xs whitespace-pre-wrap bg-slate-900/60 p-2 rounded">{it.ai}</pre>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))
       )}
-    </>
+    </div>
   );
 }
-
