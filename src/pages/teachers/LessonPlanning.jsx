@@ -1,9 +1,62 @@
+
+// src/pages/Teacher/LessonPlanning.jsx
 import React, { useMemo, useState } from "react";
 import { useScope } from "../../context/ScopeProvider";
 import { api } from "../../api";
 import { Card } from "../../ui/Card";
 import CitationLink from "../../components/CitationLink";
 import { assignMicroplan } from "../../state/assignments"; // writes to localStorage
+
+
+
+function resolveChapterIdForLO({ grade, subject, loText, fallback }) {
+  const g = String(grade || "").trim();
+  const s = String(subject || "").toLowerCase();
+  const t = String(loText || "").toLowerCase();
+
+  // Science · Class 9 → Force & Laws of Motion (CH02)
+  if (
+    g === "9" &&
+    s.startsWith("science") &&
+    (
+      /newton|first law|second law|laws of motion|inertia|net\s*force|acceleration/i.test(t) ||
+      /f\s*=\s*m\s*\*?\s*a/i.test(t) // F=ma
+    )
+  ) {
+    return "9S-CH02";
+  }
+
+  // Math · Class 10 → Quadratic Equations (CH04)
+  if (
+    (g === "10" || g === "10th") &&
+    s.startsWith("math") &&
+    ( /quadratic/i.test(t) || /ax\^?2\s*\+\s*bx\s*\+\s*c/i.test(t) )
+  ) {
+    return "10M-CH04";
+  }
+
+  // Math · Class 8 → Comparing Quantities (CH08)
+  if (
+    g === "8" &&
+    s.startsWith("math") &&
+    /percentage|profit|loss|discount|interest|tax|increase|decrease/i.test(t)
+  ) {
+    return "8M-CH08";
+  }
+
+  return fallback || "";
+}
+
+function buildCitation({ grade, subject, loText, raw }) {
+  const fallbackChapterId = raw?.citation?.chapterId || raw?.chapterRef || raw?.chapterId || "";
+  const chapterId = resolveChapterIdForLO({ grade, subject, loText, fallback: fallbackChapterId });
+
+  // Never pass remote URL/href here — we want local-first resolution in the link component.
+  const page = raw?.citation?.page ?? raw?.page;
+  const anchor = raw?.citation?.anchor ?? raw?.anchor;
+
+  return { chapterId, page, anchor };
+}
 
 function resolveClassId({ scope, classes = [], teacherGroups = [], klass }) {
   if (scope?.kind === "class" && scope.classId) return scope.classId;
@@ -40,7 +93,21 @@ export default function LessonPlanning() {
   function generate() {
     if (!selectedLOs.length) return setPlan([]);
     const all = api.cbse?.getExercisesByLO(selectedLOs, { limit: 24 }) || [];
-    setPlan(packToTarget(all, target));
+
+    // Shape correct, local-first citations per card (strip remote URLs).
+    const loById = new Map(los.map(lo => [lo.id, lo]));
+    const shaped = all.map(x => {
+      const lo = loById.get(x.loId) || {};
+      const citation = buildCitation({
+        grade: klass,
+        subject,
+        loText: lo.label || x.loText || x.preview || "",
+        raw: x
+      });
+      return { ...x, citation };
+    });
+
+    setPlan(packToTarget(shaped, target));
   }
 
   function sendToStudents() {
@@ -117,4 +184,5 @@ export default function LessonPlanning() {
     </>
   );
 }
+
 

@@ -15,6 +15,7 @@ import { api } from './api';
 import CitationLink from './components/CitationLink';
 import { assignMicroplan } from './state/assignments'
 import { generateSequence, suggestSequenceLLM } from './services/planSequencer'
+import PdfCalibrator from './pages/dev/PdfCalibrator'
 
 // Teachers pages
 import TeachersDashboard from './pages/teachers/Dashboard'
@@ -284,7 +285,9 @@ function MainArea() {
     { label: 'Overview',   href: '/admin/overview' },
     { label: 'Predictive', href: '/admin/predictive' },
     { label: 'CBSE QA',    href: '/dev/cbse-audit' },
+    { label: 'PDF Cal',    href: '/dev/pdf-cal' },
   ];
+
   const parentMenu = [
     { label: 'Portal', href: '/parent/portal' },
     { label: 'Comms',  href: '/parent/comms' },
@@ -311,6 +314,7 @@ function MainArea() {
   else if (path === '/admin/overview') page = <AdminOverview />;
   else if (path === '/admin/predictive') page = <Predictive />;
   else if (path === '/dev/cbse-audit') page = <CbseAudit />;
+  else if (path === '/dev/pdf-cal') page = <PdfCalibrator />;
   else if (path === '/parent/portal') page = <ParentPortal />;
   else if (path === '/parent/comms') page = <ParentComms />;
   if (!page) page = <TeachersDashboard />;

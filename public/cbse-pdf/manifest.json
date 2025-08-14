@@ -1,0 +1,2252 @@
+[
+  {
+    "chapterId": "8SS-CH01",
+    "file": "sources/hepr1dd/hepr101.pdf",
+    "title": "hepr101.pdf",
+    "grade": 8,
+    "subject": "Social Science",
+    "chapterNo": 1,
+    "offset": 0,
+    "anchors": [
+      {
+        "type": "summary",
+        "code": "1",
+        "page": 19
+      }
+    ]
+  },
+  {
+    "chapterId": "8SS-CH02",
+    "file": "sources/hepr1dd/hepr102.pdf",
+    "title": "hepr102.pdf",
+    "grade": 8,
+    "subject": "Social Science",
+    "chapterNo": 2,
+    "offset": 48,
+    "anchors": []
+  },
+  {
+    "chapterId": "8SS-CH03",
+    "file": "sources/hepr1dd/hepr103.pdf",
+    "title": "hepr103.pdf",
+    "grade": 8,
+    "subject": "Social Science",
+    "chapterNo": 3,
+    "offset": 12,
+    "anchors": []
+  },
+  {
+    "chapterId": "8SS-CH04",
+    "file": "sources/hepr1dd/hepr104.pdf",
+    "title": "hepr104.pdf",
+    "grade": 8,
+    "subject": "Social Science",
+    "chapterNo": 4,
+    "offset": 0,
+    "anchors": []
+  },
+  {
+    "chapterId": "8SS-CH05",
+    "file": "sources/hepr1dd/hepr105.pdf",
+    "title": "hepr105.pdf",
+    "grade": 8,
+    "subject": "Social Science",
+    "chapterNo": 5,
+    "offset": 4,
+    "anchors": [
+      {
+        "type": "summary",
+        "code": "5",
+        "page": 19
+      }
+    ]
+  },
+  {
+    "chapterId": "8SS-CH06",
+    "file": "sources/hegp1dd/hegp106.pdf",
+    "title": "hegp106.pdf",
+    "grade": 8,
+    "subject": "Social Science",
+    "chapterNo": 6,
+    "offset": 5,
+    "anchors": [
+      {
+        "type": "example",
+        "code": "1",
+        "page": 5
+      },
+      {
+        "type": "example",
+        "code": "2",
+        "page": 6
+      },
+      {
+        "type": "summary",
+        "code": "6",
+        "page": 22
+      }
+    ]
+  },
+  {
+    "chapterId": "8SS-CH07",
+    "file": "sources/hegp1dd/hegp107.pdf",
+    "title": "hegp107.pdf",
+    "grade": 8,
+    "subject": "Social Science",
+    "chapterNo": 7,
+    "offset": 6,
+    "anchors": [
+      {
+        "type": "example",
+        "code": "1",
+        "page": 4
+      },
+      {
+        "type": "example",
+        "code": "3",
+        "page": 5
+      },
+      {
+        "type": "example",
+        "code": "6",
+        "page": 6
+      },
+      {
+        "type": "example",
+        "code": "8",
+        "page": 9
+      },
+      {
+        "type": "example",
+        "code": "9",
+        "page": 11
+      },
+      {
+        "type": "example",
+        "code": "11",
+        "page": 16
+      },
+      {
+        "type": "summary",
+        "code": "7",
+        "page": 19
+      }
+    ]
+  },
+  {
+    "chapterId": "8SS-CH08",
+    "file": "sources/hecu1dd/hecu108.pdf",
+    "title": "hecu108.pdf",
+    "grade": 8,
+    "subject": "Social Science",
+    "chapterNo": 8,
+    "offset": 7,
+    "anchors": []
+  },
+  {
+    "chapterId": "8SS-CH09",
+    "file": "sources/hecu1dd/hecu109.pdf",
+    "title": "hecu109.pdf",
+    "grade": 8,
+    "subject": "Social Science",
+    "chapterNo": 9,
+    "offset": 8,
+    "anchors": []
+  },
+  {
+    "chapterId": "8SS-CH10",
+    "file": "sources/hecu1dd/hecu110.pdf",
+    "title": "hecu110.pdf",
+    "grade": 8,
+    "subject": "Social Science",
+    "chapterNo": 10,
+    "offset": 9,
+    "anchors": []
+  },
+  {
+    "chapterId": "8SS-CH11",
+    "file": "sources/hecu1dd/hecu111.pdf",
+    "title": "hecu111.pdf",
+    "grade": 8,
+    "subject": "Social Science",
+    "chapterNo": 11,
+    "offset": 10,
+    "anchors": []
+  },
+  {
+    "chapterId": "8SS-CH12",
+    "file": "sources/hecu1dd/hecu112.pdf",
+    "title": "hecu112.pdf",
+    "grade": 8,
+    "subject": "Social Science",
+    "chapterNo": 12,
+    "offset": 11,
+    "anchors": []
+  },
+  {
+    "chapterId": "8SS-CH13",
+    "file": "sources/hecu1dd/hecu113.pdf",
+    "title": "hecu113.pdf",
+    "grade": 8,
+    "subject": "Social Science",
+    "chapterNo": 13,
+    "offset": 12,
+    "anchors": []
+  },
+  {
+    "chapterId": "9E-CH01",
+    "file": "sources/iewe1dd/iewe101.pdf",
+    "title": "iewe101.pdf",
+    "grade": 9,
+    "subject": "English",
+    "chapterNo": 1,
+    "offset": 0,
+    "anchors": []
+  },
+  {
+    "chapterId": "9E-CH02",
+    "file": "sources/iewe1dd/iewe102.pdf",
+    "title": "iewe102.pdf",
+    "grade": 9,
+    "subject": "English",
+    "chapterNo": 2,
+    "offset": 1,
+    "anchors": [
+      {
+        "type": "summary",
+        "code": "2",
+        "page": 7
+      }
+    ]
+  },
+  {
+    "chapterId": "9E-CH03",
+    "file": "sources/iewe1dd/iewe103.pdf",
+    "title": "iewe103.pdf",
+    "grade": 9,
+    "subject": "English",
+    "chapterNo": 3,
+    "offset": 2,
+    "anchors": []
+  },
+  {
+    "chapterId": "9E-CH04",
+    "file": "sources/iewe1dd/iewe104.pdf",
+    "title": "iewe104.pdf",
+    "grade": 9,
+    "subject": "English",
+    "chapterNo": 4,
+    "offset": 3,
+    "anchors": []
+  },
+  {
+    "chapterId": "9E-CH05",
+    "file": "sources/iewe1dd/iewe105.pdf",
+    "title": "iewe105.pdf",
+    "grade": 9,
+    "subject": "English",
+    "chapterNo": 5,
+    "offset": 4,
+    "anchors": []
+  },
+  {
+    "chapterId": "9E-CH06",
+    "file": "sources/iewe1dd/iewe106.pdf",
+    "title": "iewe106.pdf",
+    "grade": 9,
+    "subject": "English",
+    "chapterNo": 6,
+    "offset": 5,
+    "anchors": []
+  },
+  {
+    "chapterId": "9E-CH07",
+    "file": "sources/iewe1dd/iewe107.pdf",
+    "title": "iewe107.pdf",
+    "grade": 9,
+    "subject": "English",
+    "chapterNo": 7,
+    "offset": 2,
+    "anchors": []
+  },
+  {
+    "chapterId": "9E-CH08",
+    "file": "sources/iewe1dd/iewe108.pdf",
+    "title": "iewe108.pdf",
+    "grade": 9,
+    "subject": "English",
+    "chapterNo": 8,
+    "offset": 7,
+    "anchors": []
+  },
+  {
+    "chapterId": "9E-CH09",
+    "file": "sources/iewe1dd/iewe109.pdf",
+    "title": "iewe109.pdf",
+    "grade": 9,
+    "subject": "English",
+    "chapterNo": 9,
+    "offset": 8,
+    "anchors": []
+  },
+  {
+    "chapterId": "9M-CH01",
+    "file": "sources/iemh1dd/iemh101.pdf",
+    "title": "iemh101.pdf",
+    "grade": 9,
+    "subject": "Math",
+    "chapterNo": 1,
+    "offset": 0,
+    "anchors": [
+      {
+        "type": "example",
+        "code": "1",
+        "page": 3
+      },
+      {
+        "type": "example",
+        "code": "2",
+        "page": 4
+      },
+      {
+        "type": "exercise",
+        "code": "1.1",
+        "page": 5
+      },
+      {
+        "type": "example",
+        "code": "3",
+        "page": 7
+      },
+      {
+        "type": "exercise",
+        "code": "1.2",
+        "page": 8
+      },
+      {
+        "type": "example",
+        "code": "5",
+        "page": 9
+      },
+      {
+        "type": "example",
+        "code": "6",
+        "page": 11
+      },
+      {
+        "type": "example",
+        "code": "9",
+        "page": 12
+      },
+      {
+        "type": "example",
+        "code": "10",
+        "page": 13
+      },
+      {
+        "type": "exercise",
+        "code": "1.3",
+        "page": 14
+      },
+      {
+        "type": "example",
+        "code": "13",
+        "page": 16
+      },
+      {
+        "type": "example",
+        "code": "15",
+        "page": 18
+      },
+      {
+        "type": "example",
+        "code": "16",
+        "page": 19
+      },
+      {
+        "type": "exercise",
+        "code": "1.4",
+        "page": 20
+      },
+      {
+        "type": "example",
+        "code": "17",
+        "page": 20
+      },
+      {
+        "type": "exercise",
+        "code": "1.5",
+        "page": 23
+      },
+      {
+        "type": "example",
+        "code": "20",
+        "page": 23
+      },
+      {
+        "type": "summary",
+        "code": "1",
+        "page": 24
+      }
+    ]
+  },
+  {
+    "chapterId": "9M-CH02",
+    "file": "sources/iemh1dd/iemh102.pdf",
+    "title": "iemh102.pdf",
+    "grade": 9,
+    "subject": "Math",
+    "chapterNo": 2,
+    "offset": 1,
+    "anchors": [
+      {
+        "type": "example",
+        "code": "1",
+        "page": 3
+      },
+      {
+        "type": "exercise",
+        "code": "2.1",
+        "page": 5
+      },
+      {
+        "type": "example",
+        "code": "2",
+        "page": 5
+      },
+      {
+        "type": "example",
+        "code": "3",
+        "page": 6
+      },
+      {
+        "type": "exercise",
+        "code": "2.2",
+        "page": 7
+      },
+      {
+        "type": "example",
+        "code": "4",
+        "page": 7
+      },
+      {
+        "type": "example",
+        "code": "10",
+        "page": 8
+      },
+      {
+        "type": "example",
+        "code": "7",
+        "page": 9
+      },
+      {
+        "type": "example",
+        "code": "9",
+        "page": 10
+      },
+      {
+        "type": "exercise",
+        "code": "2.3",
+        "page": 11
+      },
+      {
+        "type": "example",
+        "code": "12",
+        "page": 13
+      },
+      {
+        "type": "example",
+        "code": "14",
+        "page": 14
+      },
+      {
+        "type": "example",
+        "code": "17",
+        "page": 15
+      },
+      {
+        "type": "exercise",
+        "code": "2.4",
+        "page": 16
+      },
+      {
+        "type": "example",
+        "code": "19",
+        "page": 16
+      },
+      {
+        "type": "summary",
+        "code": "2",
+        "page": 18
+      }
+    ]
+  },
+  {
+    "chapterId": "9M-CH03",
+    "file": "sources/iemh1dd/iemh103.pdf",
+    "title": "iemh103.pdf",
+    "grade": 9,
+    "subject": "Math",
+    "chapterNo": 3,
+    "offset": 2,
+    "anchors": [
+      {
+        "type": "exercise",
+        "code": "3.1",
+        "page": 3
+      },
+      {
+        "type": "example",
+        "code": "1",
+        "page": 7
+      },
+      {
+        "type": "example",
+        "code": "2",
+        "page": 9
+      },
+      {
+        "type": "exercise",
+        "code": "3.2",
+        "page": 10
+      },
+      {
+        "type": "summary",
+        "code": "3",
+        "page": 11
+      }
+    ]
+  },
+  {
+    "chapterId": "9M-CH04",
+    "file": "sources/iemh1dd/iemh104.pdf",
+    "title": "iemh104.pdf",
+    "grade": 9,
+    "subject": "Math",
+    "chapterNo": 4,
+    "offset": 1,
+    "anchors": [
+      {
+        "type": "example",
+        "code": "1",
+        "page": 2
+      },
+      {
+        "type": "exercise",
+        "code": "4.1",
+        "page": 3
+      },
+      {
+        "type": "example",
+        "code": "2",
+        "page": 3
+      },
+      {
+        "type": "example",
+        "code": "3",
+        "page": 4
+      },
+      {
+        "type": "exercise",
+        "code": "4.2",
+        "page": 5
+      },
+      {
+        "type": "summary",
+        "code": "4",
+        "page": 5
+      }
+    ]
+  },
+  {
+    "chapterId": "9M-CH05",
+    "file": "sources/iemh1dd/iemh105.pdf",
+    "title": "iemh105.pdf",
+    "grade": 9,
+    "subject": "Math",
+    "chapterNo": 5,
+    "offset": 4,
+    "anchors": [
+      {
+        "type": "example",
+        "code": "1",
+        "page": 6
+      },
+      {
+        "type": "example",
+        "code": "2",
+        "page": 7
+      },
+      {
+        "type": "exercise",
+        "code": "5.1",
+        "page": 8
+      },
+      {
+        "type": "summary",
+        "code": "5",
+        "page": 9
+      }
+    ]
+  },
+  {
+    "chapterId": "9M-CH06",
+    "file": "sources/iemh1dd/iemh106.pdf",
+    "title": "iemh106.pdf",
+    "grade": 9,
+    "subject": "Math",
+    "chapterNo": 6,
+    "offset": 5,
+    "anchors": [
+      {
+        "type": "example",
+        "code": "1",
+        "page": 7
+      },
+      {
+        "type": "exercise",
+        "code": "6.1",
+        "page": 8
+      },
+      {
+        "type": "example",
+        "code": "3",
+        "page": 8
+      },
+      {
+        "type": "example",
+        "code": "4",
+        "page": 10
+      },
+      {
+        "type": "example",
+        "code": "5",
+        "page": 11
+      },
+      {
+        "type": "exercise",
+        "code": "6.2",
+        "page": 12
+      },
+      {
+        "type": "example",
+        "code": "6",
+        "page": 12
+      },
+      {
+        "type": "summary",
+        "code": "6",
+        "page": 14
+      }
+    ]
+  },
+  {
+    "chapterId": "9M-CH07",
+    "file": "sources/iemh1dd/iemh107.pdf",
+    "title": "iemh107.pdf",
+    "grade": 9,
+    "subject": "Math",
+    "chapterNo": 7,
+    "offset": 6,
+    "anchors": [
+      {
+        "type": "example",
+        "code": "1",
+        "page": 5
+      },
+      {
+        "type": "example",
+        "code": "2",
+        "page": 6
+      },
+      {
+        "type": "exercise",
+        "code": "7.1",
+        "page": 10
+      },
+      {
+        "type": "example",
+        "code": "3",
+        "page": 10
+      },
+      {
+        "type": "example",
+        "code": "4",
+        "page": 14
+      },
+      {
+        "type": "exercise",
+        "code": "7.2",
+        "page": 15
+      },
+      {
+        "type": "example",
+        "code": "5",
+        "page": 15
+      },
+      {
+        "type": "example",
+        "code": "7",
+        "page": 18
+      },
+      {
+        "type": "example",
+        "code": "8",
+        "page": 19
+      },
+      {
+        "type": "summary",
+        "code": "7",
+        "page": 21
+      }
+    ]
+  },
+  {
+    "chapterId": "9M-CH08",
+    "file": "sources/iemh1dd/iemh108.pdf",
+    "title": "iemh108.pdf",
+    "grade": 9,
+    "subject": "Math",
+    "chapterNo": 8,
+    "offset": 7,
+    "anchors": [
+      {
+        "type": "example",
+        "code": "1",
+        "page": 4
+      },
+      {
+        "type": "example",
+        "code": "3",
+        "page": 5
+      },
+      {
+        "type": "example",
+        "code": "5",
+        "page": 6
+      },
+      {
+        "type": "exercise",
+        "code": "8.1",
+        "page": 7
+      },
+      {
+        "type": "example",
+        "code": "6",
+        "page": 9
+      },
+      {
+        "type": "exercise",
+        "code": "8.2",
+        "page": 10
+      },
+      {
+        "type": "example",
+        "code": "7",
+        "page": 10
+      },
+      {
+        "type": "summary",
+        "code": "8",
+        "page": 12
+      }
+    ]
+  },
+  {
+    "chapterId": "9M-CH09",
+    "file": "sources/iemh1dd/iemh109.pdf",
+    "title": "iemh109.pdf",
+    "grade": 9,
+    "subject": "Math",
+    "chapterNo": 9,
+    "offset": 8,
+    "anchors": [
+      {
+        "type": "exercise",
+        "code": "9.1",
+        "page": 3
+      },
+      {
+        "type": "example",
+        "code": "1",
+        "page": 6
+      },
+      {
+        "type": "exercise",
+        "code": "9.2",
+        "page": 7
+      },
+      {
+        "type": "example",
+        "code": "2",
+        "page": 11
+      },
+      {
+        "type": "exercise",
+        "code": "9.3",
+        "page": 12
+      },
+      {
+        "type": "example",
+        "code": "4",
+        "page": 12
+      },
+      {
+        "type": "summary",
+        "code": "9",
+        "page": 14
+      }
+    ]
+  },
+  {
+    "chapterId": "9M-CH10",
+    "file": "sources/iemh1dd/iemh110.pdf",
+    "title": "iemh110.pdf",
+    "grade": 9,
+    "subject": "Math",
+    "chapterNo": 10,
+    "offset": 1,
+    "anchors": [
+      {
+        "type": "example",
+        "code": "1",
+        "page": 3
+      },
+      {
+        "type": "exercise",
+        "code": "10.1",
+        "page": 4
+      },
+      {
+        "type": "example",
+        "code": "3",
+        "page": 4
+      },
+      {
+        "type": "summary",
+        "code": "10",
+        "page": 6
+      }
+    ]
+  },
+  {
+    "chapterId": "9M-CH11",
+    "file": "sources/iemh1dd/iemh111.pdf",
+    "title": "iemh111.pdf",
+    "grade": 9,
+    "subject": "Math",
+    "chapterNo": 11,
+    "offset": 10,
+    "anchors": [
+      {
+        "type": "example",
+        "code": "1",
+        "page": 3
+      },
+      {
+        "type": "exercise",
+        "code": "1",
+        "page": 4
+      },
+      {
+        "type": "example",
+        "code": "3",
+        "page": 4
+      },
+      {
+        "type": "example",
+        "code": "4",
+        "page": 7
+      },
+      {
+        "type": "example",
+        "code": "6",
+        "page": 8
+      },
+      {
+        "type": "example",
+        "code": "8",
+        "page": 10
+      },
+      {
+        "type": "example",
+        "code": "10",
+        "page": 13
+      }
+    ]
+  },
+  {
+    "chapterId": "9M-CH12",
+    "file": "sources/iemh1dd/iemh112.pdf",
+    "title": "iemh112.pdf",
+    "grade": 9,
+    "subject": "Math",
+    "chapterNo": 12,
+    "offset": 11,
+    "anchors": [
+      {
+        "type": "example",
+        "code": "1",
+        "page": 1
+      },
+      {
+        "type": "example",
+        "code": "2",
+        "page": 2
+      },
+      {
+        "type": "example",
+        "code": "3",
+        "page": 5
+      },
+      {
+        "type": "example",
+        "code": "4",
+        "page": 10
+      },
+      {
+        "type": "example",
+        "code": "5",
+        "page": 11
+      },
+      {
+        "type": "exercise",
+        "code": "12.1",
+        "page": 13
+      },
+      {
+        "type": "summary",
+        "code": "12",
+        "page": 16
+      }
+    ]
+  },
+  {
+    "chapterId": "9S-CH01",
+    "file": "sources/iesc1dd/iesc101.pdf",
+    "title": "iesc101.pdf",
+    "grade": 9,
+    "subject": "Science",
+    "chapterNo": 1,
+    "offset": 0,
+    "anchors": []
+  },
+  {
+    "chapterId": "9S-CH02",
+    "file": "sources/iesc1dd/iesc102.pdf",
+    "title": "iesc102.pdf",
+    "grade": 9,
+    "subject": "Science",
+    "chapterNo": 2,
+    "offset": 1,
+    "anchors": [
+      {
+        "type": "example",
+        "code": "2.1",
+        "page": 4
+      }
+    ]
+  },
+  {
+    "chapterId": "9S-CH03",
+    "file": "sources/iesc1dd/iesc103.pdf",
+    "title": "iesc103.pdf",
+    "grade": 9,
+    "subject": "Science",
+    "chapterNo": 3,
+    "offset": 2,
+    "anchors": [
+      {
+        "type": "example",
+        "code": "10",
+        "page": 3
+      },
+      {
+        "type": "example",
+        "code": "3.1",
+        "page": 9
+      },
+      {
+        "type": "example",
+        "code": "3.2",
+        "page": 10
+      },
+      {
+        "type": "example",
+        "code": "2",
+        "page": 12
+      }
+    ]
+  },
+  {
+    "chapterId": "9S-CH04",
+    "file": "sources/iesc1dd/iesc104.pdf",
+    "title": "iesc104.pdf",
+    "grade": 9,
+    "subject": "Science",
+    "chapterNo": 4,
+    "offset": 3,
+    "anchors": []
+  },
+  {
+    "chapterId": "9S-CH05",
+    "file": "sources/iesc1dd/iesc105.pdf",
+    "title": "iesc105.pdf",
+    "grade": 9,
+    "subject": "Science",
+    "chapterNo": 5,
+    "offset": 4,
+    "anchors": []
+  },
+  {
+    "chapterId": "9S-CH06",
+    "file": "sources/iesc1dd/iesc106.pdf",
+    "title": "iesc106.pdf",
+    "grade": 9,
+    "subject": "Science",
+    "chapterNo": 6,
+    "offset": 5,
+    "anchors": []
+  },
+  {
+    "chapterId": "9S-CH07",
+    "file": "sources/iesc1dd/iesc107.pdf",
+    "title": "iesc107.pdf",
+    "grade": 9,
+    "subject": "Science",
+    "chapterNo": 7,
+    "offset": 6,
+    "anchors": [
+      {
+        "type": "example",
+        "code": "7.1",
+        "page": 4
+      }
+    ]
+  },
+  {
+    "chapterId": "9S-CH08",
+    "file": "sources/iesc1dd/iesc108.pdf",
+    "title": "iesc108.pdf",
+    "grade": 9,
+    "subject": "Science",
+    "chapterNo": 8,
+    "offset": 7,
+    "anchors": []
+  },
+  {
+    "chapterId": "9S-CH09",
+    "file": "sources/iesc1dd/iesc109.pdf",
+    "title": "iesc109.pdf",
+    "grade": 9,
+    "subject": "Science",
+    "chapterNo": 9,
+    "offset": 8,
+    "anchors": []
+  },
+  {
+    "chapterId": "9S-CH10",
+    "file": "sources/iesc1dd/iesc110.pdf",
+    "title": "iesc110.pdf",
+    "grade": 9,
+    "subject": "Science",
+    "chapterNo": 10,
+    "offset": 9,
+    "anchors": [
+      {
+        "type": "example",
+        "code": "10.1",
+        "page": 3
+      },
+      {
+        "type": "example",
+        "code": "10.3",
+        "page": 6
+      },
+      {
+        "type": "example",
+        "code": "10.5",
+        "page": 8
+      },
+      {
+        "type": "example",
+        "code": "10.6",
+        "page": 9
+      },
+      {
+        "type": "example",
+        "code": "10.7",
+        "page": 10
+      },
+      {
+        "type": "example",
+        "code": "10.8",
+        "page": 11
+      }
+    ]
+  },
+  {
+    "chapterId": "9S-CH11",
+    "file": "sources/iesc1dd/iesc111.pdf",
+    "title": "iesc111.pdf",
+    "grade": 9,
+    "subject": "Science",
+    "chapterNo": 11,
+    "offset": 10,
+    "anchors": [
+      {
+        "type": "example",
+        "code": "11.1",
+        "page": 6
+      }
+    ]
+  },
+  {
+    "chapterId": "9S-CH12",
+    "file": "sources/iesc1dd/iesc112.pdf",
+    "title": "iesc112.pdf",
+    "grade": 9,
+    "subject": "Science",
+    "chapterNo": 12,
+    "offset": 11,
+    "anchors": []
+  },
+  {
+    "chapterId": "9SS-CH01",
+    "file": "sources/iess4dd/iess401.pdf",
+    "title": "iess401.pdf",
+    "grade": 9,
+    "subject": "Social Science",
+    "chapterNo": 1,
+    "offset": 0,
+    "anchors": []
+  },
+  {
+    "chapterId": "9SS-CH02",
+    "file": "sources/iess4dd/iess402.pdf",
+    "title": "iess402.pdf",
+    "grade": 9,
+    "subject": "Social Science",
+    "chapterNo": 2,
+    "offset": 17,
+    "anchors": []
+  },
+  {
+    "chapterId": "9SS-CH03",
+    "file": "sources/iess4dd/iess403.pdf",
+    "title": "iess403.pdf",
+    "grade": 9,
+    "subject": "Social Science",
+    "chapterNo": 3,
+    "offset": 33,
+    "anchors": []
+  },
+  {
+    "chapterId": "9SS-CH04",
+    "file": "sources/iess4dd/iess404.pdf",
+    "title": "iess404.pdf",
+    "grade": 9,
+    "subject": "Social Science",
+    "chapterNo": 4,
+    "offset": 55,
+    "anchors": []
+  },
+  {
+    "chapterId": "9SS-CH05",
+    "file": "sources/iess4dd/iess405.pdf",
+    "title": "iess405.pdf",
+    "grade": 9,
+    "subject": "Social Science",
+    "chapterNo": 5,
+    "offset": 73,
+    "anchors": []
+  },
+  {
+    "chapterId": "9SS-CH06",
+    "file": "sources/iess1dd/iess106.pdf",
+    "title": "iess106.pdf",
+    "grade": 9,
+    "subject": "Social Science",
+    "chapterNo": 6,
+    "offset": 5,
+    "anchors": []
+  },
+  {
+    "chapterId": "10M-CH01",
+    "file": "sources/jemh1dd/jemh101.pdf",
+    "title": "jemh101.pdf",
+    "grade": 10,
+    "subject": "Math",
+    "chapterNo": 1,
+    "offset": 4,
+    "anchors": [
+      {
+        "type": "example",
+        "code": "1",
+        "page": 4
+      },
+      {
+        "type": "exercise",
+        "code": "1.1",
+        "page": 5
+      },
+      {
+        "type": "example",
+        "code": "4",
+        "page": 5
+      },
+      {
+        "type": "example",
+        "code": "5",
+        "page": 7
+      },
+      {
+        "type": "example",
+        "code": "6",
+        "page": 8
+      },
+      {
+        "type": "exercise",
+        "code": "1.2",
+        "page": 9
+      },
+      {
+        "type": "example",
+        "code": "8",
+        "page": 9
+      },
+      {
+        "type": "summary",
+        "code": "1",
+        "page": 9
+      }
+    ]
+  },
+  {
+    "chapterId": "10M-CH02",
+    "file": "sources/jemh1dd/jemh102.pdf",
+    "title": "jemh102.pdf",
+    "grade": 10,
+    "subject": "Math",
+    "chapterNo": 2,
+    "offset": 1,
+    "anchors": [
+      {
+        "type": "example",
+        "code": "1",
+        "page": 8
+      },
+      {
+        "type": "exercise",
+        "code": "2.1",
+        "page": 9
+      },
+      {
+        "type": "example",
+        "code": "2",
+        "page": 11
+      },
+      {
+        "type": "example",
+        "code": "4",
+        "page": 12
+      },
+      {
+        "type": "example",
+        "code": "5",
+        "page": 13
+      },
+      {
+        "type": "exercise",
+        "code": "2.2",
+        "page": 14
+      },
+      {
+        "type": "summary",
+        "code": "2",
+        "page": 14
+      }
+    ]
+  },
+  {
+    "chapterId": "10M-CH03",
+    "file": "sources/jemh1dd/jemh103.pdf",
+    "title": "jemh103.pdf",
+    "grade": 10,
+    "subject": "Math",
+    "chapterNo": 3,
+    "offset": 2,
+    "anchors": [
+      {
+        "type": "example",
+        "code": "1",
+        "page": 3
+      },
+      {
+        "type": "example",
+        "code": "2",
+        "page": 4
+      },
+      {
+        "type": "exercise",
+        "code": "3.1",
+        "page": 5
+      },
+      {
+        "type": "example",
+        "code": "4",
+        "page": 7
+      },
+      {
+        "type": "example",
+        "code": "5",
+        "page": 8
+      },
+      {
+        "type": "example",
+        "code": "6",
+        "page": 9
+      },
+      {
+        "type": "exercise",
+        "code": "3.2",
+        "page": 10
+      },
+      {
+        "type": "example",
+        "code": "8",
+        "page": 11
+      },
+      {
+        "type": "example",
+        "code": "9",
+        "page": 12
+      },
+      {
+        "type": "exercise",
+        "code": "3.3",
+        "page": 13
+      },
+      {
+        "type": "summary",
+        "code": "3",
+        "page": 14
+      }
+    ]
+  },
+  {
+    "chapterId": "10M-CH04",
+    "file": "sources/jemh1dd/jemh104.pdf",
+    "title": "jemh104.pdf",
+    "grade": 10,
+    "subject": "Math",
+    "chapterNo": 4,
+    "offset": 81,
+    "anchors": [
+      {
+        "type": "example",
+        "code": "1",
+        "page": 2
+      },
+      {
+        "type": "example",
+        "code": "2",
+        "page": 3
+      },
+      {
+        "type": "exercise",
+        "code": "4.1",
+        "page": 4
+      },
+      {
+        "type": "example",
+        "code": "3",
+        "page": 5
+      },
+      {
+        "type": "example",
+        "code": "4",
+        "page": 6
+      },
+      {
+        "type": "exercise",
+        "code": "4.2",
+        "page": 7
+      },
+      {
+        "type": "example",
+        "code": "6",
+        "page": 7
+      },
+      {
+        "type": "example",
+        "code": "7",
+        "page": 8
+      },
+      {
+        "type": "example",
+        "code": "9",
+        "page": 9
+      },
+      {
+        "type": "exercise",
+        "code": "4.3",
+        "page": 10
+      },
+      {
+        "type": "summary",
+        "code": "4",
+        "page": 10
+      }
+    ]
+  },
+  {
+    "chapterId": "10M-CH05",
+    "file": "sources/jemh1dd/jemh105.pdf",
+    "title": "jemh105.pdf",
+    "grade": 10,
+    "subject": "Math",
+    "chapterNo": 5,
+    "offset": 3,
+    "anchors": [
+      {
+        "type": "example",
+        "code": "1",
+        "page": 6
+      },
+      {
+        "type": "exercise",
+        "code": "5.1",
+        "page": 7
+      },
+      {
+        "type": "example",
+        "code": "3",
+        "page": 10
+      },
+      {
+        "type": "example",
+        "code": "6",
+        "page": 11
+      },
+      {
+        "type": "example",
+        "code": "9",
+        "page": 12
+      },
+      {
+        "type": "exercise",
+        "code": "5.2",
+        "page": 13
+      },
+      {
+        "type": "example",
+        "code": "10",
+        "page": 13
+      },
+      {
+        "type": "example",
+        "code": "11",
+        "page": 17
+      },
+      {
+        "type": "example",
+        "code": "13",
+        "page": 18
+      },
+      {
+        "type": "example",
+        "code": "15",
+        "page": 19
+      },
+      {
+        "type": "exercise",
+        "code": "5.3",
+        "page": 20
+      },
+      {
+        "type": "exercise",
+        "code": "5.4",
+        "page": 23
+      },
+      {
+        "type": "summary",
+        "code": "5",
+        "page": 24
+      }
+    ]
+  },
+  {
+    "chapterId": "10M-CH06",
+    "file": "sources/jemh1dd/jemh106.pdf",
+    "title": "jemh106.pdf",
+    "grade": 10,
+    "subject": "Math",
+    "chapterNo": 6,
+    "offset": 5,
+    "anchors": [
+      {
+        "type": "exercise",
+        "code": "6.3",
+        "page": 2
+      },
+      {
+        "type": "example",
+        "code": "7",
+        "page": 2
+      },
+      {
+        "type": "exercise",
+        "code": "6.1",
+        "page": 6
+      },
+      {
+        "type": "example",
+        "code": "1",
+        "page": 10
+      },
+      {
+        "type": "example",
+        "code": "2",
+        "page": 11
+      },
+      {
+        "type": "exercise",
+        "code": "6.2",
+        "page": 12
+      },
+      {
+        "type": "example",
+        "code": "4",
+        "page": 19
+      },
+      {
+        "type": "example",
+        "code": "6",
+        "page": 20
+      },
+      {
+        "type": "example",
+        "code": "8",
+        "page": 21
+      },
+      {
+        "type": "summary",
+        "code": "6",
+        "page": 25
+      }
+    ]
+  },
+  {
+    "chapterId": "10M-CH07",
+    "file": "sources/jemh1dd/jemh107.pdf",
+    "title": "jemh107.pdf",
+    "grade": 10,
+    "subject": "Math",
+    "chapterNo": 7,
+    "offset": 1,
+    "anchors": [
+      {
+        "type": "example",
+        "code": "1",
+        "page": 4
+      },
+      {
+        "type": "example",
+        "code": "2",
+        "page": 5
+      },
+      {
+        "type": "example",
+        "code": "4",
+        "page": 6
+      },
+      {
+        "type": "exercise",
+        "code": "7.1",
+        "page": 7
+      },
+      {
+        "type": "example",
+        "code": "6",
+        "page": 10
+      },
+      {
+        "type": "example",
+        "code": "8",
+        "page": 11
+      },
+      {
+        "type": "example",
+        "code": "9",
+        "page": 12
+      },
+      {
+        "type": "exercise",
+        "code": "7.2",
+        "page": 13
+      },
+      {
+        "type": "summary",
+        "code": "7",
+        "page": 14
+      }
+    ]
+  },
+  {
+    "chapterId": "10M-CH08",
+    "file": "sources/jemh1dd/jemh108.pdf",
+    "title": "jemh108.pdf",
+    "grade": 10,
+    "subject": "Math",
+    "chapterNo": 8,
+    "offset": 7,
+    "anchors": [
+      {
+        "type": "example",
+        "code": "1",
+        "page": 6
+      },
+      {
+        "type": "example",
+        "code": "3",
+        "page": 7
+      },
+      {
+        "type": "example",
+        "code": "4",
+        "page": 8
+      },
+      {
+        "type": "exercise",
+        "code": "8.1",
+        "page": 9
+      },
+      {
+        "type": "example",
+        "code": "6",
+        "page": 13
+      },
+      {
+        "type": "example",
+        "code": "7",
+        "page": 14
+      },
+      {
+        "type": "exercise",
+        "code": "8.2",
+        "page": 15
+      },
+      {
+        "type": "example",
+        "code": "9",
+        "page": 17
+      },
+      {
+        "type": "example",
+        "code": "11",
+        "page": 18
+      },
+      {
+        "type": "exercise",
+        "code": "8.3",
+        "page": 19
+      },
+      {
+        "type": "summary",
+        "code": "8",
+        "page": 20
+      }
+    ]
+  },
+  {
+    "chapterId": "10M-CH09",
+    "file": "sources/jemh1dd/jemh109.pdf",
+    "title": "jemh109.pdf",
+    "grade": 10,
+    "subject": "Math",
+    "chapterNo": 9,
+    "offset": 8,
+    "anchors": [
+      {
+        "type": "example",
+        "code": "1",
+        "page": 3
+      },
+      {
+        "type": "example",
+        "code": "2",
+        "page": 4
+      },
+      {
+        "type": "example",
+        "code": "3",
+        "page": 5
+      },
+      {
+        "type": "example",
+        "code": "5",
+        "page": 6
+      },
+      {
+        "type": "example",
+        "code": "6",
+        "page": 7
+      },
+      {
+        "type": "example",
+        "code": "7",
+        "page": 8
+      },
+      {
+        "type": "exercise",
+        "code": "9.1",
+        "page": 9
+      },
+      {
+        "type": "summary",
+        "code": "9",
+        "page": 11
+      }
+    ]
+  },
+  {
+    "chapterId": "10M-CH10",
+    "file": "sources/jemh1dd/jemh110.pdf",
+    "title": "jemh110.pdf",
+    "grade": 10,
+    "subject": "Math",
+    "chapterNo": 10,
+    "offset": 9,
+    "anchors": [
+      {
+        "type": "exercise",
+        "code": "10.1",
+        "page": 4
+      },
+      {
+        "type": "example",
+        "code": "1",
+        "page": 6
+      },
+      {
+        "type": "example",
+        "code": "2",
+        "page": 7
+      },
+      {
+        "type": "exercise",
+        "code": "10.2",
+        "page": 8
+      },
+      {
+        "type": "summary",
+        "code": "10",
+        "page": 10
+      }
+    ]
+  },
+  {
+    "chapterId": "10M-CH11",
+    "file": "sources/jemh1dd/jemh111.pdf",
+    "title": "jemh111.pdf",
+    "grade": 10,
+    "subject": "Math",
+    "chapterNo": 11,
+    "offset": 10,
+    "anchors": [
+      {
+        "type": "example",
+        "code": "1",
+        "page": 3
+      },
+      {
+        "type": "example",
+        "code": "2",
+        "page": 4
+      },
+      {
+        "type": "exercise",
+        "code": "11.1",
+        "page": 5
+      },
+      {
+        "type": "summary",
+        "code": "11",
+        "page": 7
+      }
+    ]
+  },
+  {
+    "chapterId": "10M-CH12",
+    "file": "sources/jemh1dd/jemh112.pdf",
+    "title": "jemh112.pdf",
+    "grade": 10,
+    "subject": "Math",
+    "chapterNo": 12,
+    "offset": 11,
+    "anchors": [
+      {
+        "type": "example",
+        "code": "1",
+        "page": 3
+      },
+      {
+        "type": "example",
+        "code": "2",
+        "page": 4
+      },
+      {
+        "type": "example",
+        "code": "3",
+        "page": 5
+      },
+      {
+        "type": "exercise",
+        "code": "12.1",
+        "page": 6
+      },
+      {
+        "type": "example",
+        "code": "4",
+        "page": 6
+      },
+      {
+        "type": "example",
+        "code": "5",
+        "page": 7
+      },
+      {
+        "type": "example",
+        "code": "6",
+        "page": 8
+      },
+      {
+        "type": "exercise",
+        "code": "12.2",
+        "page": 9
+      },
+      {
+        "type": "example",
+        "code": "7",
+        "page": 9
+      },
+      {
+        "type": "summary",
+        "code": "12",
+        "page": 10
+      }
+    ]
+  },
+  {
+    "chapterId": "10M-CH13",
+    "file": "sources/jemh1dd/jemh113.pdf",
+    "title": "jemh113.pdf",
+    "grade": 10,
+    "subject": "Math",
+    "chapterNo": 13,
+    "offset": 11,
+    "anchors": [
+      {
+        "type": "example",
+        "code": "1",
+        "page": 2
+      },
+      {
+        "type": "example",
+        "code": "2",
+        "page": 8
+      },
+      {
+        "type": "example",
+        "code": "3",
+        "page": 10
+      },
+      {
+        "type": "exercise",
+        "code": "13.1",
+        "page": 11
+      },
+      {
+        "type": "example",
+        "code": "4",
+        "page": 13
+      },
+      {
+        "type": "example",
+        "code": "5",
+        "page": 14
+      },
+      {
+        "type": "example",
+        "code": "6",
+        "page": 15
+      },
+      {
+        "type": "exercise",
+        "code": "13.2",
+        "page": 16
+      },
+      {
+        "type": "example",
+        "code": "7",
+        "page": 24
+      },
+      {
+        "type": "example",
+        "code": "8",
+        "page": 25
+      },
+      {
+        "type": "exercise",
+        "code": "13.3",
+        "page": 28
+      },
+      {
+        "type": "summary",
+        "code": "13",
+        "page": 30
+      }
+    ]
+  },
+  {
+    "chapterId": "10M-CH14",
+    "file": "sources/jemh1dd/jemh114.pdf",
+    "title": "jemh114.pdf",
+    "grade": 10,
+    "subject": "Math",
+    "chapterNo": 14,
+    "offset": 13,
+    "anchors": [
+      {
+        "type": "example",
+        "code": "1",
+        "page": 3
+      },
+      {
+        "type": "example",
+        "code": "4",
+        "page": 6
+      },
+      {
+        "type": "example",
+        "code": "5",
+        "page": 7
+      },
+      {
+        "type": "example",
+        "code": "7",
+        "page": 8
+      },
+      {
+        "type": "example",
+        "code": "9",
+        "page": 9
+      },
+      {
+        "type": "example",
+        "code": "10",
+        "page": 10
+      },
+      {
+        "type": "example",
+        "code": "12",
+        "page": 11
+      },
+      {
+        "type": "exercise",
+        "code": "14.1",
+        "page": 13
+      },
+      {
+        "type": "example",
+        "code": "13",
+        "page": 15
+      },
+      {
+        "type": "summary",
+        "code": "14",
+        "page": 16
+      }
+    ]
+  },
+  {
+    "chapterId": "10S-CH01",
+    "file": "sources/jesc1dd/jesc101.pdf",
+    "title": "jesc101.pdf",
+    "grade": 10,
+    "subject": "Science",
+    "chapterNo": 1,
+    "offset": 0,
+    "anchors": []
+  },
+  {
+    "chapterId": "10S-CH02",
+    "file": "sources/jesc1dd/jesc102.pdf",
+    "title": "jesc102.pdf",
+    "grade": 10,
+    "subject": "Science",
+    "chapterNo": 2,
+    "offset": 1,
+    "anchors": []
+  },
+  {
+    "chapterId": "10S-CH03",
+    "file": "sources/jesc1dd/jesc103.pdf",
+    "title": "jesc103.pdf",
+    "grade": 10,
+    "subject": "Science",
+    "chapterNo": 3,
+    "offset": 2,
+    "anchors": [
+      {
+        "type": "summary",
+        "code": "3",
+        "page": 14
+      }
+    ]
+  },
+  {
+    "chapterId": "10S-CH04",
+    "file": "sources/jesc1dd/jesc104.pdf",
+    "title": "jesc104.pdf",
+    "grade": 10,
+    "subject": "Science",
+    "chapterNo": 4,
+    "offset": 3,
+    "anchors": []
+  },
+  {
+    "chapterId": "10S-CH05",
+    "file": "sources/jesc1dd/jesc105.pdf",
+    "title": "jesc105.pdf",
+    "grade": 10,
+    "subject": "Science",
+    "chapterNo": 5,
+    "offset": 4,
+    "anchors": []
+  },
+  {
+    "chapterId": "10S-CH06",
+    "file": "sources/jesc1dd/jesc106.pdf",
+    "title": "jesc106.pdf",
+    "grade": 10,
+    "subject": "Science",
+    "chapterNo": 6,
+    "offset": 5,
+    "anchors": []
+  },
+  {
+    "chapterId": "10S-CH07",
+    "file": "sources/jesc1dd/jesc107.pdf",
+    "title": "jesc107.pdf",
+    "grade": 10,
+    "subject": "Science",
+    "chapterNo": 7,
+    "offset": 6,
+    "anchors": []
+  },
+  {
+    "chapterId": "10S-CH08",
+    "file": "sources/jesc1dd/jesc108.pdf",
+    "title": "jesc108.pdf",
+    "grade": 10,
+    "subject": "Science",
+    "chapterNo": 8,
+    "offset": 7,
+    "anchors": []
+  },
+  {
+    "chapterId": "10S-CH09",
+    "file": "sources/jesc1dd/jesc109.pdf",
+    "title": "jesc109.pdf",
+    "grade": 10,
+    "subject": "Science",
+    "chapterNo": 9,
+    "offset": 8,
+    "anchors": [
+      {
+        "type": "summary",
+        "code": "9",
+        "page": 5
+      },
+      {
+        "type": "example",
+        "code": "9.1",
+        "page": 11
+      },
+      {
+        "type": "example",
+        "code": "9.3",
+        "page": 23
+      }
+    ]
+  },
+  {
+    "chapterId": "10S-CH10",
+    "file": "sources/jesc1dd/jesc110.pdf",
+    "title": "jesc110.pdf",
+    "grade": 10,
+    "subject": "Science",
+    "chapterNo": 10,
+    "offset": 9,
+    "anchors": []
+  },
+  {
+    "chapterId": "10S-CH11",
+    "file": "sources/jesc1dd/jesc111.pdf",
+    "title": "jesc111.pdf",
+    "grade": 10,
+    "subject": "Science",
+    "chapterNo": 11,
+    "offset": 10,
+    "anchors": [
+      {
+        "type": "example",
+        "code": "11.1",
+        "page": 2
+      },
+      {
+        "type": "example",
+        "code": "11.2",
+        "page": 3
+      },
+      {
+        "type": "example",
+        "code": "11.3",
+        "page": 9
+      },
+      {
+        "type": "example",
+        "code": "11.4",
+        "page": 10
+      },
+      {
+        "type": "example",
+        "code": "11.7",
+        "page": 14
+      },
+      {
+        "type": "example",
+        "code": "11.8",
+        "page": 16
+      },
+      {
+        "type": "example",
+        "code": "11.9",
+        "page": 17
+      },
+      {
+        "type": "example",
+        "code": "11.10",
+        "page": 19
+      },
+      {
+        "type": "example",
+        "code": "11.12",
+        "page": 21
+      }
+    ]
+  },
+  {
+    "chapterId": "10S-CH12",
+    "file": "sources/jesc1dd/jesc112.pdf",
+    "title": "jesc112.pdf",
+    "grade": 10,
+    "subject": "Science",
+    "chapterNo": 12,
+    "offset": 11,
+    "anchors": [
+      {
+        "type": "example",
+        "code": "12.1",
+        "page": 6
+      },
+      {
+        "type": "example",
+        "code": "12.2",
+        "page": 9
+      }
+    ]
+  },
+  {
+    "chapterId": "10S-CH13",
+    "file": "sources/jesc1dd/jesc113.pdf",
+    "title": "jesc113.pdf",
+    "grade": 10,
+    "subject": "Science",
+    "chapterNo": 13,
+    "offset": 12,
+    "anchors": []
+  },
+  {
+    "chapterId": "10SS-CH01",
+    "file": "sources/jess4dd/jess401.pdf",
+    "title": "jess401.pdf",
+    "grade": 10,
+    "subject": "Social Science",
+    "chapterNo": 1,
+    "offset": 0,
+    "anchors": []
+  },
+  {
+    "chapterId": "10SS-CH02",
+    "file": "sources/jess4dd/jess402.pdf",
+    "title": "jess402.pdf",
+    "grade": 10,
+    "subject": "Social Science",
+    "chapterNo": 2,
+    "offset": 12,
+    "anchors": []
+  },
+  {
+    "chapterId": "10SS-CH03",
+    "file": "sources/jess4dd/jess403.pdf",
+    "title": "jess403.pdf",
+    "grade": 10,
+    "subject": "Social Science",
+    "chapterNo": 3,
+    "offset": 28,
+    "anchors": []
+  },
+  {
+    "chapterId": "10SS-CH04",
+    "file": "sources/jess4dd/jess404.pdf",
+    "title": "jess404.pdf",
+    "grade": 10,
+    "subject": "Social Science",
+    "chapterNo": 4,
+    "offset": 45,
+    "anchors": []
+  },
+  {
+    "chapterId": "10SS-CH05",
+    "file": "sources/jess4dd/jess405.pdf",
+    "title": "jess405.pdf",
+    "grade": 10,
+    "subject": "Social Science",
+    "chapterNo": 5,
+    "offset": 62,
+    "anchors": []
+  },
+  {
+    "chapterId": "10SS-CH06",
+    "file": "sources/jess1dd/jess106.pdf",
+    "title": "jess106.pdf",
+    "grade": 10,
+    "subject": "Social Science",
+    "chapterNo": 6,
+    "offset": 57,
+    "anchors": []
+  },
+  {
+    "chapterId": "10SS-CH07",
+    "file": "sources/jess1dd/jess107.pdf",
+    "title": "jess107.pdf",
+    "grade": 10,
+    "subject": "Social Science",
+    "chapterNo": 7,
+    "offset": 0,
+    "anchors": []
+  }
+]

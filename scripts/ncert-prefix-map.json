@@ -1,0 +1,22 @@
+{
+  "gepr": { "grade": 7,  "subject": "Social Science" },
+  "hemh": { "grade": 8,  "subject": "Math" },
+  "hesc": { "grade": 8,  "subject": "Science" },
+  "hegp": { "grade": 8,  "subject": "Social Science" },
+  "hepr": { "grade": 8,  "subject": "Social Science" },
+  "hees": { "grade": 8,  "subject": "Social Science" },
+  "hecu": { "grade": 8,  "subject": "Social Science" },
+  "hewe": { "grade": 8,  "subject": "English" },
+  "iemh": { "grade": 9,  "subject": "Math" },
+  "iesc": { "grade": 9,  "subject": "Science" },
+  "iess": { "grade": 9,  "subject": "Social Science" },
+  "iebe": { "grade": 9,  "subject": "English" },
+  "iemo": { "grade": 9,  "subject": "English" },
+  "iewe": { "grade": 9,  "subject": "English" },
+  "jemh": { "grade": 10, "subject": "Math" },
+  "jesc": { "grade": 10, "subject": "Science" },
+  "jess": { "grade": 10, "subject": "Social Science" },
+  "jefl": { "grade": 10, "subject": "English" },
+  "jemo": { "grade": 10, "subject": "English" }
+}
+
