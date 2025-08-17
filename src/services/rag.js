@@ -1,65 +1,86 @@
+// src/services/rag.js
+// Zero-dependency client RAG (keyword scoring over /cbse-pdf/rag/index.json)
 
-// Lightweight client-side retrieval against precomputed index.json
-const RAG_INDEX_URL = "/cbse-pdf/rag/index.json";
-
-let _index = null;
-export async function ensureRagIndex() {
-  if (_index) return _index;
-  try {
-    const r = await fetch(RAG_INDEX_URL, { cache: "no-store" });
-    _index = await r.json();
-  } catch { _index = []; }
-  return _index;
+let _ragIndex = null;
+async function loadIndex() {
+  if (_ragIndex) return _ragIndex;
+  const url = (import.meta.env.VITE_CBSE_PDF_BASE || "/cbse-pdf") + "/rag/index.json";
+  const res = await fetch(url, { cache: "no-cache" });
+  if (!res.ok) throw new Error(`RAG index not found at ${url}`);
+  _ragIndex = await res.json();
+  return _ragIndex;
 }
 
-function cosine(a, b) {
-  if (!a || !b || a.length !== b.length) return 0;
-  let dot=0, na=0, nb=0;
-  for (let i=0;i<a.length;i++){ const x=a[i], y=b[i]; dot+=x*y; na+=x*x; nb+=y*y; }
-  return dot / (Math.sqrt(na)*Math.sqrt(nb) + 1e-8);
-}
-
-export function rankByKeyword(chunks, q, k=8) {
-  const qq = String(q||"").toLowerCase().split(/\W+/).filter(Boolean);
-  return chunks
-    .map(c => {
-      const t = (c.text||"").toLowerCase();
-      let s = 0; for (const w of qq) if (t.includes(w)) s++;
-      return [s, c];
-    })
-    .sort((a,b)=>b[0]-a[0])
-    .slice(0,k)
-    .map(([_,c])=>c);
-}
-
-export async function retrieve({ query, chapterId, subject, grade, topK=6 }) {
-  const idx = await ensureRagIndex();
-  let pool = idx;
-  if (chapterId) pool = pool.filter(c => c.chapterId === chapterId);
-  // TODO: could also filter by grade/subject prefix in chapterId
-  // Prefer vector search if vectors exist
-  if (pool.length && pool[0].vector && Array.isArray(pool[0].vector)) {
-    // For the PoC, use the same embed API for the query if available, else keyword fallback
-    try {
-      const res = await fetch("https://api.together.xyz/v1/embeddings", {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${import.meta.env.VITE_TOGETHER_API_KEY}`,
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ model: import.meta.env.VITE_TOGETHER_EMBED_MODEL || "sentence-transformers/all-MiniLM-L6-v2", input: [query] })
-      });
-      const data = await res.json();
-      const qvec = data?.data?.[0]?.embedding;
-      if (Array.isArray(qvec)) {
-        const ranked = pool
-          .map(c => [cosine(qvec, c.vector), c])
-          .sort((a,b)=>b[0]-a[0])
-          .slice(0, topK)
-          .map(([_,c]) => c);
-        return ranked;
-      }
-    } catch {}
+function score(text, queryTerms) {
+  const t = text.toLowerCase();
+  let s = 0;
+  for (const q of queryTerms) {
+    if (!q) continue;
+    const w = String(q).toLowerCase().trim();
+    if (!w) continue;
+    const count = t.split(w).length - 1; // basic term frequency
+    s += count * (w.length >= 6 ? 2 : 1);
   }
-  return rankByKeyword(pool, query, topK);
+  return s;
 }
+
+function topMatches(chunks, query, limit = 5) {
+  const terms = String(query || "").split(/\W+/).filter(Boolean);
+  const withScores = chunks.map((c) => ({ ...c, __score: score(c.text || "", terms) }));
+  withScores.sort((a, b) => b.__score - a.__score);
+  return withScores.slice(0, limit).filter((c) => c.__score > 0);
+}
+
+export async function getChapterContext(chapterId, maxChars = 2400) {
+  const idx = await loadIndex();
+  const chunks = (idx.byChapter && idx.byChapter[chapterId]) || [];
+  const sorted = [...chunks].sort((a, b) => (a.page || 0) - (b.page || 0));
+  let out = "";
+  for (const c of sorted) {
+    const t = (c?.text || "").replace(/\s+/g, " ").trim();
+    if (!t) continue;
+    if (out.length + t.length + 1 > maxChars) {
+      out += " " + t.slice(0, Math.max(0, maxChars - out.length));
+      break;
+    }
+    out += (out ? " " : "") + t;
+  }
+  return out.trim();
+}
+
+export async function enrichLOs({ chapterId, los = [], topicLabel }) {
+  const idx = await loadIndex();
+  const chunks = (idx.byChapter && idx.byChapter[chapterId]) || idx.chunks || [];
+  if (!chunks.length) return los;
+
+  const enhanced = los.map((lo) => {
+    const q = `${topicLabel || ""} ${lo}`.trim();
+    const hits = topMatches(chunks, q, 3);
+    if (!hits.length) return lo;
+    const snippets = hits.map((h) => (h.text || "").slice(0, 180).replace(/\s+/g, " ").trim());
+    return `${lo} — e.g., ${snippets.join(" / ")}`;
+  });
+
+  return enhanced;
+}
+
+export async function generateMicroplan({ chapterId, los = [], topicLabel }) {
+  const idx = await loadIndex();
+  const chunks = (idx.byChapter && idx.byChapter[chapterId]) || idx.chunks || [];
+  const baseText = (chunks[0]?.text || "").replace(/\s+/g, " ").slice(0, 260);
+
+  return {
+    title: `Microplan • ${chapterId}${topicLabel ? ` • ${topicLabel}` : ""}`,
+    overview: baseText || "Overview not found in RAG index.",
+    steps: [
+      { type: "Hook", minutes: 5, detail: `Quick prompt about: ${topicLabel || los[0] || "today's concept"}` },
+      { type: "Teach", minutes: 10, detail: `Explain core idea. Use example from text (see: ${chapterId}).` },
+      { type: "Guided Practice", minutes: 10, detail: `Work through 1–2 problems tied to: ${los.slice(0,2).join("; ")}` },
+      { type: "Check for Understanding", minutes: 5, detail: "1-minute exit ticket on the main idea." },
+    ],
+  };
+}
+
+// Back-compat default export
+export default { enrichLOs, generateMicroplan, getChapterContext };
+

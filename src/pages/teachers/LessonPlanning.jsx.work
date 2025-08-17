@@ -1,0 +1,235 @@
+import React, { useEffect, useMemo, useState } from "react";
+import { Card } from "../../ui/Card";
+import { Button } from "../../ui/Button";
+import PDFPreview from "../../components/PDFPreview";
+import {
+  ensureManifest,
+  getGrades,
+  getSubjectsForGrade,
+  getChaptersForGradeSubject,
+  getTopicsForChapter,
+  getChapterById,
+  buildLocalPdfUrl,
+} from "../../services/manifest";
+
+// local, deterministic LO seeder as a fallback
+function seedLOs({ subject, chapter, topics }) {
+  const t = topics?.[0];
+  const base = [
+    "Explain the key concept(s) introduced.",
+    "Identify real-life examples of the concept.",
+    "Solve a numerical/example related to the concept.",
+    "Summarize the main points from the section.",
+  ];
+  if (t) base[0] = `Explain the key concept(s) in “${t}”.`;
+  // subject-based tweak
+  if ((subject || "").toLowerCase().includes("english"))
+    base[2] = "Analyze a passage/example related to the concept.";
+  return base;
+}
+
+// tiny skeleton generator (keeps the page usable even before LLM wiring)
+function skeletonFromLOs(los, topic) {
+  return [
+    { title: "Starter / Hook", body: `Quick hook using ${topic ? `"${topic}"` : "a chapter cue"}.` },
+    { title: "Teach / Model", body: "Explain the core idea with one worked example." },
+    { title: "Practice", body: "3–5 targeted problems with immediate feedback." },
+    { title: "Assess / Exit Ticket", body: `Exit ticket: 2 questions mapping to LO${los.length > 1 ? "s" : ""}.` },
+  ];
+}
+
+export default function LessonPlanning() {
+  // selects
+  const [grade, setGrade] = useState(8);
+  const [subject, setSubject] = useState("");
+  const [chapterId, setChapterId] = useState("");
+  const [topic, setTopic] = useState("");
+
+  // options
+  const [gradeOptions, setGradeOptions] = useState([8, 9, 10]);
+  const [subjectOptions, setSubjectOptions] = useState([]);
+  const [chapterOptions, setChapterOptions] = useState([]);
+  const [topicOptions, setTopicOptions] = useState([]);
+
+  // LOs and Microplan
+  const [los, setLos] = useState([]);
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [microplan, setMicroplan] = useState([]);
+
+  // PDF
+  const [pdfExpanded, setPdfExpanded] = useState(true);
+
+  // bootstrap
+  useEffect(() => {
+    (async () => {
+      await ensureManifest();
+      const g = await getGrades();
+      setGradeOptions(g);
+      // keep existing selection if possible
+      const subs = await getSubjectsForGrade(grade);
+      setSubjectOptions(subs);
+      if (!subs.includes(subject)) {
+        setSubject(subs[0] || "");
+      }
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // grade → subjects
+  useEffect(() => {
+    (async () => {
+      const subs = await getSubjectsForGrade(grade);
+      setSubjectOptions(subs);
+      if (!subs.includes(subject)) setSubject(subs[0] || "");
+    })();
+  }, [grade]);
+
+  // subject → chapters
+  useEffect(() => {
+    (async () => {
+      if (!subject) { setChapterOptions([]); setChapterId(""); return; }
+      const chs = await getChaptersForGradeSubject(grade, subject);
+      setChapterOptions(chs);
+      if (!chs.find(c => c.chapterId === chapterId)) setChapterId(chs[0]?.chapterId || "");
+    })();
+  }, [grade, subject]);
+
+  // chapter → topics + seed LOs
+  useEffect(() => {
+    (async () => {
+      if (!chapterId) { setTopicOptions([]); setTopic(""); setLos([]); return; }
+      const topics = await getTopicsForChapter(chapterId);
+      setTopicOptions(topics);
+      if (topics.length) setTopic(topics[0]);
+      const chapter = await getChapterById(chapterId);
+      setLos(seedLOs({ subject, chapter, topics }));
+    })();
+  }, [chapterId, subject]);
+
+  const pdfUrl = useMemo(
+    () =>
+      chapterId ? buildLocalPdfUrl({ chapterId, file: chapterOptions.find(c => c.chapterId === chapterId)?.file }, { page: 1 }) : "",
+    [chapterId, chapterOptions]
+  );
+
+  function onAddLO() {
+    setLos(prev => [...prev, ""]);
+  }
+
+  function onRemoveLO(i) {
+    setLos(prev => prev.filter((_, idx) => idx !== i));
+  }
+
+  function onChangeLO(i, val) {
+    setLos(prev => prev.map((x, idx) => (idx === i ? val : x)));
+  }
+
+  function onGenerate() {
+    const plan = skeletonFromLOs(los.filter(Boolean), topic);
+    setMicroplan(plan);
+    setPreviewOpen(true);
+  }
+
+  async function onEnrich() {
+    // Hook for your LLM/RAG pass – for now, use the same skeleton so UX flows
+    // Once you wire RAG, replace with: const plan = await enrichWithRag({ grade, subject, chapterId, los, topic })
+    const plan = skeletonFromLOs(los.filter(Boolean), topic);
+    setMicroplan(plan);
+    setPreviewOpen(true);
+  }
+
+  return (
+    <>
+      <Card title="Teacher · Lesson Planner">
+        <div className="grid md:grid-cols-4 gap-3">
+          <div>
+            <div className="label">Class</div>
+            <select className="input" value={grade} onChange={(e) => setGrade(Number(e.target.value))}>
+              {gradeOptions.map(g => <option key={g} value={g}>{g}</option>)}
+            </select>
+          </div>
+
+          <div>
+            <div className="label">Subject</div>
+            <select className="input" value={subject} onChange={(e) => setSubject(e.target.value)}>
+              {subjectOptions.map(s => <option key={s} value={s}>{s}</option>)}
+            </select>
+          </div>
+
+          <div>
+            <div className="label">Chapter</div>
+            <select className="input" value={chapterId} onChange={(e) => setChapterId(e.target.value)}>
+              {chapterOptions.map(c => <option key={c.chapterId} value={c.chapterId}>{c.label}</option>)}
+            </select>
+          </div>
+
+          <div>
+            <div className="label">Topic (optional)</div>
+            <select
+              className="input"
+              value={topic || ""}
+              onChange={(e) => setTopic(e.target.value)}
+            >
+              {topicOptions.length ? topicOptions.map(t => <option key={t} value={t}>{t}</option>)
+                : <option value="">(none)</option>}
+            </select>
+          </div>
+        </div>
+
+        <div className="mt-4">
+          <div className="section-title">Learning Objectives (LOs)</div>
+          <div className="space-y-2">
+            {los.map((text, i) => (
+              <div key={`${i}-${text.slice(0,8)}`} className="flex gap-2">
+                <input
+                  className="input flex-1"
+                  value={text}
+                  placeholder={`LO #${i + 1}`}
+                  onChange={(e) => onChangeLO(i, e.target.value)}
+                />
+                <Button variant="danger" onClick={() => onRemoveLO(i)}>Remove</Button>
+              </div>
+            ))}
+            <div>
+              <Button variant="ghost" onClick={onAddLO}>+ Add LO</Button>
+            </div>
+          </div>
+
+          <div className="mt-3 flex gap-2">
+            <Button onClick={onEnrich}>Enrich with AI (RAG)</Button>
+            <Button variant="secondary" onClick={onGenerate}>Generate Microplan</Button>
+          </div>
+        </div>
+
+        {/* Inline microplan preview */}
+        {previewOpen && (
+          <div className="mt-4 card">
+            <div className="card-header">
+              <div className="title">Microplan Preview</div>
+              <Button variant="ghost" onClick={() => setPreviewOpen(false)}>Close</Button>
+            </div>
+            <div className="card-body space-y-3">
+              {microplan.map((b, idx) => (
+                <div key={idx} className="card muted">
+                  <div className="title-sm">{b.title}</div>
+                  <div className="mt-1">{b.body}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* PDF */}
+        <div className="mt-6">
+          <PDFPreview
+            chapterId={chapterId}
+            url={pdfUrl}
+            expanded={pdfExpanded}
+            onToggle={() => setPdfExpanded((v) => !v)}
+          />
+        </div>
+      </Card>
+    </>
+  );
+}
+

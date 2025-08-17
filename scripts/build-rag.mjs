@@ -1,153 +1,190 @@
-#!/usr/bin/env node
-// Build a lightweight retrieval index from local chapter PDFs.
-//
-// Fixes:
-// - Hard-chunk text so each embedding input ≤ model context (default 1500 chars ~ <=512 tokens)
-// - Graceful fallback to keyword-only if embeddings unavailable/disabled
-//
-// Env knobs:
-//   TOGETHER_API_KEY=...                     (server key)
-//   TOGETHER_EMBED_MODEL=intfloat/multilingual-e5-large-instruct   (or any enabled embedding model)
-//   TOGETHER_DISABLE_EMBED=1                 (force keyword-only)
-//   RAG_EMBED_MAX_CHARS=1500                 (per-chunk char cap)
 
 import fs from "node:fs";
 import path from "node:path";
-
-// --- robust pdf-parse import (bypass package entry that tries to read test files) ---
 import { createRequire } from "node:module";
-const require = createRequire(import.meta.url);
-const pdfParsePath = require.resolve("pdf-parse/lib/pdf-parse.js");
-const { default: pdf } = await import(pdfParsePath);
+import { pathToFileURL } from "node:url";
 
-// ------------ config ------------
-const ROOT = "public/cbse-pdf";
-const MANIFEST = path.join(ROOT, "manifest.json");
-const OUT_DIR = path.join(ROOT, "rag");
+const require = createRequire(import.meta.url);
+
+let pdfjsLib;
+async function loadPdfJs() {
+  // Prefer legacy build for Node, then fall back
+  try {
+    pdfjsLib = await import("pdfjs-dist/legacy/build/pdf.mjs");
+  } catch (_) {
+    pdfjsLib = await import("pdfjs-dist/build/pdf.mjs");
+  }
+
+  // Try to set worker (optional in Node; safe to skip if not found)
+  try {
+    const pkgPath = require.resolve("pdfjs-dist/package.json");
+    const baseDir = path.dirname(pkgPath);
+    let workerPath;
+    const candidates = [
+      path.join(baseDir, "legacy/build/pdf.worker.min.js"),
+      path.join(baseDir, "build/pdf.worker.min.js")
+    ];
+    for (const c of candidates) {
+      if (fs.existsSync(c)) { workerPath = c; break; }
+    }
+    if (workerPath) {
+      pdfjsLib.GlobalWorkerOptions.workerSrc = pathToFileURL(workerPath).href;
+    }
+  } catch (e) {
+    // Non-fatal
+    console.warn("[PDFJS] Worker not set (ok in Node):", e?.message);
+  }
+}
+
+function resolvePdfJsAssets() {
+  try {
+    const pkgPath = require.resolve("pdfjs-dist/package.json");
+    const baseDir = path.dirname(pkgPath);
+    const standardFonts = path.join(baseDir, "standard_fonts/");
+    const cmaps = path.join(baseDir, "cmaps/");
+    const cfg = {};
+    if (fs.existsSync(standardFonts)) cfg.standardFontDataUrl = pathToFileURL(standardFonts).href;
+    if (fs.existsSync(cmaps)) { cfg.cMapUrl = pathToFileURL(cmaps).href; cfg.cMapPacked = true; }
+    return cfg;
+  } catch (e) {
+    return {};
+  }
+}
+
+const ROOT = process.cwd();
+const MANIFEST = path.resolve(ROOT, "public/cbse-pdf/manifest.json");
+const SOURCES_DIR = path.resolve(ROOT, "public/cbse-pdf/sources");
+const OUT_DIR = path.resolve(ROOT, "public/cbse-pdf/rag");
 const OUT_INDEX = path.join(OUT_DIR, "index.json");
 
-const EMBED_API = "https://api.together.xyz/v1/embeddings";
-const EMBED_MODEL =
-  process.env.TOGETHER_EMBED_MODEL || "intfloat/multilingual-e5-large-instruct";
 const KEY = process.env.TOGETHER_API_KEY || "";
-const DISABLE_EMBED = /^(1|true|yes)$/i.test(process.env.TOGETHER_DISABLE_EMBED || "");
-const MAX_CHARS = Math.max(400, Number(process.env.RAG_EMBED_MAX_CHARS || 1500)); // ~<=512 tokens
+const EMBED_MODEL = process.env.TOGETHER_EMBED_MODEL || "intfloat/multilingual-e5-large-instruct";
+const DISABLE_EMBED = String(process.env.TOGETHER_DISABLE_EMBED || "0") === "1";
+const MAX_CHARS = Math.max(300, parseInt(process.env.RAG_EMBED_MAX_CHARS || "1500", 10));
 
-// ------------ utils ------------
-function readJson(p){ return JSON.parse(fs.readFileSync(p,"utf8")); }
-function writeJson(p, o){ fs.writeFileSync(p, JSON.stringify(o,null,2)); }
-function abs(p){ return path.resolve(p); }
-function norm(s){ return String(s||"").replace(/\s+/g," ").trim(); }
+const EMBED_API = "https://api.together.xyz/v1/embeddings";
 
-// Chunk text on sentence-ish boundaries, max MAX_CHARS each
+function readJson(p) { return JSON.parse(fs.readFileSync(p, "utf-8")); }
+function writeJson(p, o) { fs.mkdirSync(path.dirname(p), { recursive: true }); fs.writeFileSync(p, JSON.stringify(o, null, 2)); }
+function norm(s) { return String(s || "").replace(/\s+/g, " ").trim(); }
+
 function smartChunks(text, maxChars = MAX_CHARS) {
   const t = norm(text);
   if (!t) return [];
   if (t.length <= maxChars) return [t];
-
   const out = [];
   let start = 0;
   const len = t.length;
   while (start < len) {
     let end = Math.min(start + maxChars, len);
-    // try to break on a sentence boundary or whitespace near the end
-    let cut = t.lastIndexOf(". ", end);
-    if (cut <= start + Math.floor(maxChars * 0.6)) {
-      cut = t.lastIndexOf(" ", end);
+    let cut = end;
+    for (let k = end; k > start + Math.floor(maxChars * 0.6); k--) {
+      const ch = t[k];
+      if (ch === "." || ch === "!" || ch === "?" || ch === ";" || ch === "\n" || ch === " ") { cut = k; break; }
     }
-    if (cut <= start) cut = end;
     out.push(t.slice(start, cut).trim());
-    start = cut + 1;
+    start = cut;
   }
   return out.filter(Boolean);
 }
 
-// Read a PDF and return an array of chunks (<=MAX_CHARS). Prefer per-page splits; fallback to hard chunks.
-async function readPdfChunks(absPdf) {
-  const buf = new Uint8Array(fs.readFileSync(absPdf));
-
-  // Use pdf-parse; its `text` is usually joined with \f between pages.
-  const res = await pdf(buf, {
-    pagerender: (pg) =>
-      pg.getTextContent().then(tc => tc.items.map(i => i.str || "").join(" "))
-  });
-
-  let raw = String(res.text || "");
-  let byPage = raw.split("\f").map(norm).filter(Boolean);
-
-  // If the splitter failed (common for some PDFs), or any page is still too long, re-chunk the whole text.
-  const anyTooLong = byPage.some(p => p.length > MAX_CHARS);
-  if (!byPage.length || byPage.length === 1 || anyTooLong) {
-    byPage = smartChunks(raw, MAX_CHARS);
-  } else {
-    // also re-chunk long pages individually
-    const fixed = [];
-    for (const p of byPage) {
-      if (p.length > MAX_CHARS) fixed.push(...smartChunks(p, MAX_CHARS));
-      else fixed.push(p);
-    }
-    byPage = fixed;
+async function readPdfPages(absPdf) {
+  if (!pdfjsLib) await loadPdfJs();
+  const opts = resolvePdfJsAssets();
+  const data = new Uint8Array(fs.readFileSync(absPdf));
+  const task = pdfjsLib.getDocument({ data, useWorkerFetch: false, isEvalSupported: false, ...opts });
+  const doc = await task.promise;
+  const pages = [];
+  for (let i = 1; i <= doc.numPages; i++) {
+    const page = await doc.getPage(i);
+    const tc = await page.getTextContent();
+    const text = tc.items.map(it => it.str || "").join(" ");
+    pages.push(norm(text));
   }
-  return byPage;
+  try { await doc.destroy(); } catch {}
+  return pages;
 }
 
 async function embedBatch(texts) {
-  if (DISABLE_EMBED || !KEY) return texts.map(() => null); // keyword-only
+  if (DISABLE_EMBED || !KEY) return texts.map(() => null);
+  const payload = { model: EMBED_MODEL, input: texts };
   try {
     const res = await fetch(EMBED_API, {
       method: "POST",
       headers: { "Authorization": `Bearer ${KEY}`, "Content-Type": "application/json" },
-      body: JSON.stringify({ model: EMBED_MODEL, input: texts })
+      body: JSON.stringify(payload)
     });
     if (!res.ok) {
       const t = await res.text().catch(() => "?");
-      console.warn(`[RAG] Embedding API ${res.status}: ${t.slice(0,180)} — falling back to keyword only.`);
+      console.warn(`[RAG] Embeddings API non-OK ${res.status}: ${t.slice(0,200)}`);
       return texts.map(() => null);
     }
-    const data = await res.json();
-    return (data?.data || []).map(d => d.embedding || null);
-  } catch (err) {
-    console.warn(`[RAG] Embedding error: ${err.message} — falling back to keyword only.`);
+    const json = await res.json();
+    const arr = json?.data || [];
+    return texts.map((_, i) => arr[i]?.embedding || null);
+  } catch (e) {
+    console.warn("[RAG] Embeddings API failed; continuing keyword-only.", e);
     return texts.map(() => null);
   }
 }
 
-// ------------ main ------------
+function resolvePdfPath(entryFile) {
+  const f = String(entryFile || "").replace(/^\/+/, "");
+  if (f.startsWith("sources/")) return path.resolve(ROOT, "public/cbse-pdf", f);
+  return path.resolve(SOURCES_DIR, f);
+}
+function deriveChapterId(e) {
+  if (e.chapterId) return String(e.chapterId);
+  const base = path.basename(String(e.file || ""), ".pdf");
+  return base || "unknown";
+}
+
 async function main() {
-  if (!fs.existsSync(OUT_DIR)) fs.mkdirSync(OUT_DIR, { recursive: true });
-  if (!fs.existsSync(MANIFEST)) {
-    console.error(`Missing ${MANIFEST}`);
-    process.exit(2);
-  }
+  if (!fs.existsSync(MANIFEST)) throw new Error(`Manifest not found at ${MANIFEST}`);
+  const list = readJson(MANIFEST);
+  if (!Array.isArray(list) || list.length === 0) throw new Error("Manifest is empty or not an array");
+  console.log(`Building RAG from ${list.length} manifest entries…`);
 
-  const manifest = readJson(MANIFEST);
   const index = [];
-  const BATCH = 8;
+  for (const e of list) {
+    const chapterId = deriveChapterId(e);
+    const absPdf = resolvePdfPath(e.file);
+    if (!fs.existsSync(absPdf)) { console.warn(`[RAG] Missing PDF for ${chapterId}: ${absPdf}`); continue; }
 
-  for (const e of manifest) {
-    const absPdf = abs(path.join(ROOT, e.file));
-    if (!fs.existsSync(absPdf)) continue;
+    console.log(`• Reading ${chapterId} ← ${path.relative(ROOT, absPdf)}`);
+    const pages = await readPdfPages(absPdf);
+    if (!pages || pages.length === 0) { console.warn(`[RAG] No text extracted for ${chapterId}`); continue; }
 
-    const chunks = await readPdfChunks(absPdf); // already <= MAX_CHARS
+    const chunks = [];
+    for (let i = 0; i < pages.length; i++) {
+      const pageNo = i + 1;
+      const text = pages[i];
+      if (!text) continue;
+      const parts = smartChunks(text, MAX_CHARS);
+      for (const part of parts) chunks.push({ text: part, pdfPage: pageNo });
+    }
+
+    const BATCH = 8;
     for (let i = 0; i < chunks.length; i += BATCH) {
       const slice = chunks.slice(i, i + BATCH);
-      const embeds = await embedBatch(slice);
+      const embeds = await embedBatch(slice.map(c => c.text));
       for (let j = 0; j < slice.length; j++) {
+        const c = slice[j];
         index.push({
-          id: `${e.chapterId}:${i + j + 1}`,
-          chapterId: e.chapterId,
-          page: i + j + 1,             // "page" here = chunk number (fine for retrieval links)
-          text: slice[j],
+          id: `${chapterId}:${i + j + 1}`,
+          chapterId,
+          page: c.pdfPage,
+          text: c.text,
           vector: embeds ? embeds[j] : null
         });
       }
-      process.stdout.write(`• ${e.chapterId} chunks ${i + 1}-${Math.min(i + BATCH, chunks.length)}\n`);
+      process.stdout.write(`  - chunks ${i + 1}-${Math.min(i + BATCH, chunks.length)}\r`);
     }
+    process.stdout.write("\n");
   }
 
-  writeJson(OUT_INDEX, index);
-  console.log(`\n✅ RAG index written to ${OUT_INDEX} (${index.length} chunks, vectors: ${index.filter(x=>x.vector).length})`);
+  writeJson(OUT_INDEX, { passages: index });
+  console.log(`\n✅ RAG index written to ${path.relative(ROOT, OUT_INDEX)} (${index.length} chunks, vectors: ${index.filter(x => x.vector).length})`);
 }
 
-main().catch(e => { console.error(e); process.exit(1); });
-
+main().catch(err => { console.error(err); process.exit(1); });

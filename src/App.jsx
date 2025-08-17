@@ -14,7 +14,7 @@ import { Card } from './ui/Card'
 import { api } from './api';
 import CitationLink from './components/CitationLink';
 import { assignMicroplan } from './state/assignments'
-import { generateSequence, suggestSequenceLLM } from './services/planSequencer'
+import { generateMicroplan, enrichWithRag } from "./services/planSequencer";
 import PdfCalibrator from './pages/dev/PdfCalibrator'
 
 // Teachers pages
@@ -119,8 +119,8 @@ function LegacyLessonPlanning() {
 
   async function generateMicroplan() {
     if (!selectedLOs.length) return setPlan([]);
-    const llm = await suggestSequenceLLM({ klass, subject, loIds: selectedLOs, target: 20 });
-    const seq = llm || await generateSequence({ klass, subject, loIds: selectedLOs, target: 20 });
+    const llm = await enrichWithRag({ klass, subject, loIds: selectedLOs, target: 20 });
+    const seq = llm || await generateMicroplan({ klass, subject, loIds: selectedLOs, target: 20 });
     setPlan(seq.items);
   }
 

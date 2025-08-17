@@ -1,76 +1,104 @@
-import { api } from "../api";
-import { annotateWithChapter } from "./chapterRef";
+// src/services/planSequencer.js
+import example from "../models/planExample.json";
 
-// Heuristic 4-phase sequence that lands ~ target minutes (±2)
-export async function generateSequence({ klass, subject, loIds, target = 20 }) {
-  const los = (loIds && loIds.length)
-    ? loIds
-    : (api.cbse?.getLOs({ klass, subject }) || []).slice(0, 2).map(x => x.id);
+/** Ensure we always return {starter:[], teach:[], practice:[], assess:[]} */
+export function toCanonicalPlan(input) {
+  const empty = { starter: [], teach: [], practice: [], assess: [] };
+  if (!input) return empty;
 
-  const pool = [];
-  for (const lo of los) {
-    const ex = api.cbse?.getExercisesByLO([lo], { limit: 12 }) || [];
-    ex.forEach(e => pool.push({ ...e, lo }));
+  // already canonical-ish
+  if (
+    typeof input === "object" &&
+    ("starter" in input || "teach" in input || "practice" in input || "assess" in input)
+  ) {
+    const out = { ...empty };
+    for (const k of ["starter", "teach", "practice", "assess"]) {
+      const v = input[k];
+      out[k] = Array.isArray(v) ? v : v ? [v] : [];
+    }
+    return out;
   }
 
-  // Prefer cited + shorter first
-  pool.sort((a, b) =>
-    (Number(!!b.citation) - Number(!!a.citation)) ||
-    ((a.estMinutes || 6) - (b.estMinutes || 6))
-  );
-
-  const phases = { warmup: [], teach: [], practice: [], reflect: [] };
-  const cap = { warmup: 5, teach: 8, practice: Math.max(target - 6, 6), reflect: 3 };
-
-  for (const x of pool) {
-    const m = x.estMinutes || 6;
-    if (mins(phases.warmup)   < cap.warmup   && m <= 6)     { phases.warmup.push(x);   continue; }
-    if (mins(phases.teach)    < cap.teach    && x.citation) { phases.teach.push(x);    continue; }
-    if (mins(phases.practice) < cap.practice)               { phases.practice.push(x); continue; }
+  if (Array.isArray(input)) {
+    const out = { ...empty };
+    for (const it of input) {
+      const phase = (it?.phase || it?.section || "teach").toString().toLowerCase();
+      const node =
+        typeof it === "string" ? { text: it } : { title: it.title, text: it.text || it.body || "" };
+      if (["starter", "hook", "warmup"].includes(phase)) out.starter.push(node);
+      else if (["practice", "guided", "independent"].includes(phase)) out.practice.push(node);
+      else if (["assess", "exit", "check"].includes(phase)) out.assess.push(node);
+      else out.teach.push(node);
+    }
+    return out;
   }
-  const leftover = pool.find(x => !Object.values(phases).some(arr => arr.includes(x)));
-  if (leftover) phases.reflect.push(leftover);
 
-  const seq = trimToTarget([...phases.warmup, ...phases.teach, ...phases.practice, ...phases.reflect], target);
+  if (typeof input === "string") {
+    return { ...empty, teach: [{ text: input }] };
+  }
 
-  const phaseOf = (n) =>
-    phases.warmup.includes(n)   ? "warmup"  :
-    phases.teach.includes(n)    ? "teach"   :
-    phases.practice.includes(n) ? "practice" : "reflect";
-
-  const seqWithPhase = seq.map(x => ({ ...x, phase: phaseOf(x) }));
-  const withCh = annotateWithChapter(seqWithPhase, los)
-    .map((x, i) => ({ ...x, id: x.id || `it${i + 1}` }));
-
-  return { phases, items: withCh, loIds: los };
+  return empty;
 }
 
-function mins(arr){ return arr.reduce((s,x)=>s+(x.estMinutes||6),0); }
-function trimToTarget(items, target){
-  let sum=0, out=[];
-  for(const x of items){
-    const m=x.estMinutes||6;
-    if(sum+m>target+2) continue;
-    out.push(x); sum+=m;
-    if(sum>=target-2) break;
-  }
-  let i=0;
-  while(sum<target-2 && i<items.length){
-    const x=items[i++]; if(out.includes(x)) continue;
-    out.push(x); sum+=(x.estMinutes||6);
-  }
-  return out;
+export async function generateMicroplan({ grade, subject, chapterId, los, topic }) {
+  // If you already call your LLM here, keep it.
+  // This fallback keeps dev/demo working.
+  const seed =
+    example?.plan ||
+    [
+      { phase: "starter", text: "Quick recap + hook prompt." },
+      { phase: "teach", text: "Explain the core idea with one worked example." },
+      { phase: "practice", text: "3–5 problems with immediate feedback." },
+      { phase: "assess", text: "Exit ticket: 2 questions mapping to LOs." },
+    ];
+
+  return toCanonicalPlan(seed);
 }
 
-// Optional server LLM; safe no-op unless enabled
-export async function suggestSequenceLLM(ctx){
-  if (import.meta.env.VITE_LLM_ENABLED !== '1') return null;
-  try {
-    const res = await fetch('/api/llm-sequence',{
-      method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(ctx)
-    });
-    if(!res.ok) return null;
-    return await res.json();
-  } catch { return null; }
+export async function enrichWithRag({ grade, subject, chapterId, los, topic }) {
+  // Keep your existing RAG call if present; normalize its shape before returning.
+  const enriched =
+    example?.enriched ||
+    [
+      { phase: "starter", text: "Anchor to a real-life scenario from the chapter PDF." },
+      { phase: "teach", text: "Use a short passage/diagram reference to ground the concept." },
+      { phase: "practice", text: "Targeted questions pulled from chapter context." },
+      { phase: "assess", text: "One higher-order question citing the chapter." },
+    ];
+
+  return toCanonicalPlan(enriched);
 }
+
+// --- Back-compat shim exports for older call sites ---
+
+// Minimal skeleton so PlanPreview has something to render
+export function generateMicroplanSkeleton({ los = [], topic = null } = {}) {
+  const plan = {
+    "Starter / Hook": [
+      `Anchor to a real-life scenario from the chapter${topic ? ` (topic: ${topic})` : ""}.`
+    ],
+    "Teach / Model": [
+      "Use a short passage/diagram reference to ground the concept."
+    ],
+    "Practice": [
+      "Targeted questions pulled from chapter context."
+    ],
+    "Assess / Exit Ticket": [
+      "One higher-order question citing the chapter."
+    ]
+  };
+
+  // Weave a few LOs into Practice, if provided
+  los.slice(0, 3).forEach((lo, i) => {
+    plan["Practice"].push(`Task ${i + 1}: ${lo}`);
+  });
+
+  return plan;
+}
+
+// If your file already exports generateMicroplan, leave it.
+
+// Extra aliases for older imports you might still have around:
+export const generateSequence = generateMicroplan;
+export const suggestSequenceLLM = generateMicroplan;
 

@@ -7,33 +7,7 @@
     "subject": "English",
     "chapterNo": "1",
     "offset": 0,
-    "anchors": [
-      {
-        "type": "summary",
-        "code": "1",
-        "page": 19
-      },
-      {
-        "type": "Exercise",
-        "page": 9
-      },
-      {
-        "type": "Example",
-        "page": 11
-      },
-      {
-        "type": "Intext Questions",
-        "page": 7
-      },
-      {
-        "type": "Summary",
-        "page": 19
-      },
-      {
-        "type": "Let us think and reflect",
-        "page": 21
-      }
-    ]
+    "anchors": []
   },
   {
     "chapterId": "8SS-CH02",
@@ -43,24 +17,7 @@
     "subject": "Science",
     "chapterNo": "2",
     "offset": 48,
-    "anchors": [
-      {
-        "type": "Exercise",
-        "page": 59
-      },
-      {
-        "type": "Examples",
-        "page": 60
-      },
-      {
-        "type": "Intext Questions",
-        "page": 61
-      },
-      {
-        "type": "Summary",
-        "page": 67
-      }
-    ]
+    "anchors": []
   },
   {
     "chapterId": "8SS-CH03",
@@ -80,24 +37,7 @@
     "subject": "Environment",
     "chapterNo": "4",
     "offset": 0,
-    "anchors": [
-      {
-        "type": "Exercise",
-        "page": 159
-      },
-      {
-        "type": "Example",
-        "page": 159
-      },
-      {
-        "type": "Intext Questions",
-        "page": 159
-      },
-      {
-        "type": "Summary",
-        "page": 165
-      }
-    ]
+    "anchors": []
   },
   {
     "chapterId": "8SS-CH05",
@@ -107,29 +47,7 @@
     "subject": "Social Science",
     "chapterNo": ",",
     "offset": 4,
-    "anchors": [
-      {
-        "type": "summary",
-        "code": "5",
-        "page": 19
-      },
-      {
-        "type": "Exercise",
-        "page": 206
-      },
-      {
-        "type": "Examples",
-        "page": 207
-      },
-      {
-        "type": "Intext Questions",
-        "page": 208
-      },
-      {
-        "type": "Summary",
-        "page": 211
-      }
-    ]
+    "anchors": []
   },
   {
     "chapterId": "8SS-CH06",
@@ -139,39 +57,7 @@
     "subject": "Social Science",
     "chapterNo": ",",
     "offset": 5,
-    "anchors": [
-      {
-        "type": "example",
-        "code": "1",
-        "page": 5
-      },
-      {
-        "type": "example",
-        "code": "2",
-        "page": 6
-      },
-      {
-        "type": "summary",
-        "code": "6",
-        "page": 22
-      },
-      {
-        "type": "Exercises",
-        "page": 143
-      },
-      {
-        "type": "Examples",
-        "page": 140
-      },
-      {
-        "type": "Intext Questions",
-        "page": 138
-      },
-      {
-        "type": "Summary",
-        "page": 157
-      }
-    ]
+    "anchors": []
   },
   {
     "chapterId": "8SS-CH07",
@@ -181,43 +67,7 @@
     "subject": "Math",
     "chapterNo": ": 7",
     "offset": 6,
-    "anchors": [
-      {
-        "type": "example",
-        "code": "1",
-        "page": 4
-      },
-      {
-        "type": "example",
-        "code": "3",
-        "page": 5
-      },
-      {
-        "type": "example",
-        "code": "6",
-        "page": 6
-      },
-      {
-        "type": "example",
-        "code": "8",
-        "page": 9
-      },
-      {
-        "type": "example",
-        "code": "9",
-        "page": 11
-      },
-      {
-        "type": "example",
-        "code": "11",
-        "page": 16
-      },
-      {
-        "type": "summary",
-        "code": "7",
-        "page": 19
-      }
-    ]
+    "anchors": []
   },
   {
     "chapterId": "8SS-CH08",
@@ -237,24 +87,7 @@
     "subject": "Science",
     "chapterNo": "Just 9",
     "offset": 8,
-    "anchors": [
-      {
-        "type": "Exercise",
-        "page": 136
-      },
-      {
-        "type": "Examples",
-        "page": 137
-      },
-      {
-        "type": "Intext Questions",
-        "page": 138
-      },
-      {
-        "type": "Summary",
-        "page": 149
-      }
-    ]
+    "anchors": []
   },
   {
     "chapterId": "8SS-CH10",
@@ -274,20 +107,7 @@
     "subject": "Science",
     "chapterNo": ": 11",
     "offset": 10,
-    "anchors": [
-      {
-        "type": "Activity",
-        "page": 171
-      },
-      {
-        "type": "Exercises",
-        "page": 187
-      },
-      {
-        "type": "Summary",
-        "page": 186
-      }
-    ]
+    "anchors": []
   },
   {
     "chapterId": "8SS-CH12",
@@ -297,24 +117,7 @@
     "subject": "Science",
     "chapterNo": "How Nature Works in Harmony",
     "offset": 11,
-    "anchors": [
-      {
-        "type": "Exercise",
-        "page": 190
-      },
-      {
-        "type": "Examples",
-        "page": 190
-      },
-      {
-        "type": "Intext Questions",
-        "page": 190
-      },
-      {
-        "type": "Summary",
-        "page": 190
-      }
-    ]
+    "anchors": []
   },
   {
     "chapterId": "8SS-CH13",
@@ -324,24 +127,7 @@
     "subject": "Science",
     "chapterNo": "Our Home: Earth, a Unique Life Sustaining Planet",
     "offset": 12,
-    "anchors": [
-      {
-        "type": "Exercises",
-        "page": 226
-      },
-      {
-        "type": "Examples",
-        "page": 211
-      },
-      {
-        "type": "Intext Questions",
-        "page": 211
-      },
-      {
-        "type": "Summary",
-        "page": 225
-      }
-    ]
+    "anchors": []
   },
   {
     "chapterId": "9E-CH01",
@@ -351,24 +137,7 @@
     "subject": "English",
     "chapterNo": "One",
     "offset": 0,
-    "anchors": [
-      {
-        "type": "Exercises",
-        "page": 3
-      },
-      {
-        "type": "Examples",
-        "page": 4
-      },
-      {
-        "type": "Intext Questions",
-        "page": 5
-      },
-      {
-        "type": "Summary",
-        "page": 19
-      }
-    ]
+    "anchors": []
   },
   {
     "chapterId": "9E-CH02",
@@ -378,13 +147,7 @@
     "subject": "English",
     "chapterNo": 2,
     "offset": 1,
-    "anchors": [
-      {
-        "type": "summary",
-        "code": "2",
-        "page": 7
-      }
-    ]
+    "anchors": []
   },
   {
     "chapterId": "9E-CH03",
@@ -394,44 +157,7 @@
     "subject": "English",
     "chapterNo": "On page 38",
     "offset": 2,
-    "anchors": [
-      {
-        "type": "Text",
-        "page": 38
-      },
-      {
-        "type": "Poem",
-        "page": 41
-      },
-      {
-        "type": "Vocabulary",
-        "page": 43
-      },
-      {
-        "type": "Grammar",
-        "page": 45
-      },
-      {
-        "type": "Editing",
-        "page": 46
-      },
-      {
-        "type": "Listening",
-        "page": 48
-      },
-      {
-        "type": "Speaking",
-        "page": 50
-      },
-      {
-        "type": "Writing",
-        "page": 52
-      },
-      {
-        "type": "Project",
-        "page": 53
-      }
-    ]
+    "anchors": []
   },
   {
     "chapterId": "9E-CH04",
@@ -461,24 +187,7 @@
     "subject": "English",
     "chapterNo": ",",
     "offset": 5,
-    "anchors": [
-      {
-        "type": "Exercises",
-        "page": 82
-      },
-      {
-        "type": "Examples",
-        "page": 82
-      },
-      {
-        "type": "Intext Questions",
-        "page": 82
-      },
-      {
-        "type": "Summary",
-        "page": 82
-      }
-    ]
+    "anchors": []
   },
   {
     "chapterId": "9E-CH07",
@@ -488,24 +197,7 @@
     "subject": "English",
     "chapterNo": ",",
     "offset": 2,
-    "anchors": [
-      {
-        "type": "Exercises",
-        "page": 96
-      },
-      {
-        "type": "Examples",
-        "page": 97
-      },
-      {
-        "type": "Intext Questions",
-        "page": 98
-      },
-      {
-        "type": "Summary",
-        "page": 100
-      }
-    ]
+    "anchors": []
   },
   {
     "chapterId": "9E-CH08",
@@ -525,24 +217,7 @@
     "subject": "English",
     "chapterNo": ",",
     "offset": 8,
-    "anchors": [
-      {
-        "type": "Exercise",
-        "page": 126
-      },
-      {
-        "type": "Examples",
-        "page": 126
-      },
-      {
-        "type": "Intext Questions",
-        "page": 126
-      },
-      {
-        "type": "Summary",
-        "page": 126
-      }
-    ]
+    "anchors": []
   },
   {
     "chapterId": "9M-CH01",
@@ -554,98 +229,44 @@
     "offset": 0,
     "anchors": [
       {
-        "type": "example",
-        "code": "1",
-        "page": 3
-      },
-      {
-        "type": "example",
-        "code": "2",
-        "page": 4
-      },
-      {
-        "type": "exercise",
-        "code": "1.1",
+        "name": "Exercises",
         "page": 5
       },
       {
-        "type": "example",
-        "code": "3",
-        "page": 7
-      },
-      {
-        "type": "exercise",
-        "code": "1.2",
+        "name": "Exercises",
         "page": 8
       },
       {
-        "type": "example",
-        "code": "5",
-        "page": 9
-      },
-      {
-        "type": "example",
-        "code": "6",
-        "page": 11
-      },
-      {
-        "type": "example",
-        "code": "9",
-        "page": 12
-      },
-      {
-        "type": "example",
-        "code": "10",
-        "page": 13
-      },
-      {
-        "type": "exercise",
-        "code": "1.3",
+        "name": "Exercises",
         "page": 14
       },
       {
-        "type": "example",
-        "code": "13",
-        "page": 16
+        "name": "Summary",
+        "page": 166
       },
       {
-        "type": "example",
-        "code": "15",
-        "page": 18
+        "name": "Keywords",
+        "page": 166
       },
       {
-        "type": "example",
-        "code": "16",
-        "page": 19
+        "name": "Examples",
+        "page": 166
       },
       {
-        "type": "exercise",
-        "code": "1.4",
-        "page": 20
+        "name": "Example 1",
+        "page": 166
       },
       {
-        "type": "example",
-        "code": "17",
-        "page": 20
+        "name": "Example 2",
+        "page": 166
       },
       {
-        "type": "exercise",
-        "code": "1.5",
-        "page": 23
+        "name": "Intext Questions",
+        "page": 166
       },
       {
-        "type": "example",
-        "code": "20",
-        "page": 23
-      },
-      {
-        "type": "summary",
-        "code": "1",
-        "page": 24
-      },
-      {
-        "type": "Exercise",
-        "page": 5
+        "name": "Try These",
+        "page": 166
       }
     ]
   },
@@ -659,84 +280,8 @@
     "offset": 1,
     "anchors": [
       {
-        "type": "example",
-        "code": "1",
-        "page": 3
-      },
-      {
-        "type": "exercise",
-        "code": "2.1",
+        "name": "Exercises",
         "page": 5
-      },
-      {
-        "type": "example",
-        "code": "2",
-        "page": 5
-      },
-      {
-        "type": "example",
-        "code": "3",
-        "page": 6
-      },
-      {
-        "type": "exercise",
-        "code": "2.2",
-        "page": 7
-      },
-      {
-        "type": "example",
-        "code": "4",
-        "page": 7
-      },
-      {
-        "type": "example",
-        "code": "10",
-        "page": 8
-      },
-      {
-        "type": "example",
-        "code": "7",
-        "page": 9
-      },
-      {
-        "type": "example",
-        "code": "9",
-        "page": 10
-      },
-      {
-        "type": "exercise",
-        "code": "2.3",
-        "page": 11
-      },
-      {
-        "type": "example",
-        "code": "12",
-        "page": 13
-      },
-      {
-        "type": "example",
-        "code": "14",
-        "page": 14
-      },
-      {
-        "type": "example",
-        "code": "17",
-        "page": 15
-      },
-      {
-        "type": "exercise",
-        "code": "2.4",
-        "page": 16
-      },
-      {
-        "type": "example",
-        "code": "19",
-        "page": 16
-      },
-      {
-        "type": "summary",
-        "code": "2",
-        "page": 18
       }
     ]
   },
@@ -748,41 +293,7 @@
     "subject": "Math",
     "chapterNo": "C HAPTER 3",
     "offset": 2,
-    "anchors": [
-      {
-        "type": "exercise",
-        "code": "3.1",
-        "page": 3
-      },
-      {
-        "type": "example",
-        "code": "1",
-        "page": 7
-      },
-      {
-        "type": "example",
-        "code": "2",
-        "page": 9
-      },
-      {
-        "type": "exercise",
-        "code": "3.2",
-        "page": 10
-      },
-      {
-        "type": "summary",
-        "code": "3",
-        "page": 11
-      },
-      {
-        "type": "EXERCISE",
-        "page": 46
-      },
-      {
-        "type": "Summary",
-        "page": 53
-      }
-    ]
+    "anchors": []
   },
   {
     "chapterId": "9M-CH04",
@@ -792,42 +303,7 @@
     "subject": "Math",
     "chapterNo": "fmt(4)",
     "offset": 1,
-    "anchors": [
-      {
-        "type": "example",
-        "code": "1",
-        "page": 2
-      },
-      {
-        "type": "exercise",
-        "code": "4.1",
-        "page": 3
-      },
-      {
-        "type": "example",
-        "code": "2",
-        "page": 3
-      },
-      {
-        "type": "example",
-        "code": "3",
-        "page": 4
-      },
-      {
-        "type": "exercise",
-        "code": "4.2",
-        "page": 5
-      },
-      {
-        "type": "summary",
-        "code": "4",
-        "page": 5
-      },
-      {
-        "type": "Exercise",
-        "page": 56
-      }
-    ]
+    "anchors": []
   },
   {
     "chapterId": "9M-CH05",
@@ -837,28 +313,7 @@
     "subject": "Math",
     "chapterNo": 5,
     "offset": 4,
-    "anchors": [
-      {
-        "type": "example",
-        "code": "1",
-        "page": 6
-      },
-      {
-        "type": "example",
-        "code": "2",
-        "page": 7
-      },
-      {
-        "type": "exercise",
-        "code": "5.1",
-        "page": 8
-      },
-      {
-        "type": "summary",
-        "code": "5",
-        "page": 9
-      }
-    ]
+    "anchors": []
   },
   {
     "chapterId": "9M-CH06",
@@ -868,48 +323,7 @@
     "subject": "Math",
     "chapterNo": "C",
     "offset": 5,
-    "anchors": [
-      {
-        "type": "example",
-        "code": "1",
-        "page": 7
-      },
-      {
-        "type": "exercise",
-        "code": "6.1",
-        "page": 8
-      },
-      {
-        "type": "example",
-        "code": "3",
-        "page": 8
-      },
-      {
-        "type": "example",
-        "code": "4",
-        "page": 10
-      },
-      {
-        "type": "example",
-        "code": "5",
-        "page": 11
-      },
-      {
-        "type": "exercise",
-        "code": "6.2",
-        "page": 12
-      },
-      {
-        "type": "example",
-        "code": "6",
-        "page": 12
-      },
-      {
-        "type": "summary",
-        "code": "6",
-        "page": 14
-      }
-    ]
+    "anchors": []
   },
   {
     "chapterId": "9M-CH07",
@@ -919,62 +333,7 @@
     "subject": "Math",
     "chapterNo": ",",
     "offset": 6,
-    "anchors": [
-      {
-        "type": "example",
-        "code": "1",
-        "page": 5
-      },
-      {
-        "type": "example",
-        "code": "2",
-        "page": 6
-      },
-      {
-        "type": "exercise",
-        "code": "7.1",
-        "page": 10
-      },
-      {
-        "type": "example",
-        "code": "3",
-        "page": 10
-      },
-      {
-        "type": "example",
-        "code": "4",
-        "page": 14
-      },
-      {
-        "type": "exercise",
-        "code": "7.2",
-        "page": 15
-      },
-      {
-        "type": "example",
-        "code": "5",
-        "page": 15
-      },
-      {
-        "type": "example",
-        "code": "7",
-        "page": 18
-      },
-      {
-        "type": "example",
-        "code": "8",
-        "page": 19
-      },
-      {
-        "type": "summary",
-        "code": "7",
-        "page": 21
-      },
-      {
-        "type": "Exercise",
-        "page": 93
-      }
-    ]
+    "anchors": []
   },
   {
     "chapterId": "9M-CH08",
@@ -984,56 +343,7 @@
     "subject": "Math",
     "chapterNo": ",",
     "offset": 7,
-    "anchors": [
-      {
-        "type": "example",
-        "code": "1",
-        "page": 4
-      },
-      {
-        "type": "example",
-        "code": "3",
-        "page": 5
-      },
-      {
-        "type": "example",
-        "code": "5",
-        "page": 6
-      },
-      {
-        "type": "exercise",
-        "code": "8.1",
-        "page": 7
-      },
-      {
-        "type": "example",
-        "code": "6",
-        "page": 9
-      },
-      {
-        "type": "exercise",
-        "code": "8.2",
-        "page": 10
-      },
-      {
-        "type": "example",
-        "code": "7",
-        "page": 10
-      },
-      {
-        "type": "summary",
-        "code": "8",
-        "page": 12
-      },
-      {
-        "type": "Exercise",
-        "page": 109
-      },
-      {
-        "type": "Summary",
-        "page": 115
-      }
-    ]
+    "anchors": []
   },
   {
     "chapterId": "9M-CH09",
@@ -1045,39 +355,8 @@
     "offset": 8,
     "anchors": [
       {
-        "type": "exercise",
-        "code": "9.1",
-        "page": 3
-      },
-      {
-        "type": "example",
-        "code": "1",
-        "page": 6
-      },
-      {
-        "type": "exercise",
-        "code": "9.2",
+        "name": "Exercises",
         "page": 7
-      },
-      {
-        "type": "example",
-        "code": "2",
-        "page": 11
-      },
-      {
-        "type": "exercise",
-        "code": "9.3",
-        "page": 12
-      },
-      {
-        "type": "example",
-        "code": "4",
-        "page": 12
-      },
-      {
-        "type": "summary",
-        "code": "9",
-        "page": 14
       }
     ]
   },
@@ -1089,36 +368,7 @@
     "subject": "Math",
     "chapterNo": "io",
     "offset": 1,
-    "anchors": [
-      {
-        "type": "example",
-        "code": "1",
-        "page": 3
-      },
-      {
-        "type": "exercise",
-        "code": "10.1",
-        "page": 4
-      },
-      {
-        "type": "example",
-        "code": "3",
-        "page": 4
-      },
-      {
-        "type": "summary",
-        "code": "10",
-        "page": 6
-      },
-      {
-        "type": "EXERCISE",
-        "page": 134
-      },
-      {
-        "type": "Summary",
-        "page": 136
-      }
-    ]
+    "anchors": []
   },
   {
     "chapterId": "9M-CH11",
@@ -1130,43 +380,36 @@
     "offset": 10,
     "anchors": [
       {
-        "type": "example",
-        "code": "1",
-        "page": 3
+        "name": "Summary",
+        "page": 0
       },
       {
-        "type": "exercise",
-        "code": "1",
-        "page": 4
+        "name": "Keywords",
+        "page": 0
       },
       {
-        "type": "example",
-        "code": "3",
-        "page": 4
+        "name": "Examples",
+        "page": 0
       },
       {
-        "type": "example",
-        "code": "4",
-        "page": 7
+        "name": "Intext Questions",
+        "page": 0
       },
       {
-        "type": "example",
-        "code": "6",
-        "page": 8
+        "name": "Try These",
+        "page": 0
       },
       {
-        "type": "example",
-        "code": "8",
-        "page": 10
+        "name": "Exercises",
+        "page": 14
       },
       {
-        "type": "example",
-        "code": "10",
-        "page": 13
+        "name": "Example 1",
+        "page": 14
       },
       {
-        "type": "Exercise",
-        "page": 141
+        "name": "Example 2",
+        "page": 14
       }
     ]
   },
@@ -1178,51 +421,7 @@
     "subject": "Math",
     "chapterNo": ",",
     "offset": 11,
-    "anchors": [
-      {
-        "type": "example",
-        "code": "1",
-        "page": 1
-      },
-      {
-        "type": "example",
-        "code": "2",
-        "page": 2
-      },
-      {
-        "type": "example",
-        "code": "3",
-        "page": 5
-      },
-      {
-        "type": "example",
-        "code": "4",
-        "page": 10
-      },
-      {
-        "type": "example",
-        "code": "5",
-        "page": 11
-      },
-      {
-        "type": "exercise",
-        "code": "12.1",
-        "page": 13
-      },
-      {
-        "type": "summary",
-        "code": "12",
-        "page": 16
-      },
-      {
-        "type": "Exercise",
-        "page": 164
-      },
-      {
-        "type": "Summary",
-        "page": 166
-      }
-    ]
+    "anchors": []
   },
   {
     "chapterId": "9S-CH01",
@@ -1242,13 +441,7 @@
     "subject": "Science",
     "chapterNo": 2,
     "offset": 1,
-    "anchors": [
-      {
-        "type": "example",
-        "code": "2.1",
-        "page": 4
-      }
-    ]
+    "anchors": []
   },
   {
     "chapterId": "9S-CH03",
@@ -1258,44 +451,7 @@
     "subject": "Science",
     "chapterNo": "Atoms and Molecules",
     "offset": 2,
-    "anchors": [
-      {
-        "type": "example",
-        "code": "10",
-        "page": 3
-      },
-      {
-        "type": "example",
-        "code": "3.1",
-        "page": 9
-      },
-      {
-        "type": "example",
-        "code": "3.2",
-        "page": 10
-      },
-      {
-        "type": "example",
-        "code": "2",
-        "page": 12
-      },
-      {
-        "type": "Exercise",
-        "page": 3
-      },
-      {
-        "type": "Examples",
-        "page": 3
-      },
-      {
-        "type": "Intext Questions",
-        "page": 3
-      },
-      {
-        "type": "Summary",
-        "page": 3
-      }
-    ]
+    "anchors": []
   },
   {
     "chapterId": "9S-CH04",
@@ -1305,28 +461,7 @@
     "subject": "Science",
     "chapterNo": "Our Structure of the Atom",
     "offset": 3,
-    "anchors": [
-      {
-        "type": "Exercises",
-        "page": 47
-      },
-      {
-        "type": "Examples",
-        "page": 4
-      },
-      {
-        "type": "Intext Questions",
-        "page": 4
-      },
-      {
-        "type": "Summary",
-        "page": 46
-      },
-      {
-        "type": "Questions",
-        "page": 4
-      }
-    ]
+    "anchors": []
   },
   {
     "chapterId": "9S-CH05",
@@ -1356,25 +491,7 @@
     "subject": "Science",
     "chapterNo": "7",
     "offset": 6,
-    "anchors": [
-      {
-        "type": "example",
-        "code": "7.1",
-        "page": 4
-      },
-      {
-        "type": "Exercise",
-        "page": 73
-      },
-      {
-        "type": "Example",
-        "page": 75
-      },
-      {
-        "type": "Activity",
-        "page": 77
-      }
-    ]
+    "anchors": []
   },
   {
     "chapterId": "9S-CH08",
@@ -1384,24 +501,7 @@
     "subject": "Science",
     "chapterNo": ": 8",
     "offset": 7,
-    "anchors": [
-      {
-        "type": "Exercises",
-        "page": 98
-      },
-      {
-        "type": "Examples",
-        "page": 92
-      },
-      {
-        "type": "Intext Questions",
-        "page": 91
-      },
-      {
-        "type": "Summary",
-        "page": 97
-      }
-    ]
+    "anchors": []
   },
   {
     "chapterId": "9S-CH09",
@@ -1411,24 +511,7 @@
     "subject": "Science",
     "chapterNo": ">9",
     "offset": 8,
-    "anchors": [
-      {
-        "type": "Exercises",
-        "page": 111
-      },
-      {
-        "type": "Examples",
-        "page": 102
-      },
-      {
-        "type": "Intext Questions",
-        "page": 101
-      },
-      {
-        "type": "Summary",
-        "page": 109
-      }
-    ]
+    "anchors": []
   },
   {
     "chapterId": "9S-CH10",
@@ -1438,54 +521,7 @@
     "subject": "Science",
     "chapterNo": "W",
     "offset": 9,
-    "anchors": [
-      {
-        "type": "example",
-        "code": "10.1",
-        "page": 3
-      },
-      {
-        "type": "example",
-        "code": "10.3",
-        "page": 6
-      },
-      {
-        "type": "example",
-        "code": "10.5",
-        "page": 8
-      },
-      {
-        "type": "example",
-        "code": "10.6",
-        "page": 9
-      },
-      {
-        "type": "example",
-        "code": "10.7",
-        "page": 10
-      },
-      {
-        "type": "example",
-        "code": "10.8",
-        "page": 11
-      },
-      {
-        "type": "Exercise",
-        "page": 114
-      },
-      {
-        "type": "Example",
-        "page": 115
-      },
-      {
-        "type": "Activity",
-        "page": 116
-      },
-      {
-        "type": "Question",
-        "page": 117
-      }
-    ]
+    "anchors": []
   },
   {
     "chapterId": "9S-CH11",
@@ -1495,13 +531,7 @@
     "subject": "Science",
     "chapterNo": 11,
     "offset": 10,
-    "anchors": [
-      {
-        "type": "example",
-        "code": "11.1",
-        "page": 6
-      }
-    ]
+    "anchors": []
   },
   {
     "chapterId": "9S-CH12",
@@ -1521,24 +551,7 @@
     "subject": "Civics",
     "chapterNo": "One",
     "offset": 0,
-    "anchors": [
-      {
-        "type": "Activity",
-        "page": 2
-      },
-      {
-        "type": "Exercises",
-        "page": 9
-      },
-      {
-        "type": "Summary",
-        "page": 8
-      },
-      {
-        "type": "Check Your Progress",
-        "page": 4
-      }
-    ]
+    "anchors": []
   },
   {
     "chapterId": "9SS-CH02",
@@ -1548,12 +561,7 @@
     "subject": "Civics",
     "chapterNo": "Onstitutional Design",
     "offset": 17,
-    "anchors": [
-      {
-        "type": "Exercise",
-        "page": 31
-      }
-    ]
+    "anchors": []
   },
   {
     "chapterId": "9SS-CH03",
@@ -1563,24 +571,7 @@
     "subject": "Civic Politics",
     "chapterNo": "3",
     "offset": 33,
-    "anchors": [
-      {
-        "type": "Exercise",
-        "page": 36
-      },
-      {
-        "type": "Examples",
-        "page": 37
-      },
-      {
-        "type": "Intext Questions",
-        "page": 38
-      },
-      {
-        "type": "Summary",
-        "page": 49
-      }
-    ]
+    "anchors": []
   },
   {
     "chapterId": "9SS-CH04",
@@ -1590,24 +581,7 @@
     "subject": "Social Science",
     "chapterNo": ",",
     "offset": 55,
-    "anchors": [
-      {
-        "type": "Exercise",
-        "page": 58
-      },
-      {
-        "type": "Example",
-        "page": 58
-      },
-      {
-        "type": "Intext Questions",
-        "page": 58
-      },
-      {
-        "type": "Summary",
-        "page": 58
-      }
-    ]
+    "anchors": []
   },
   {
     "chapterId": "9SS-CH05",
@@ -1639,64 +613,8 @@
     "offset": 4,
     "anchors": [
       {
-        "type": "example",
-        "code": "1",
-        "page": 4
-      },
-      {
-        "type": "exercise",
-        "code": "1.1",
-        "page": 5
-      },
-      {
-        "type": "example",
-        "code": "4",
-        "page": 5
-      },
-      {
-        "type": "example",
-        "code": "5",
-        "page": 7
-      },
-      {
-        "type": "example",
-        "code": "6",
-        "page": 8
-      },
-      {
-        "type": "exercise",
-        "code": "1.2",
+        "name": "Exercises",
         "page": 9
-      },
-      {
-        "type": "example",
-        "code": "8",
-        "page": 9
-      },
-      {
-        "type": "summary",
-        "code": "1",
-        "page": 9
-      },
-      {
-        "type": "Introduction",
-        "page": 1
-      },
-      {
-        "type": "The Fundamental Theorem of Arithmetic",
-        "page": 2
-      },
-      {
-        "type": "Revisiting Irrational Numbers",
-        "page": 6
-      },
-      {
-        "type": "Summary",
-        "page": 9
-      },
-      {
-        "type": "Exercises",
-        "page": 1
       }
     ]
   },
@@ -1710,43 +628,12 @@
     "offset": 1,
     "anchors": [
       {
-        "type": "example",
-        "code": "1",
-        "page": 8
-      },
-      {
-        "type": "exercise",
-        "code": "2.1",
+        "name": "Exercises",
         "page": 9
       },
       {
-        "type": "example",
-        "code": "2",
-        "page": 11
-      },
-      {
-        "type": "example",
-        "code": "4",
-        "page": 12
-      },
-      {
-        "type": "example",
-        "code": "5",
-        "page": 13
-      },
-      {
-        "type": "exercise",
-        "code": "2.2",
+        "name": "Exercises",
         "page": 14
-      },
-      {
-        "type": "summary",
-        "code": "2",
-        "page": 14
-      },
-      {
-        "type": "Exercise",
-        "page": 18
       }
     ]
   },
@@ -1758,67 +645,7 @@
     "subject": "Math",
     "chapterNo": "3",
     "offset": 2,
-    "anchors": [
-      {
-        "type": "example",
-        "code": "1",
-        "page": 3
-      },
-      {
-        "type": "example",
-        "code": "2",
-        "page": 4
-      },
-      {
-        "type": "exercise",
-        "code": "3.1",
-        "page": 5
-      },
-      {
-        "type": "example",
-        "code": "4",
-        "page": 7
-      },
-      {
-        "type": "example",
-        "code": "5",
-        "page": 8
-      },
-      {
-        "type": "example",
-        "code": "6",
-        "page": 9
-      },
-      {
-        "type": "exercise",
-        "code": "3.2",
-        "page": 10
-      },
-      {
-        "type": "example",
-        "code": "8",
-        "page": 11
-      },
-      {
-        "type": "example",
-        "code": "9",
-        "page": 12
-      },
-      {
-        "type": "exercise",
-        "code": "3.3",
-        "page": 13
-      },
-      {
-        "type": "summary",
-        "code": "3",
-        "page": 14
-      },
-      {
-        "type": "Exercise",
-        "page": 29
-      }
-    ]
+    "anchors": []
   },
   {
     "chapterId": "10M-CH04",
@@ -1830,71 +657,20 @@
     "offset": 81,
     "anchors": [
       {
-        "type": "example",
-        "code": "1",
-        "page": 2
-      },
-      {
-        "type": "example",
-        "code": "2",
-        "page": 3
-      },
-      {
-        "type": "exercise",
-        "code": "4.1",
-        "page": 4
-      },
-      {
-        "type": "example",
-        "code": "3",
-        "page": 5
-      },
-      {
-        "type": "example",
-        "code": "4",
-        "page": 6
-      },
-      {
-        "type": "exercise",
-        "code": "4.2",
-        "page": 7
-      },
-      {
-        "type": "example",
-        "code": "6",
-        "page": 7
-      },
-      {
-        "type": "example",
-        "code": "7",
-        "page": 8
-      },
-      {
-        "type": "example",
-        "code": "9",
-        "page": 9
-      },
-      {
-        "type": "exercise",
-        "code": "4.3",
+        "name": "Exercises",
         "page": 10
       },
       {
-        "type": "summary",
-        "code": "4",
-        "page": 10
-      },
-      {
-        "type": "Exercise",
-        "page": 39
-      },
-      {
-        "type": "Examples",
+        "name": "Summary",
         "page": 38
       },
       {
-        "type": "Summary",
-        "page": 47
+        "name": "Keywords",
+        "page": 38
+      },
+      {
+        "name": "Examples",
+        "page": 40
       }
     ]
   },
@@ -1908,73 +684,12 @@
     "offset": 3,
     "anchors": [
       {
-        "type": "example",
-        "code": "1",
-        "page": 6
-      },
-      {
-        "type": "exercise",
-        "code": "5.1",
+        "name": "Exercises",
         "page": 7
       },
       {
-        "type": "example",
-        "code": "3",
-        "page": 10
-      },
-      {
-        "type": "example",
-        "code": "6",
-        "page": 11
-      },
-      {
-        "type": "example",
-        "code": "9",
-        "page": 12
-      },
-      {
-        "type": "exercise",
-        "code": "5.2",
-        "page": 13
-      },
-      {
-        "type": "example",
-        "code": "10",
-        "page": 13
-      },
-      {
-        "type": "example",
-        "code": "11",
-        "page": 17
-      },
-      {
-        "type": "example",
-        "code": "13",
-        "page": 18
-      },
-      {
-        "type": "example",
-        "code": "15",
-        "page": 19
-      },
-      {
-        "type": "exercise",
-        "code": "5.3",
-        "page": 20
-      },
-      {
-        "type": "exercise",
-        "code": "5.4",
+        "name": "Exercises",
         "page": 23
-      },
-      {
-        "type": "summary",
-        "code": "5",
-        "page": 24
-      },
-      {
-        "type": "Exercise",
-        "page": 56
       }
     ]
   },
@@ -1988,54 +703,12 @@
     "offset": 5,
     "anchors": [
       {
-        "type": "exercise",
-        "code": "6.3",
-        "page": 2
-      },
-      {
-        "type": "example",
-        "code": "7",
-        "page": 2
-      },
-      {
-        "type": "exercise",
-        "code": "6.1",
+        "name": "Exercises",
         "page": 6
       },
       {
-        "type": "example",
-        "code": "1",
-        "page": 10
-      },
-      {
-        "type": "example",
-        "code": "2",
-        "page": 11
-      },
-      {
-        "type": "exercise",
-        "code": "6.2",
+        "name": "Exercises",
         "page": 12
-      },
-      {
-        "type": "example",
-        "code": "4",
-        "page": 19
-      },
-      {
-        "type": "example",
-        "code": "6",
-        "page": 20
-      },
-      {
-        "type": "example",
-        "code": "8",
-        "page": 21
-      },
-      {
-        "type": "summary",
-        "code": "6",
-        "page": 25
       }
     ]
   },
@@ -2049,53 +722,8 @@
     "offset": 1,
     "anchors": [
       {
-        "type": "example",
-        "code": "1",
-        "page": 4
-      },
-      {
-        "type": "example",
-        "code": "2",
-        "page": 5
-      },
-      {
-        "type": "example",
-        "code": "4",
-        "page": 6
-      },
-      {
-        "type": "exercise",
-        "code": "7.1",
-        "page": 7
-      },
-      {
-        "type": "example",
-        "code": "6",
-        "page": 10
-      },
-      {
-        "type": "example",
-        "code": "8",
-        "page": 11
-      },
-      {
-        "type": "example",
-        "code": "9",
-        "page": 12
-      },
-      {
-        "type": "exercise",
-        "code": "7.2",
-        "page": 13
-      },
-      {
-        "type": "summary",
-        "code": "7",
-        "page": 14
-      },
-      {
-        "type": "Exercise",
-        "page": 105
+        "name": "Exercises",
+        "page": 100
       }
     ]
   },
@@ -2109,63 +737,16 @@
     "offset": 7,
     "anchors": [
       {
-        "type": "example",
-        "code": "1",
-        "page": 6
-      },
-      {
-        "type": "example",
-        "code": "3",
-        "page": 7
-      },
-      {
-        "type": "example",
-        "code": "4",
-        "page": 8
-      },
-      {
-        "type": "exercise",
-        "code": "8.1",
+        "name": "Exercises",
         "page": 9
       },
       {
-        "type": "example",
-        "code": "6",
-        "page": 13
-      },
-      {
-        "type": "example",
-        "code": "7",
-        "page": 14
-      },
-      {
-        "type": "exercise",
-        "code": "8.2",
+        "name": "Exercises",
         "page": 15
       },
       {
-        "type": "example",
-        "code": "9",
-        "page": 17
-      },
-      {
-        "type": "example",
-        "code": "11",
-        "page": 18
-      },
-      {
-        "type": "exercise",
-        "code": "8.3",
+        "name": "Exercises",
         "page": 19
-      },
-      {
-        "type": "summary",
-        "code": "8",
-        "page": 20
-      },
-      {
-        "type": "Exercise",
-        "page": 121
       }
     ]
   },
@@ -2177,56 +758,7 @@
     "subject": "Math",
     "chapterNo": "Some Applications of Trigonometry",
     "offset": 8,
-    "anchors": [
-      {
-        "type": "example",
-        "code": "1",
-        "page": 3
-      },
-      {
-        "type": "example",
-        "code": "2",
-        "page": 4
-      },
-      {
-        "type": "example",
-        "code": "3",
-        "page": 5
-      },
-      {
-        "type": "example",
-        "code": "5",
-        "page": 6
-      },
-      {
-        "type": "example",
-        "code": "6",
-        "page": 7
-      },
-      {
-        "type": "example",
-        "code": "7",
-        "page": 8
-      },
-      {
-        "type": "exercise",
-        "code": "9.1",
-        "page": 9
-      },
-      {
-        "type": "summary",
-        "code": "9",
-        "page": 11
-      },
-      {
-        "type": "Exercises",
-        "page": 142
-      },
-      {
-        "type": "Summary",
-        "page": 143
-      }
-    ]
+    "anchors": []
   },
   {
     "chapterId": "10M-CH10",
@@ -2236,41 +768,7 @@
     "subject": "10",
     "chapterNo": "mathematics",
     "offset": 9,
-    "anchors": [
-      {
-        "type": "exercise",
-        "code": "10.1",
-        "page": 4
-      },
-      {
-        "type": "example",
-        "code": "1",
-        "page": 6
-      },
-      {
-        "type": "example",
-        "code": "2",
-        "page": 7
-      },
-      {
-        "type": "exercise",
-        "code": "10.2",
-        "page": 8
-      },
-      {
-        "type": "summary",
-        "code": "10",
-        "page": 10
-      },
-      {
-        "type": "Exercise",
-        "page": 146
-      },
-      {
-        "type": "Summary",
-        "page": 153
-      }
-    ]
+    "anchors": []
   },
   {
     "chapterId": "10M-CH11",
@@ -2280,36 +778,7 @@
     "subject": "Math",
     "chapterNo": "Our 11",
     "offset": 10,
-    "anchors": [
-      {
-        "type": "example",
-        "code": "1",
-        "page": 3
-      },
-      {
-        "type": "example",
-        "code": "2",
-        "page": 4
-      },
-      {
-        "type": "exercise",
-        "code": "11.1",
-        "page": 5
-      },
-      {
-        "type": "summary",
-        "code": "11",
-        "page": 7
-      },
-      {
-        "type": "Summary",
-        "page": 160
-      },
-      {
-        "type": "Exercises",
-        "page": 158
-      }
-    ]
+    "anchors": []
   },
   {
     "chapterId": "10M-CH12",
@@ -2319,82 +788,7 @@
     "subject": "Math",
     "chapterNo": ": 12",
     "offset": 11,
-    "anchors": [
-      {
-        "type": "example",
-        "code": "1",
-        "page": 3
-      },
-      {
-        "type": "example",
-        "code": "2",
-        "page": 4
-      },
-      {
-        "type": "example",
-        "code": "3",
-        "page": 5
-      },
-      {
-        "type": "exercise",
-        "code": "12.1",
-        "page": 6
-      },
-      {
-        "type": "example",
-        "code": "4",
-        "page": 6
-      },
-      {
-        "type": "example",
-        "code": "5",
-        "page": 7
-      },
-      {
-        "type": "example",
-        "code": "6",
-        "page": 8
-      },
-      {
-        "type": "exercise",
-        "code": "12.2",
-        "page": 9
-      },
-      {
-        "type": "example",
-        "code": "7",
-        "page": 9
-      },
-      {
-        "type": "summary",
-        "code": "12",
-        "page": 10
-      },
-      {
-        "type": "Introduction",
-        "page": 161
-      },
-      {
-        "type": "Surface Area of a Combination of Solids",
-        "page": 162
-      },
-      {
-        "type": "Volume of a Combination of Solids",
-        "page": 168
-      },
-      {
-        "type": "Summary",
-        "page": 170
-      },
-      {
-        "type": "Exercises",
-        "page": 165
-      },
-      {
-        "type": "Examples",
-        "page": 163
-      }
-    ]
+    "anchors": []
   },
   {
     "chapterId": "10M-CH13",
@@ -2406,68 +800,20 @@
     "offset": 11,
     "anchors": [
       {
-        "type": "example",
-        "code": "1",
-        "page": 2
-      },
-      {
-        "type": "example",
-        "code": "2",
-        "page": 8
-      },
-      {
-        "type": "example",
-        "code": "3",
-        "page": 10
-      },
-      {
-        "type": "exercise",
-        "code": "13.1",
-        "page": 11
-      },
-      {
-        "type": "example",
-        "code": "4",
-        "page": 13
-      },
-      {
-        "type": "example",
-        "code": "5",
-        "page": 14
-      },
-      {
-        "type": "example",
-        "code": "6",
-        "page": 15
-      },
-      {
-        "type": "exercise",
-        "code": "13.2",
-        "page": 16
-      },
-      {
-        "type": "example",
-        "code": "7",
-        "page": 24
-      },
-      {
-        "type": "example",
-        "code": "8",
-        "page": 25
-      },
-      {
-        "type": "exercise",
-        "code": "13.3",
+        "name": "Exercises",
         "page": 28
       },
       {
-        "type": "summary",
-        "code": "13",
-        "page": 30
+        "name": "Summary",
+        "page": 173
       },
       {
-        "type": "Exercise",
-        "page": 183
+        "name": "Example 1",
+        "page": 173
+      },
+      {
+        "name": "Example 2",
+        "page": 173
       }
     ]
   },
@@ -2481,62 +827,8 @@
     "offset": 13,
     "anchors": [
       {
-        "type": "example",
-        "code": "1",
-        "page": 3
-      },
-      {
-        "type": "example",
-        "code": "4",
-        "page": 6
-      },
-      {
-        "type": "example",
-        "code": "5",
-        "page": 7
-      },
-      {
-        "type": "example",
-        "code": "7",
-        "page": 8
-      },
-      {
-        "type": "example",
-        "code": "9",
-        "page": 9
-      },
-      {
-        "type": "example",
-        "code": "10",
-        "page": 10
-      },
-      {
-        "type": "example",
-        "code": "12",
-        "page": 11
-      },
-      {
-        "type": "exercise",
-        "code": "14.1",
+        "name": "Exercises",
         "page": 13
-      },
-      {
-        "type": "example",
-        "code": "13",
-        "page": 15
-      },
-      {
-        "type": "summary",
-        "code": "14",
-        "page": 16
-      },
-      {
-        "type": "Exercise",
-        "page": 214
-      },
-      {
-        "type": "Summary",
-        "page": 217
       }
     ]
   },
@@ -2548,16 +840,7 @@
     "subject": "Science",
     "chapterNo": "One",
     "offset": 0,
-    "anchors": [
-      {
-        "type": "Exercises",
-        "page": 15
-      },
-      {
-        "type": "Questions",
-        "page": 7
-      }
-    ]
+    "anchors": []
   },
   {
     "chapterId": "10S-CH02",
@@ -2577,13 +860,7 @@
     "subject": "Science",
     "chapterNo": 3,
     "offset": 2,
-    "anchors": [
-      {
-        "type": "summary",
-        "code": "3",
-        "page": 14
-      }
-    ]
+    "anchors": []
   },
   {
     "chapterId": "10S-CH04",
@@ -2593,16 +870,7 @@
     "subject": "Science",
     "chapterNo": "I",
     "offset": 3,
-    "anchors": [
-      {
-        "type": "Exercises",
-        "page": 78
-      },
-      {
-        "type": "Questions",
-        "page": 71
-      }
-    ]
+    "anchors": []
   },
   {
     "chapterId": "10S-CH05",
@@ -2612,24 +880,7 @@
     "subject": "Science",
     "chapterNo": ",",
     "offset": 4,
-    "anchors": [
-      {
-        "type": "Exercise",
-        "page": 80
-      },
-      {
-        "type": "Example",
-        "page": 83
-      },
-      {
-        "type": "Intext Questions",
-        "page": 87
-      },
-      {
-        "type": "Summary",
-        "page": 99
-      }
-    ]
+    "anchors": []
   },
   {
     "chapterId": "10S-CH06",
@@ -2639,32 +890,7 @@
     "subject": "Science",
     "chapterNo": "I",
     "offset": 5,
-    "anchors": [
-      {
-        "type": "Exercises",
-        "page": 112
-      },
-      {
-        "type": "Questions",
-        "page": 111
-      },
-      {
-        "type": "Activity 6.4",
-        "page": 111
-      },
-      {
-        "type": "Activity 6.3",
-        "page": 110
-      },
-      {
-        "type": "Activity 6.2",
-        "page": 108
-      },
-      {
-        "type": "Activity 6.1",
-        "page": 102
-      }
-    ]
+    "anchors": []
   },
   {
     "chapterId": "10S-CH07",
@@ -2684,28 +910,7 @@
     "subject": "Science",
     "chapterNo": "How do Mendel’s experiments show that traits may be dominant or recessive?",
     "offset": 7,
-    "anchors": [
-      {
-        "type": "Questions",
-        "page": 129
-      },
-      {
-        "type": "Activity",
-        "page": 129
-      },
-      {
-        "type": "Figure",
-        "page": 130
-      },
-      {
-        "type": "What you have learnt",
-        "page": 133
-      },
-      {
-        "type": "Exercises",
-        "page": 133
-      }
-    ]
+    "anchors": []
   },
   {
     "chapterId": "10S-CH09",
@@ -2715,23 +920,7 @@
     "subject": "Science",
     "chapterNo": "L",
     "offset": 8,
-    "anchors": [
-      {
-        "type": "summary",
-        "code": "9",
-        "page": 5
-      },
-      {
-        "type": "example",
-        "code": "9.1",
-        "page": 11
-      },
-      {
-        "type": "example",
-        "code": "9.3",
-        "page": 23
-      }
-    ]
+    "anchors": []
   },
   {
     "chapterId": "10S-CH10",
@@ -2741,16 +930,7 @@
     "subject": "Science",
     "chapterNo": "io",
     "offset": 9,
-    "anchors": [
-      {
-        "type": "section",
-        "page": 162
-      },
-      {
-        "type": "exercise",
-        "page": 170
-      }
-    ]
+    "anchors": []
   },
   {
     "chapterId": "10S-CH11",
@@ -2760,65 +940,7 @@
     "subject": "Science",
     "chapterNo": "11",
     "offset": 10,
-    "anchors": [
-      {
-        "type": "example",
-        "code": "11.1",
-        "page": 2
-      },
-      {
-        "type": "example",
-        "code": "11.2",
-        "page": 3
-      },
-      {
-        "type": "example",
-        "code": "11.3",
-        "page": 9
-      },
-      {
-        "type": "example",
-        "code": "11.4",
-        "page": 10
-      },
-      {
-        "type": "example",
-        "code": "11.7",
-        "page": 14
-      },
-      {
-        "type": "example",
-        "code": "11.8",
-        "page": 16
-      },
-      {
-        "type": "example",
-        "code": "11.9",
-        "page": 17
-      },
-      {
-        "type": "example",
-        "code": "11.10",
-        "page": 19
-      },
-      {
-        "type": "example",
-        "code": "11.12",
-        "page": 21
-      },
-      {
-        "type": "Exercise",
-        "page": 193
-      },
-      {
-        "type": "Example",
-        "page": 173
-      },
-      {
-        "type": "Question",
-        "page": 172
-      }
-    ]
+    "anchors": []
   },
   {
     "chapterId": "10S-CH12",
@@ -2828,38 +950,7 @@
     "subject": "Science",
     "chapterNo": "Magnetic Effects of Electric Current",
     "offset": 11,
-    "anchors": [
-      {
-        "type": "example",
-        "code": "12.1",
-        "page": 6
-      },
-      {
-        "type": "example",
-        "code": "12.2",
-        "page": 9
-      },
-      {
-        "type": "Exercise",
-        "page": 207
-      },
-      {
-        "type": "Summary",
-        "page": 206
-      },
-      {
-        "type": "Intext Questions",
-        "page": 201
-      },
-      {
-        "type": "Examples",
-        "page": 200
-      },
-      {
-        "type": "Activity",
-        "page": 199
-      }
-    ]
+    "anchors": []
   },
   {
     "chapterId": "10S-CH13",
@@ -2879,24 +970,7 @@
     "subject": "Democratic Politics",
     "chapterNo": "1",
     "offset": 0,
-    "anchors": [
-      {
-        "type": "Exercises",
-        "page": 10
-      },
-      {
-        "type": "Examples",
-        "page": 9
-      },
-      {
-        "type": "Forms of power-sharing",
-        "page": 8
-      },
-      {
-        "type": "Summary",
-        "page": 12
-      }
-    ]
+    "anchors": []
   },
   {
     "chapterId": "10SS-CH02",
@@ -2906,24 +980,7 @@
     "subject": "Democratic Politics",
     "chapterNo": "2",
     "offset": 12,
-    "anchors": [
-      {
-        "type": "Exercises",
-        "page": 27
-      },
-      {
-        "type": "Examples",
-        "page": 14
-      },
-      {
-        "type": "Intext Questions",
-        "page": 16
-      },
-      {
-        "type": "Summary",
-        "page": 28
-      }
-    ]
+    "anchors": []
   },
   {
     "chapterId": "10SS-CH03",
@@ -2943,24 +1000,7 @@
     "subject": "Democratic Politics",
     "chapterNo": "4",
     "offset": 45,
-    "anchors": [
-      {
-        "type": "Exercises",
-        "page": 61
-      },
-      {
-        "type": "Examples",
-        "page": 47
-      },
-      {
-        "type": "Intext Questions",
-        "page": 51
-      },
-      {
-        "type": "Summary",
-        "page": 59
-      }
-    ]
+    "anchors": []
   },
   {
     "chapterId": "10SS-CH05",
@@ -2970,24 +1010,7 @@
     "subject": "Democratic Politics",
     "chapterNo": ": 5",
     "offset": 62,
-    "anchors": [
-      {
-        "type": "Exercises",
-        "page": 73
-      },
-      {
-        "type": "Examples",
-        "page": 70
-      },
-      {
-        "type": "Intext Questions",
-        "page": 69
-      },
-      {
-        "type": "Summary",
-        "page": 72
-      }
-    ]
+    "anchors": []
   },
   {
     "chapterId": "10SS-CH06",
@@ -3007,15 +1030,6 @@
     "subject": "Geography",
     "chapterNo": "Lifelines of National Economy",
     "offset": 0,
-    "anchors": [
-      {
-        "type": "Exercises",
-        "page": 82
-      },
-      {
-        "type": "Activity",
-        "page": 83
-      }
-    ]
+    "anchors": []
   }
 ]

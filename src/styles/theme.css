@@ -1,73 +1,121 @@
-:root, .theme-dark {
-  --bg: #0b1020;            /* app background */
-  --card: #0f172a;          /* panels/cards */
-  --card-ring: #1e293b;     /* borders */
-  --text: #e5e7eb;          /* primary text */
-  --muted: #94a3b8;         /* secondary text */
-  --accent: #22d3ee;        /* cyan buttons you already use */
-  --accent-attn: #f43f5e;   /* red highlight for active tabs */
-  --shadow: 0 6px 20px rgba(2,8,23,.35);
+:root{
+  --bg:#0b1220;
+  --panel:#0f172a;
+  --muted:#9ca3af;
+  --text:#e5e7eb;
+  --accent:#22d3ee;
+  --accent-2:#10b981;
+  --danger:#ef4444;
+  --border:#1f2937;
+  --radius:12px;
+  --font-ui: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
 }
 
-/* Utility classes used throughout the app (keeps Tailwind light) */
-.bg-bg { background-color: var(--bg); }
-.bg-card { background-color: var(--card); }
-.text-text { color: var(--text); }
-.muted { color: var(--muted); }
-.border-card-ring { border-color: var(--card-ring); }
-.ring-accent { --tw-ring-color: var(--accent); }
-.text-attn { color: var(--accent-attn); }
-.bg-attn { background-color: var(--accent-attn); }
+html,body,#root{height:100%}
+body{
+  margin:0;background:var(--bg);color:var(--text);
+  font-family:var(--font-ui); -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+}
+*{box-sizing:border-box}
 
-/* Buttons & cards (subtle polish) */
-.btn-primary {
-  background: var(--accent);
-  color: #000;
-  border-radius: 9999px;
-  padding: .55rem .9rem;
-  font-weight: 600;
-}
-.btn-ghost {
-  background: transparent;
-  color: var(--text);
-  border: 1px solid var(--card-ring);
-  border-radius: 9999px;
-  padding: .5rem .8rem;
-}
-.card {
-  background: var(--card);
-  border: 1px solid var(--card-ring);
-  border-radius: 14px;
-  box-shadow: var(--shadow);
-}
-.panel-title { font-weight: 700; }
+a.link{color:var(--accent);text-decoration:underline}
+a.link.disabled{opacity:.5;pointer-events:none}
 
-/* Tabs (thin red underline on active) */
-.tabs {
-  display: flex; gap: .5rem; border-bottom: 1px solid var(--card-ring);
-  padding: .25rem;
+/* Cards & layout */
+.card{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius)}
+.card + .card{margin-top:12px}
+.card-header{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-bottom:1px solid var(--border)}
+.card-body{padding:12px}
+.title{font-weight:600}
+.title-sm{font-weight:600;font-size:13px}
+.section-title{font-weight:600;margin-bottom:6px}
+
+/* Inputs */
+.input{
+  width:100%;border:1px solid var(--border);background:#0b1327;color:var(--text);
+  border-radius:10px;padding:8px 10px;font-size:14px;
 }
-.tab {
-  position: relative;
-  padding: .5rem .9rem; border-radius: 9999px;
-  color: var(--muted);
-}
-.tab:hover { background: rgba(255,255,255,.03); color: var(--text); }
-.tab.active { color: var(--text); }
-.tab.active::after {
-  content: "";
-  position: absolute; left: 10px; right: 10px; bottom: -1px;
-  height: 2px; background: var(--accent-attn); border-radius: 2px;
+.input:disabled{opacity:.6}
+
+/* Buttons */
+.btn{border:1px solid transparent;border-radius:10px;padding:8px 12px;font-weight:600;cursor:pointer}
+.btn-primary{background:#1d4ed8;border-color:#1e40af}
+.btn-secondary{background:#0b1327;border-color:var(--border)}
+.btn-ghost{background:transparent;border-color:var(--border)}
+.btn-danger{background:var(--danger);border-color:#b91c1c}
+.btn-outline{background:transparent;border-color:var(--border)}
+
+/* Utility */
+.label{font-size:12px;color:var(--muted);margin-bottom:4px}
+.muted{color:var(--muted)}
+
+/* Screen tabs / top nav spacing (applies to any container you mark as .tabs) */
+.tabs { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+.tabs > * { margin: 0 !important; }         /* neutralize inline margins */
+.tabs a, .tabs button { padding: 6px 10px; border-radius: 8px; text-decoration: none; color: var(--text); opacity: .85; }
+.tabs a.active, .tabs button.active { opacity: 1; border-bottom: 2px solid var(--accent); padding-bottom: 4px; }
+
+
+/* ===== App header tidy (brand row) ===== */
+.appbar, header.appbar {               /* applies if your header already has .appbar */
+  position: sticky;
+  top: 0;
+  z-index: 60;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
 }
 
-/* Top-level stakeholder nav underline */
-.topnav { display:flex; gap:.5rem; }
-.topnav-link {
-  position:relative; padding:.4rem .75rem; border-radius:8px;
-  color: var(--text);
+/* If the header doesn't use .appbar, the next 2 rules still fix spacing safely */
+header > .appbar-row,
+header > .row,
+header > div:first-child {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 16px;
 }
-.topnav-link:hover { background: rgba(255,255,255,.04); }
-.topnav-link.active::after{
-  content:""; position:absolute; left:8px; right:8px; bottom:-6px;
-  height: 2px; background: var(--accent-attn); border-radius:2px;
+
+/* Brand on the left */
+header .brand, header .brand a {
+  font-size: 18px;
+  font-weight: 650;
+  letter-spacing: .2px;
+  white-space: nowrap;
+  margin-right: 12px;
 }
+
+/* Primary nav beside the brand (Students / Admin / Parent …) */
+header nav, header .primary-nav, header .stakeholder-nav {
+  display: flex;
+  align-items: center;
+  gap: 18px;                      /* <- the missing breathing room */
+}
+header nav > * { margin: 0 !important; }
+header nav a, header nav button {
+  padding: 6px 8px;
+  border-radius: 8px;
+  text-decoration: none;
+  opacity: .9;
+}
+header nav a:hover, header nav button:hover { opacity: 1; background: var(--bg-elev); }
+
+/* Right-side cluster (Tasks · Demo · Class · Open as…) */
+header .header-actions { display: flex; align-items: center; gap: 12px; }
+
+/* ===== “Scope:” pill row just under the header (if present) ===== */
+.scopebar, [data-scopebar] {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+}
+
+/* Keep your section tabs nicely spaced (you already have these, left here for completeness) */
+.tabs { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+.tabs > * { margin: 0 !important; }
+.tabs a, .tabs button { padding: 6px 10px; border-radius: 8px; text-decoration: none; color: var(--text); opacity: .85; }
+.tabs a.active, .tabs button.active { opacity: 1; border-bottom: 2px solid var(--accent); padding-bottom: 4px; }
+

@@ -1,13 +1,19 @@
-export function Card({ title, actions, children }) {
+import React from "react";
+
+export function Card({ title, actions = null, className = "", children }) {
   return (
-    <div className="card p-4">
+    <div className={`card ${className}`}>
       {(title || actions) && (
-        <div className="flex items-center justify-between mb-3">
-          {title && <div className="panel-title">{title}</div>}
+        <div className="card-header">
+          {title ? <div className="title">{title}</div> : <div />}
           {actions}
         </div>
       )}
-      {children}
+      <div className="card-body">{children}</div>
     </div>
-  )
+  );
 }
+
+// Backward-compat: both default + named export work
+export default Card;
+
