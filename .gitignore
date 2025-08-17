@@ -54,3 +54,6 @@ poc-backup-*.zip
 *.proposed
 patches/
 
+
+# ignore local NCERT sources noise
+public/cbse-pdf/sources/**
