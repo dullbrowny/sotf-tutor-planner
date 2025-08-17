@@ -1,7 +1,8 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Card } from "../../ui/Card";
-import { Button } from "../../ui/Button";
+import Card from "../../ui/Card.jsx";
+import Button from "../../ui/Button.jsx";
 import PDFPreview from "../../components/PDFPreview";
+
 import {
   ensureManifest,
   getGrades,
@@ -15,14 +16,31 @@ import {
 import { enrichLOs as enrichLOsRAG, generateMicroplan as generateMicroplanRAG } from "../../services/rag";
 import { enrichLOsLLM, generateMicroplanLLM } from "../../services/llmClient";
 
+/* -------------------- tiny helpers -------------------- */
 
-/* -------------------- helpers -------------------- */
+function normalizeLos(anyShape) {
+  // Accept: ["a","b"], {learningObjectives:[...]}, {los:[...]}, null, undefined
+  let arr = [];
+  if (Array.isArray(anyShape)) arr = anyShape;
+  else if (anyShape?.learningObjectives && Array.isArray(anyShape.learningObjectives)) arr = anyShape.learningObjectives;
+  else if (anyShape?.los && Array.isArray(anyShape.los)) arr = anyShape.los;
+  return arr
+    .map(x => (typeof x === "string" ? x : (x?.text ?? x?.title ?? x?.goal ?? "")))
+    .map(s => String(s || "").trim())
+    .filter(Boolean);
+}
 
-// “smart” LO seeding that adapts to subject/topic
 function seedLos({ subjectLabel, topicLabel }) {
   const s = (subjectLabel || "").toLowerCase();
   const t = topicLabel && topicLabel !== "(none)" ? ` in “${topicLabel}”` : "";
-
+  if (s.includes("science")) {
+    return [
+      `Explain the key concept(s)${t}.`,
+      "Identify real-life applications/examples of the concept.",
+      "Plan/interpret a simple investigation or data table.",
+      "Summarize the main points from the section.",
+    ];
+  }
   if (s.includes("english")) {
     return [
       `Explain the key concept(s)${t}.`,
@@ -31,99 +49,67 @@ function seedLos({ subjectLabel, topicLabel }) {
       "Summarize the main points from the section.",
     ];
   }
-  if (s.includes("science")) {
-    return [
-      `Explain the key concept(s)${t}.`,
-      "Identify real-life applications/examples of the concept.",
-      "Plan/interpret a simple investigation, observation, or data table.",
-      "Summarize the main points from the section.",
-    ];
-  }
-  if (s.includes("social")) {
-    return [
-      `Explain the key concept(s)${t}.`,
-      "Connect the concept to historical/civic context and examples.",
-      "Interpret a map/table/graph relevant to the chapter.",
-      "Summarize the main points from the section.",
-    ];
-  }
-  // math/default
   return [
     `Explain the key concept(s)${t}.`,
     "Identify real-life examples of the concept.",
-    "Solve a numerical/example related to the concept.",
+    "Solve a worked example related to the concept.",
     "Summarize the main points from the section.",
   ];
 }
 
-// keep teacher edits: only reseed when LOs look “default”
 function looksUntouched(los) {
   if (!Array.isArray(los) || los.length === 0) return true;
-  const joined = los.map(s => String(s || "").trim().toLowerCase()).join("|");
+  const joined = los.map(s => String(typeof s === "string" ? s : s?.text || "").toLowerCase()).join("|");
   const stems = ["explain the key", "identify", "solve", "summarize", "analyze", "interpret"];
   const hits = stems.filter(k => joined.includes(k)).length;
   return hits >= Math.min(2, los.length);
 }
 
-function skeletonFromLOs(los, topic) {
-  return [
-    { title: "Starter / Hook", body: `Quick hook using ${topic ? `"${topic}"` : "a chapter cue"}.` },
-    { title: "Teach / Model", body: "Explain the core idea with one worked example." },
-    { title: "Practice", body: "3–5 targeted problems with immediate feedback." },
-    {
-      title: "Assess / Exit Ticket",
-      body: `Exit ticket: 2 questions mapping to LO${los.length > 1 ? "s" : ""}.`,
-    },
-  ];
-}
-
 /* -------------------- component -------------------- */
 
 export default function LessonPlanning() {
-  // selects
-  const [grade, setGrade] = useState(8);
-  const [subject, setSubject] = useState("");
-  const [chapterId, setChapterId] = useState("");
-  const [topic, setTopic] = useState("");
-
-  // option lists
-  const [gradeOptions, setGradeOptions] = useState([8, 9, 10]);
+  // selector options
+  const [gradeOptions, setGradeOptions] = useState([]);
   const [subjectOptions, setSubjectOptions] = useState([]);
   const [chapterOptions, setChapterOptions] = useState([]);
   const [topicOptions, setTopicOptions] = useState([]);
 
-  // LOs & preview
+  // selector state (declare before any usage)
+  const [selectedGrade, setGrade] = useState("");
+  const [subject, setSubject] = useState("");
+  const [chapterId, setChapterId] = useState("");
+  const [topic, setTopic] = useState("");
+
+  // LO list (backward-compatible with strings)
   const [los, setLos] = useState([]);
-  const [previewOpen, setPreviewOpen] = useState(false);
+
+  // mode selector
+  const [mode, setMode] = useState("Balanced"); // "Grounded" | "Balanced" | "Creative"
+
+  // outputs
   const [microplan, setMicroplan] = useState([]);
 
-  const [loading, setLoading] = useState({ enrich: false, generate: false });
-  // const busy = loading.enrich || loading.generate;
-  const [busy, setBusy] = useState(false);
-
-
-  // Track user edits (to avoid clobbering) and button/loading states
-  const [dirty, setDirty] = useState(false);
+  // loading / errors
   const [enriching, setEnriching] = useState(false);
   const [planning, setPlanning] = useState(false);
-
-
-  // Normalize whatever the LLM/RAG returns to plain strings for <input value="...">
-  function normalizeLos(anyShape) {
-    // Accept: ["a","b"], {learningObjectives:[...]}, {los:[...]}, null, undefined
-    let arr = [];
-    if (Array.isArray(anyShape)) arr = anyShape;
-    else if (anyShape?.learningObjectives && Array.isArray(anyShape.learningObjectives)) arr = anyShape.learningObjectives;
-    else if (anyShape?.los && Array.isArray(anyShape.los)) arr = anyShape.los;
-
-    return arr
-      .filter(Boolean)
-      .map(x => (typeof x === 'string' ? x : (x.text ?? x.title ?? x.goal ?? '')))
-      .filter(s => s && s.trim().length); // final cleanup
-  }
+  const [error, setError] = useState("");
 
   // PDF
   const [pdfExpanded, setPdfExpanded] = useState(true);
+
+  /* ------------ derived labels ------------ */
+  const subjectLabel = subject;
+  const chapterLabel = useMemo(() => {
+    const hit = chapterOptions.find(c => c.chapterId === chapterId);
+    return hit ? `${hit.chapterNum ? `Ch ${hit.chapterNum}: ` : ""}${hit.chapterTitle || hit.title || hit.name || ""}` : "";
+  }, [chapterOptions, chapterId]);
+  const topicLabel = topic || "(none)";
+
+  const pdfUrl = useMemo(() => {
+    if (!chapterId) return "";
+    const file = chapterOptions.find(c => c.chapterId === chapterId)?.file;
+    return buildLocalPdfUrl({ chapterId, file }, { page: 1 });
+  }, [chapterId, chapterOptions]);
 
   /* ------------ bootstrap ------------ */
   useEffect(() => {
@@ -131,9 +117,7 @@ export default function LessonPlanning() {
       await ensureManifest();
       const g = await getGrades();
       setGradeOptions(g);
-      const subs = await getSubjectsForGrade(grade);
-      setSubjectOptions(subs);
-      if (!subs.includes(subject)) setSubject(subs[0] || "");
+      if (!g.includes(selectedGrade)) setGrade(g[0] || "");
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -141,211 +125,192 @@ export default function LessonPlanning() {
   /* ------------ grade → subjects ------------ */
   useEffect(() => {
     (async () => {
-      const subs = await getSubjectsForGrade(grade);
+      if (!selectedGrade) { setSubjectOptions([]); return; }
+      const subs = await getSubjectsForGrade(selectedGrade);
       setSubjectOptions(subs);
       if (!subs.includes(subject)) setSubject(subs[0] || "");
     })();
-  }, [grade]);
+  }, [selectedGrade]);
 
   /* ------------ subject → chapters ------------ */
   useEffect(() => {
     (async () => {
-      if (!subject) {
-        setChapterOptions([]);
-        setChapterId("");
-        return;
-      }
-      const chs = await getChaptersForGradeSubject(grade, subject);
+      if (!selectedGrade || !subject) { setChapterOptions([]); return; }
+      const chs = await getChaptersForGradeSubject(selectedGrade, subject);
       setChapterOptions(chs);
-      if (!chs.find(c => c.chapterId === chapterId)) {
-        setChapterId(chs[0]?.chapterId || "");
-      }
+      if (!chs.map(c => c.chapterId).includes(chapterId)) setChapterId(chs?.[0]?.chapterId || "");
     })();
-  }, [grade, subject]); // keep chapterId in sync with subject/grade
+  }, [selectedGrade, subject]);
 
-  /* ------------ chapter → topics + seed LOs (safe) ------------ */
+  /* ------------ chapter → topics + optional LO seed ------------ */
   useEffect(() => {
     (async () => {
-      if (!chapterId) {
-        setTopicOptions([]);
-        setTopic("");
-        return;
-      }
-      const topics = await getTopicsForChapter(chapterId);
-      setTopicOptions(topics);
-
-      // pick a stable topic default
-      const nextTopic = topics.includes(topic) ? topic : (topics[0] || "");
-      if (nextTopic !== topic) setTopic(nextTopic);
-
-      // seed only if LOs look default/empty
-      setLos(prev => (looksUntouched(prev) ? seedLos({
-        subjectLabel: subject,
-        topicLabel: nextTopic
-      }) : prev));
+      if (!chapterId) { setTopicOptions([]); return; }
+      const chapter = await getChapterById(chapterId);
+      const t = await getTopicsForChapter(chapterId);
+      setTopicOptions(["(none)", ...t]);
+      const chapterHasKnownLOs = Array.isArray(chapter?.learningObjectives) && chapter.learningObjectives.length >= 2;
+      setLos(prev => {
+        if (!looksUntouched(prev)) return prev;
+        const base = chapterHasKnownLOs ? normalizeLos(chapter.learningObjectives) : seedLos({ subjectLabel, topicLabel });
+        return base.map((txt, i) => ({ id: `lo_${i}`, text: txt, selected: true }));
+      });
     })();
-  }, [chapterId, subject]); // reseed when chapter/subject changes
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [chapterId]);
 
-  /* ------------ reseed when the user switches topic (still safe) ------------ */
-  useEffect(() => {
-    if (!chapterId) return;
-    setLos(prev => (looksUntouched(prev) ? seedLos({
-      subjectLabel: subject,
-      topicLabel: topic
-    }) : prev));
-  }, [topic]); // do not clobber custom edits
+  /* ------------ LO helpers ------------ */
+  const onAddLO = () =>
+    setLos(prev => [...prev, { id: `lo_${Date.now()}`, text: "", selected: true }]);
 
-  /* ------------ keep microplan live while preview is open ------------ */
-  useEffect(() => {
-    if (!previewOpen) return;
-    setMicroplan(skeletonFromLOs(los.filter(Boolean), topic));
-  }, [previewOpen, los, topic]);
+  const onRemoveLO = (i) =>
+    setLos(prev => prev.filter((_, idx) => idx !== i));
 
-  /* ------------ pdf url ------------ */
-  const pdfUrl = useMemo(() => {
-    if (!chapterId) return "";
-    const file = chapterOptions.find(c => c.chapterId === chapterId)?.file;
-    return buildLocalPdfUrl({ chapterId, file }, { page: 1 });
-  }, [chapterId, chapterOptions]);
+  const onChangeLO = (i, val) =>
+    setLos(prev =>
+      prev.map((x, idx) => (idx === i ? { ...(typeof x === "string" ? { id: `lo_${i}`, selected: true, text: val } : { ...x, text: val }) } : x))
+    );
 
-  /* ------------ LO handlers ------------ */
-  const onAddLO = () => setLos(prev => [...prev, ""]);
-  const onRemoveLO = i => setLos(prev => prev.filter((_, idx) => idx !== i));
-  const onChangeLO = (i, val) => setLos(prev => prev.map((x, idx) => (idx === i ? val : x)));
+  const onToggleLO = (i) =>
+    setLos(prev =>
+      prev.map((x, idx) => (idx === i
+        ? (typeof x === "string"
+            ? { id: `lo_${i}`, text: x, selected: false }
+            : { ...x, selected: !(x.selected ?? true) })
+        : x))
+    );
+
+  const selectedLosOnly = useMemo(
+    () => los
+      .filter(item => (typeof item === "string" ? true : item?.selected !== false))
+      .map(item => (typeof item === "string" ? item : (item?.text ?? "")))
+      .map(s => String(s || "").trim())
+      .filter(Boolean),
+    [los]
+  );
 
   /* ------------ actions ------------ */
 
-// ------------ actions (LLM first, RAG fallback) ------------
-
-// LLM first, fall back to RAG if needed
-
-/* ------------ actions (LLM first, RAG fallback) ------------ */
-
-// Derive human-readable labels from current selects
-const subjectLabel = subject || "";
-const chapterLabel = useMemo(
-  () => chapterOptions.find((c) => c.chapterId === chapterId)?.label || "",
-  [chapterId, chapterOptions]
-);
-const topicLabel = topic || "";
-
-// Normalize whatever the LLM/RAG returns to plain strings for <input value="...">
-function normalizeLos(anyShape) {
-  let arr = [];
-  if (Array.isArray(anyShape)) arr = anyShape;
-  else if (anyShape?.learningObjectives && Array.isArray(anyShape.learningObjectives)) arr = anyShape.learningObjectives;
-  else if (anyShape?.los && Array.isArray(anyShape.los)) arr = anyShape.los;
-
-  return arr
-    .filter(Boolean)
-    .map((x) => (typeof x === "string" ? x : (x.text ?? x.title ?? x.goal ?? "")))
-    .filter((s) => s && s.trim().length);
-}
-
-// Single helper (remove any duplicate declaration above)
-const compactLos = () => los.map((s) => String(s || "").trim()).filter(Boolean);
-
-// LLM-first enrich, fallback to RAG if LLM throws/parses badly
-const onEnrich = async () => {
-  if (!chapterId) return;
-  setEnriching(true);
-  try {
-    const payload = {
-      grade,
-      subject: subjectLabel,
-      chapterId,
-      chapterLabel,
-      topicLabel,
-      los: compactLos(),
-      // If you later expose extracted PDF text, pass it here; for now keep empty.
-      context: [],
-    };
-
-    let out;
+  const onEnrich = async () => {
+    if (!chapterId) return;
+    if (selectedLosOnly.length === 0) { setError("Select at least one LO to enrich."); return; }
+    setError(""); setEnriching(true);
     try {
-      out = await enrichLOsLLM(payload);
+      const payload = {
+        grade: selectedGrade,
+        subject: subjectLabel,
+        chapterId,
+        chapterLabel,
+        topicLabel,
+        los: selectedLosOnly,
+        mode,
+        context: [],
+      };
+      let out;
+      try {
+        out = await enrichLOsLLM(payload);
+      } catch (e) {
+        console.warn("[LLM enrich failed, falling back to RAG]", e?.message || e);
+        out = await enrichLOsRAG(payload);
+      }
+      const normalized = normalizeLos(out);
+      // Replace only the selected ones; keep unselected untouched
+      setLos(prev => {
+        const kept = prev.filter(item => (typeof item === "string" ? false : item?.selected === false));
+        const fresh = normalized.map((txt, i) => ({ id: `lo_new_${i}`, text: txt, selected: true }));
+        return [...kept, ...fresh];
+      });
     } catch (e) {
-      console.warn("[LLM enrich failed, falling back to RAG]", e?.message || e);
-      out = await enrichLOsRAG(payload);
+      console.error(e);
+      setError("Could not enrich LOs.");
+    } finally {
+      setEnriching(false);
     }
+  };
 
-    setLos(normalizeLos(out));
-  } finally {
-    setEnriching(false);
-  }
-};
-
-// LLM-first plan, fallback to RAG; always open the preview
-const onGenerate = async () => {
-  if (!chapterId) return;
-  setPlanning(true);
-  try {
-    const payload = {
-      grade,
-      subject: subjectLabel,
-      chapterId,
-      chapterLabel,
-      topicLabel,
-      los: compactLos(),
-      context: [], // add extracted PDF text later if you want stronger plans
-    };
-
-    let plan;
+  const onGenerate = async () => {
+    if (!chapterId) return;
+    if (selectedLosOnly.length === 0) { setError("Select at least one LO to generate a plan."); return; }
+    setError(""); setPlanning(true);
     try {
-      plan = await generateMicroplanLLM(payload);
-    } catch (e) {
-      console.warn("[LLM plan failed, falling back to RAG]", e?.message || e);
-      plan = await generateMicroplanRAG(payload);
-    }
+      const payload = {
+        grade: selectedGrade,
+        subject: subjectLabel,
+        chapterId,
+        chapterLabel,
+        topicLabel,
+        los: selectedLosOnly,
+        mode,
+        context: [],
+      };
 
-    // Normalize possible shapes: array of blocks, {blocks}, or {steps}
-    const blocks =
-      Array.isArray(plan) ? plan :
-      plan?.blocks ? plan.blocks :
-      plan?.steps
-        ? plan.steps.map(s => ({
-            title: s.title || s.type || "Step",
-            body:  s.body  || s.detail || s.text || "",
-            minutes: s.minutes,
+      let plan;
+      if (mode === "Grounded") {
+        plan = await generateMicroplanRAG(payload);
+      } else if (mode === "Creative") {
+        plan = await generateMicroplanLLM(payload);
+      } else {
+        try {
+          plan = await generateMicroplanLLM(payload);
+        } catch (e) {
+          console.warn("[LLM plan failed, falling back to RAG]", e?.message || e);
+          plan = await generateMicroplanRAG(payload);
+        }
+      }
+
+      // Normalize shapes: array, {blocks}, or {steps}
+      const blocks =
+        Array.isArray(plan) ? plan :
+        plan?.blocks ? plan.blocks :
+        plan?.steps ? plan.steps.map(s => ({
+          title: s.title || s.type || "Step",
+          body: s.body || s.detail || s.text || "",
+          minutes: s.minutes
+        })) : [];
+
+      setMicroplan(
+        (blocks || [])
+          .map(b => ({
+            title: b.title || b.type || "Step",
+            body: b.body || b.detail || b.text || "",
           }))
-        : [];
+          .filter(x => x.title || x.body)
+      );
+    } catch (e) {
+      console.error(e);
+      setError("Could not generate microplan.");
+    } finally {
+      setPlanning(false);
+    }
+  };
 
-    setMicroplan(
-      blocks.length ? blocks : skeletonFromLOs(compactLos(), topic) // last-resort fallback
-    );
-    setPreviewOpen(true);
-  } finally {
-    setPlanning(false);
-  }
-};
+  /* -------------------- render -------------------- */
 
-  /* ------------ render ------------ */
   return (
     <Card title="Teacher · Lesson Planner">
+      {/* selectors */}
       <div className="grid md:grid-cols-4 gap-3">
         <div>
-          <div className="label">Class</div>
-          <select className="input" value={grade} onChange={e => setGrade(Number(e.target.value))}>
-            {gradeOptions.map(g => (
-              <option key={g} value={g}>{g}</option>
-            ))}
+          <div className="label">Class / Grade</div>
+          <select className="input" value={selectedGrade || ""} onChange={e => setGrade(e.target.value)}>
+            {gradeOptions.map(g => <option key={g} value={g}>{g}</option>)}
           </select>
         </div>
 
         <div>
           <div className="label">Subject</div>
-          <select className="input" value={subject} onChange={e => setSubject(e.target.value)}>
-            {subjectOptions.map(s => (
-              <option key={s} value={s}>{s}</option>
-            ))}
+          <select className="input" value={subject || ""} onChange={e => setSubject(e.target.value)}>
+            {subjectOptions.map(s => <option key={s} value={s}>{s}</option>)}
           </select>
         </div>
 
         <div>
           <div className="label">Chapter</div>
-          <select className="input" value={chapterId} onChange={e => setChapterId(e.target.value)}>
+          <select className="input" value={chapterId || ""} onChange={e => setChapterId(e.target.value)}>
             {chapterOptions.map(c => (
-              <option key={c.chapterId} value={c.chapterId}>{c.label}</option>
+              <option key={c.chapterId} value={c.chapterId}>
+                {c.chapterNum ? `Ch ${c.chapterNum}: ` : ""}{c.chapterTitle || c.title || c.name}
+              </option>
             ))}
           </select>
         </div>
@@ -360,21 +325,36 @@ const onGenerate = async () => {
         </div>
       </div>
 
+      {/* mode selector */}
+      <div className="mt-3">
+        <div className="label">Planning Mode</div>
+        <div className="flex gap-2">
+          <Button variant={mode === "Grounded" ? "primary" : "ghost"} onClick={() => setMode("Grounded")}>Grounded</Button>
+          <Button variant={mode === "Balanced" ? "primary" : "ghost"} onClick={() => setMode("Balanced")}>Balanced</Button>
+          <Button variant={mode === "Creative" ? "primary" : "ghost"} onClick={() => setMode("Creative")}>Creative</Button>
+        </div>
+      </div>
+
+      {/* LOs */}
       <div className="mt-4">
         <div className="section-title">Learning Objectives (LOs)</div>
         <div className="space-y-2">
-          {los.map((text, i) => (
-            <div key={`${i}-${text.slice(0, 8)}`} className="flex gap-2">
-              <input
-                className="input flex-1"
-                value={typeof text === "string" ? text : (text?.text ?? text?.title ?? text?.goal ?? "")}
-                placeholder={`LO #${i + 1}`}
-                onChange={e => onChangeLO(i, e.target.value)}
-              />
-
-              <Button variant="danger" onClick={() => onRemoveLO(i)}>Remove</Button>
-            </div>
-          ))}
+          {los.map((item, i) => {
+            const text = typeof item === "string" ? item : (item?.text ?? "");
+            const selected = typeof item === "string" ? true : (item?.selected !== false);
+            return (
+              <div key={`${i}-${String(text).slice(0, 12)}`} className="flex gap-2 items-center">
+                <input type="checkbox" checked={selected} onChange={() => onToggleLO(i)} />
+                <input
+                  className="input flex-1"
+                  value={text}
+                  placeholder={`LO #${i + 1}`}
+                  onChange={e => onChangeLO(i, e.target.value)}
+                />
+                <Button variant="danger" onClick={() => onRemoveLO(i)}>Remove</Button>
+              </div>
+            );
+          })}
           <div><Button variant="ghost" onClick={onAddLO}>+ Add LO</Button></div>
         </div>
 
@@ -386,25 +366,34 @@ const onGenerate = async () => {
             {planning ? "Generating…" : "Generate Microplan"}
           </Button>
         </div>
-       </div> {/* closes the <div className="mt-4"> LO wrapper */}
 
-      {previewOpen && (
-        <div className="mt-4 card">
-          <div className="card-header">
-            <div className="title">Microplan Preview</div>
-            <Button variant="ghost" onClick={() => setPreviewOpen(false)}>Close</Button>
+        {!!error && (
+          <div className="muted mt-2" style={{ color: "var(--danger)" }}>
+            {error}
           </div>
-          <div className="card-body space-y-3">
-            {microplan.map((b, idx) => (
-              <div key={idx} className="card muted">
-                <div className="title-sm">{b.title}</div>
-                <div className="mt-1">{b.body}</div>
-              </div>
-            ))}
+        )}
+      </div>
+
+      {/* plan */}
+      {!!microplan?.length && (
+        <div className="mt-6">
+          <div className="card">
+            <div className="card-header">
+              <div className="title">Microplan</div>
+            </div>
+            <div className="card-body space-y-3">
+              {microplan.map((b, idx) => (
+                <div key={idx} className="card muted">
+                  <div className="title-sm">{b.title}</div>
+                  <div className="mt-1">{b.body}</div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       )}
 
+      {/* PDF preview */}
       <div className="mt-6">
         <PDFPreview
           chapterId={chapterId}

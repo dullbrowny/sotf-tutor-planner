@@ -40,3 +40,11 @@ public/cbse-pdf/rag/
 rag_copy.sh
 test_embed.sh
 together.logs
+# Local helper scripts / patches / backups
+apply-*.sh
+codemod-*.sh
+fix-tdz-*.sh
+patches/
+poc-backup-*.zip
+*.proposed
+*.bak.*
