@@ -48,3 +48,9 @@ patches/
 poc-backup-*.zip
 *.proposed
 *.bak.*
+
+# local backups & patches
+*.bak.*
+*.proposed
+patches/
+
