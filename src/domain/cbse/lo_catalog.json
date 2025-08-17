@@ -1,0 +1,13 @@
+{
+  "los": [
+    { "id": "LO8M-CQ-01", "class": 8, "subject": "Math", "label": "Calculate percentage increase/decrease" },
+    { "id": "LO8M-CQ-02", "class": 8, "subject": "Math", "label": "Solve profit, loss and discount problems" },
+
+    { "id": "LO9S-FM-01", "class": 9, "subject": "Science", "label": "State and apply Newton’s First Law" },
+    { "id": "LO9S-FM-02", "class": 9, "subject": "Science", "label": "Use F=ma to compute acceleration" },
+
+    { "id": "LO10M-QE-01", "class": 10, "subject": "Math", "label": "Identify quadratic equations in standard form" },
+    { "id": "LO10M-QE-02", "class": 10, "subject": "Math", "label": "Solve quadratics by factorization" }
+  ]
+}
+

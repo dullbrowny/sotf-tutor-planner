@@ -1,0 +1,1035 @@
+[
+  {
+    "chapterId": "8SS-CH01",
+    "file": "sources/hepr1dd/hepr101.pdf",
+    "title": "Wit and Wisdom",
+    "grade": 8,
+    "subject": "English",
+    "chapterNo": "1",
+    "offset": 0,
+    "anchors": []
+  },
+  {
+    "chapterId": "8SS-CH02",
+    "file": "sources/hepr1dd/hepr102.pdf",
+    "title": "Values and Dispositions",
+    "grade": 8,
+    "subject": "Science",
+    "chapterNo": "2",
+    "offset": 48,
+    "anchors": []
+  },
+  {
+    "chapterId": "8SS-CH03",
+    "file": "sources/hepr1dd/hepr103.pdf",
+    "title": "hepr103.pdf",
+    "grade": 8,
+    "subject": "Social Science",
+    "chapterNo": 3,
+    "offset": 12,
+    "anchors": []
+  },
+  {
+    "chapterId": "8SS-CH04",
+    "file": "sources/hepr1dd/hepr104.pdf",
+    "title": "The Cherry Tree",
+    "grade": 8,
+    "subject": "Environment",
+    "chapterNo": "4",
+    "offset": 0,
+    "anchors": []
+  },
+  {
+    "chapterId": "8SS-CH05",
+    "file": "sources/hepr1dd/hepr105.pdf",
+    "title": "Science and Curiosity",
+    "grade": 8,
+    "subject": "Social Science",
+    "chapterNo": ",",
+    "offset": 4,
+    "anchors": []
+  },
+  {
+    "chapterId": "8SS-CH06",
+    "file": "sources/hegp1dd/hegp106.pdf",
+    "title": "We Distribute, Yet Things Multiply",
+    "grade": 8,
+    "subject": "Social Science",
+    "chapterNo": ",",
+    "offset": 5,
+    "anchors": []
+  },
+  {
+    "chapterId": "8SS-CH07",
+    "file": "sources/hegp1dd/hegp107.pdf",
+    "title": "Proportional Reasoning-1",
+    "grade": 8,
+    "subject": "Math",
+    "chapterNo": ": 7",
+    "offset": 6,
+    "anchors": []
+  },
+  {
+    "chapterId": "8SS-CH08",
+    "file": "sources/hecu1dd/hecu108.pdf",
+    "title": "hecu108.pdf",
+    "grade": 8,
+    "subject": "Social Science",
+    "chapterNo": 8,
+    "offset": 7,
+    "anchors": []
+  },
+  {
+    "chapterId": "8SS-CH09",
+    "file": "sources/hecu1dd/hecu109.pdf",
+    "title": "The Amazing World of Solutes, Solvents, and Solutions",
+    "grade": 8,
+    "subject": "Science",
+    "chapterNo": "Just 9",
+    "offset": 8,
+    "anchors": []
+  },
+  {
+    "chapterId": "8SS-CH10",
+    "file": "sources/hecu1dd/hecu110.pdf",
+    "title": "hecu110.pdf",
+    "grade": 8,
+    "subject": "Social Science",
+    "chapterNo": 10,
+    "offset": 9,
+    "anchors": []
+  },
+  {
+    "chapterId": "8SS-CH11",
+    "file": "sources/hecu1dd/hecu111.pdf",
+    "title": "Keeping Time with the Skies",
+    "grade": 8,
+    "subject": "Science",
+    "chapterNo": ": 11",
+    "offset": 10,
+    "anchors": []
+  },
+  {
+    "chapterId": "8SS-CH12",
+    "file": "sources/hecu1dd/hecu112.pdf",
+    "title": "How Nature Works in Harmony",
+    "grade": 8,
+    "subject": "Science",
+    "chapterNo": "How Nature Works in Harmony",
+    "offset": 11,
+    "anchors": []
+  },
+  {
+    "chapterId": "8SS-CH13",
+    "file": "sources/hecu1dd/hecu113.pdf",
+    "title": "Our Home: Earth, a Unique Life Sustaining Planet",
+    "grade": 8,
+    "subject": "Science",
+    "chapterNo": "Our Home: Earth, a Unique Life Sustaining Planet",
+    "offset": 12,
+    "anchors": []
+  },
+  {
+    "chapterId": "9E-CH01",
+    "file": "sources/iewe1dd/iewe101.pdf",
+    "title": "Words and Expressions",
+    "grade": 9,
+    "subject": "English",
+    "chapterNo": "One",
+    "offset": 0,
+    "anchors": []
+  },
+  {
+    "chapterId": "9E-CH02",
+    "file": "sources/iewe1dd/iewe102.pdf",
+    "title": "iewe102.pdf",
+    "grade": 9,
+    "subject": "English",
+    "chapterNo": 2,
+    "offset": 1,
+    "anchors": []
+  },
+  {
+    "chapterId": "9E-CH03",
+    "file": "sources/iewe1dd/iewe103.pdf",
+    "title": "The Story of The Little Girl",
+    "grade": 9,
+    "subject": "English",
+    "chapterNo": "On page 38",
+    "offset": 2,
+    "anchors": []
+  },
+  {
+    "chapterId": "9E-CH04",
+    "file": "sources/iewe1dd/iewe104.pdf",
+    "title": "iewe104.pdf",
+    "grade": 9,
+    "subject": "English",
+    "chapterNo": 4,
+    "offset": 3,
+    "anchors": []
+  },
+  {
+    "chapterId": "9E-CH05",
+    "file": "sources/iewe1dd/iewe105.pdf",
+    "title": "iewe105.pdf",
+    "grade": 9,
+    "subject": "English",
+    "chapterNo": 5,
+    "offset": 4,
+    "anchors": []
+  },
+  {
+    "chapterId": "9E-CH06",
+    "file": "sources/iewe1dd/iewe106.pdf",
+    "title": "Unit 6",
+    "grade": 9,
+    "subject": "English",
+    "chapterNo": ",",
+    "offset": 5,
+    "anchors": []
+  },
+  {
+    "chapterId": "9E-CH07",
+    "file": "sources/iewe1dd/iewe107.pdf",
+    "title": "Reach for the Top",
+    "grade": 9,
+    "subject": "English",
+    "chapterNo": ",",
+    "offset": 2,
+    "anchors": []
+  },
+  {
+    "chapterId": "9E-CH08",
+    "file": "sources/iewe1dd/iewe108.pdf",
+    "title": "Kathmandu",
+    "grade": 9,
+    "subject": "English",
+    "chapterNo": "L",
+    "offset": 7,
+    "anchors": []
+  },
+  {
+    "chapterId": "9E-CH09",
+    "file": "sources/iewe1dd/iewe109.pdf",
+    "title": "Identity",
+    "grade": 9,
+    "subject": "English",
+    "chapterNo": ",",
+    "offset": 8,
+    "anchors": []
+  },
+  {
+    "chapterId": "9M-CH01",
+    "file": "sources/iemh1dd/iemh101.pdf",
+    "title": "Number Systems",
+    "grade": 9,
+    "subject": "Math",
+    "chapterNo": "1",
+    "offset": 0,
+    "anchors": [
+      {
+        "name": "Exercises",
+        "page": 5
+      },
+      {
+        "name": "Exercises",
+        "page": 8
+      },
+      {
+        "name": "Exercises",
+        "page": 14
+      },
+      {
+        "name": "Summary",
+        "page": 166
+      },
+      {
+        "name": "Keywords",
+        "page": 166
+      },
+      {
+        "name": "Examples",
+        "page": 166
+      },
+      {
+        "name": "Example 1",
+        "page": 166
+      },
+      {
+        "name": "Example 2",
+        "page": 166
+      },
+      {
+        "name": "Intext Questions",
+        "page": 166
+      },
+      {
+        "name": "Try These",
+        "page": 166
+      }
+    ]
+  },
+  {
+    "chapterId": "9M-CH02",
+    "file": "sources/iemh1dd/iemh102.pdf",
+    "title": "iemh102.pdf",
+    "grade": 9,
+    "subject": "Math",
+    "chapterNo": 2,
+    "offset": 1,
+    "anchors": [
+      {
+        "name": "Exercises",
+        "page": 5
+      }
+    ]
+  },
+  {
+    "chapterId": "9M-CH03",
+    "file": "sources/iemh1dd/iemh103.pdf",
+    "title": "Coordinate Geometry",
+    "grade": 9,
+    "subject": "Math",
+    "chapterNo": "C HAPTER 3",
+    "offset": 2,
+    "anchors": []
+  },
+  {
+    "chapterId": "9M-CH04",
+    "file": "sources/iemh1dd/iemh104.pdf",
+    "title": "LINEAR EQUATIONS IN TWO VARIABLES",
+    "grade": 9,
+    "subject": "Math",
+    "chapterNo": "fmt(4)",
+    "offset": 1,
+    "anchors": []
+  },
+  {
+    "chapterId": "9M-CH05",
+    "file": "sources/iemh1dd/iemh105.pdf",
+    "title": "iemh105.pdf",
+    "grade": 9,
+    "subject": "Math",
+    "chapterNo": 5,
+    "offset": 4,
+    "anchors": []
+  },
+  {
+    "chapterId": "9M-CH06",
+    "file": "sources/iemh1dd/iemh106.pdf",
+    "title": "LINES AND ANGLES",
+    "grade": 9,
+    "subject": "Math",
+    "chapterNo": "C",
+    "offset": 5,
+    "anchors": []
+  },
+  {
+    "chapterId": "9M-CH07",
+    "file": "sources/iemh1dd/iemh107.pdf",
+    "title": "Triangles",
+    "grade": 9,
+    "subject": "Math",
+    "chapterNo": ",",
+    "offset": 6,
+    "anchors": []
+  },
+  {
+    "chapterId": "9M-CH08",
+    "file": "sources/iemh1dd/iemh108.pdf",
+    "title": "Quadrilaterals",
+    "grade": 9,
+    "subject": "Math",
+    "chapterNo": ",",
+    "offset": 7,
+    "anchors": []
+  },
+  {
+    "chapterId": "9M-CH09",
+    "file": "sources/iemh1dd/iemh109.pdf",
+    "title": "iemh109.pdf",
+    "grade": 9,
+    "subject": "Math",
+    "chapterNo": 9,
+    "offset": 8,
+    "anchors": [
+      {
+        "name": "Exercises",
+        "page": 7
+      }
+    ]
+  },
+  {
+    "chapterId": "9M-CH10",
+    "file": "sources/iemh1dd/iemh110.pdf",
+    "title": "HERON’S FORMULA",
+    "grade": 9,
+    "subject": "Math",
+    "chapterNo": "io",
+    "offset": 1,
+    "anchors": []
+  },
+  {
+    "chapterId": "9M-CH11",
+    "file": "sources/iemh1dd/iemh111.pdf",
+    "title": "SURFACE AREAS AND VOLUMES",
+    "grade": 9,
+    "subject": "Math",
+    "chapterNo": "11",
+    "offset": 10,
+    "anchors": [
+      {
+        "name": "Summary",
+        "page": 0
+      },
+      {
+        "name": "Keywords",
+        "page": 0
+      },
+      {
+        "name": "Examples",
+        "page": 0
+      },
+      {
+        "name": "Intext Questions",
+        "page": 0
+      },
+      {
+        "name": "Try These",
+        "page": 0
+      },
+      {
+        "name": "Exercises",
+        "page": 14
+      },
+      {
+        "name": "Example 1",
+        "page": 14
+      },
+      {
+        "name": "Example 2",
+        "page": 14
+      }
+    ]
+  },
+  {
+    "chapterId": "9M-CH12",
+    "file": "sources/iemh1dd/iemh112.pdf",
+    "title": "Statistics",
+    "grade": 9,
+    "subject": "Math",
+    "chapterNo": ",",
+    "offset": 11,
+    "anchors": []
+  },
+  {
+    "chapterId": "9S-CH01",
+    "file": "sources/iesc1dd/iesc101.pdf",
+    "title": "iesc101.pdf",
+    "grade": 9,
+    "subject": "Science",
+    "chapterNo": 1,
+    "offset": 0,
+    "anchors": []
+  },
+  {
+    "chapterId": "9S-CH02",
+    "file": "sources/iesc1dd/iesc102.pdf",
+    "title": "iesc102.pdf",
+    "grade": 9,
+    "subject": "Science",
+    "chapterNo": 2,
+    "offset": 1,
+    "anchors": []
+  },
+  {
+    "chapterId": "9S-CH03",
+    "file": "sources/iesc1dd/iesc103.pdf",
+    "title": "Atoms and Molecules",
+    "grade": 9,
+    "subject": "Science",
+    "chapterNo": "Atoms and Molecules",
+    "offset": 2,
+    "anchors": []
+  },
+  {
+    "chapterId": "9S-CH04",
+    "file": "sources/iesc1dd/iesc104.pdf",
+    "title": "Structure of the Atom",
+    "grade": 9,
+    "subject": "Science",
+    "chapterNo": "Our Structure of the Atom",
+    "offset": 3,
+    "anchors": []
+  },
+  {
+    "chapterId": "9S-CH05",
+    "file": "sources/iesc1dd/iesc105.pdf",
+    "title": "iesc105.pdf",
+    "grade": 9,
+    "subject": "Science",
+    "chapterNo": 5,
+    "offset": 4,
+    "anchors": []
+  },
+  {
+    "chapterId": "9S-CH06",
+    "file": "sources/iesc1dd/iesc106.pdf",
+    "title": "iesc106.pdf",
+    "grade": 9,
+    "subject": "Science",
+    "chapterNo": 6,
+    "offset": 5,
+    "anchors": []
+  },
+  {
+    "chapterId": "9S-CH07",
+    "file": "sources/iesc1dd/iesc107.pdf",
+    "title": "Motion",
+    "grade": 9,
+    "subject": "Science",
+    "chapterNo": "7",
+    "offset": 6,
+    "anchors": []
+  },
+  {
+    "chapterId": "9S-CH08",
+    "file": "sources/iesc1dd/iesc108.pdf",
+    "title": "Force and Laws of Motion",
+    "grade": 9,
+    "subject": "Science",
+    "chapterNo": ": 8",
+    "offset": 7,
+    "anchors": []
+  },
+  {
+    "chapterId": "9S-CH09",
+    "file": "sources/iesc1dd/iesc109.pdf",
+    "title": "Gravitation",
+    "grade": 9,
+    "subject": "Science",
+    "chapterNo": ">9",
+    "offset": 8,
+    "anchors": []
+  },
+  {
+    "chapterId": "9S-CH10",
+    "file": "sources/iesc1dd/iesc110.pdf",
+    "title": "Work and Energy",
+    "grade": 9,
+    "subject": "Science",
+    "chapterNo": "W",
+    "offset": 9,
+    "anchors": []
+  },
+  {
+    "chapterId": "9S-CH11",
+    "file": "sources/iesc1dd/iesc111.pdf",
+    "title": "iesc111.pdf",
+    "grade": 9,
+    "subject": "Science",
+    "chapterNo": 11,
+    "offset": 10,
+    "anchors": []
+  },
+  {
+    "chapterId": "9S-CH12",
+    "file": "sources/iesc1dd/iesc112.pdf",
+    "title": "Improvement in Food Resources",
+    "grade": 9,
+    "subject": "Science",
+    "chapterNo": ", ",
+    "offset": 11,
+    "anchors": []
+  },
+  {
+    "chapterId": "9SS-CH01",
+    "file": "sources/iess4dd/iess401.pdf",
+    "title": "What is Democracy? Why Democracy?",
+    "grade": 9,
+    "subject": "Civics",
+    "chapterNo": "One",
+    "offset": 0,
+    "anchors": []
+  },
+  {
+    "chapterId": "9SS-CH02",
+    "file": "sources/iess4dd/iess402.pdf",
+    "title": "Constitutional Design",
+    "grade": 9,
+    "subject": "Civics",
+    "chapterNo": "Onstitutional Design",
+    "offset": 17,
+    "anchors": []
+  },
+  {
+    "chapterId": "9SS-CH03",
+    "file": "sources/iess4dd/iess403.pdf",
+    "title": "Elec tor al Po liti cs",
+    "grade": 9,
+    "subject": "Civic Politics",
+    "chapterNo": "3",
+    "offset": 33,
+    "anchors": []
+  },
+  {
+    "chapterId": "9SS-CH04",
+    "file": "sources/iess4dd/iess404.pdf",
+    "title": "Working of Institutions",
+    "grade": 9,
+    "subject": "Social Science",
+    "chapterNo": ",",
+    "offset": 55,
+    "anchors": []
+  },
+  {
+    "chapterId": "9SS-CH05",
+    "file": "sources/iess4dd/iess405.pdf",
+    "title": "iess405.pdf",
+    "grade": 9,
+    "subject": "Social Science",
+    "chapterNo": 5,
+    "offset": 73,
+    "anchors": []
+  },
+  {
+    "chapterId": "9SS-CH06",
+    "file": "sources/iess1dd/iess106.pdf",
+    "title": "Population",
+    "grade": 9,
+    "subject": "Social Science",
+    "chapterNo": ", ",
+    "offset": 5,
+    "anchors": []
+  },
+  {
+    "chapterId": "10M-CH01",
+    "file": "sources/jemh1dd/jemh101.pdf",
+    "title": "Real Numbers",
+    "grade": 10,
+    "subject": "Math",
+    "chapterNo": "1",
+    "offset": 4,
+    "anchors": [
+      {
+        "name": "Exercises",
+        "page": 9
+      }
+    ]
+  },
+  {
+    "chapterId": "10M-CH02",
+    "file": "sources/jemh1dd/jemh102.pdf",
+    "title": "Polynomials",
+    "grade": 10,
+    "subject": "Math",
+    "chapterNo": "2",
+    "offset": 1,
+    "anchors": [
+      {
+        "name": "Exercises",
+        "page": 9
+      },
+      {
+        "name": "Exercises",
+        "page": 14
+      }
+    ]
+  },
+  {
+    "chapterId": "10M-CH03",
+    "file": "sources/jemh1dd/jemh103.pdf",
+    "title": "Pair of Linear Equations in Two Variables",
+    "grade": 10,
+    "subject": "Math",
+    "chapterNo": "3",
+    "offset": 2,
+    "anchors": []
+  },
+  {
+    "chapterId": "10M-CH04",
+    "file": "sources/jemh1dd/jemh104.pdf",
+    "title": "Quadratic Equations",
+    "grade": 10,
+    "subject": "Math",
+    "chapterNo": "Our chapter number is 4",
+    "offset": 81,
+    "anchors": [
+      {
+        "name": "Exercises",
+        "page": 10
+      },
+      {
+        "name": "Summary",
+        "page": 38
+      },
+      {
+        "name": "Keywords",
+        "page": 38
+      },
+      {
+        "name": "Examples",
+        "page": 40
+      }
+    ]
+  },
+  {
+    "chapterId": "10M-CH05",
+    "file": "sources/jemh1dd/jemh105.pdf",
+    "title": "Arithmetic Progressions",
+    "grade": 10,
+    "subject": "Math",
+    "chapterNo": "5",
+    "offset": 3,
+    "anchors": [
+      {
+        "name": "Exercises",
+        "page": 7
+      },
+      {
+        "name": "Exercises",
+        "page": 23
+      }
+    ]
+  },
+  {
+    "chapterId": "10M-CH06",
+    "file": "sources/jemh1dd/jemh106.pdf",
+    "title": "Triangles",
+    "grade": 10,
+    "subject": "Math",
+    "chapterNo": ", ",
+    "offset": 5,
+    "anchors": [
+      {
+        "name": "Exercises",
+        "page": 6
+      },
+      {
+        "name": "Exercises",
+        "page": 12
+      }
+    ]
+  },
+  {
+    "chapterId": "10M-CH07",
+    "file": "sources/jemh1dd/jemh107.pdf",
+    "title": "Coordinate Geometry",
+    "grade": 10,
+    "subject": "Math",
+    "chapterNo": ",",
+    "offset": 1,
+    "anchors": [
+      {
+        "name": "Exercises",
+        "page": 100
+      }
+    ]
+  },
+  {
+    "chapterId": "10M-CH08",
+    "file": "sources/jemh1dd/jemh108.pdf",
+    "title": "Introduction to Trigonometry",
+    "grade": 10,
+    "subject": "Math",
+    "chapterNo": "So, we have",
+    "offset": 7,
+    "anchors": [
+      {
+        "name": "Exercises",
+        "page": 9
+      },
+      {
+        "name": "Exercises",
+        "page": 15
+      },
+      {
+        "name": "Exercises",
+        "page": 19
+      }
+    ]
+  },
+  {
+    "chapterId": "10M-CH09",
+    "file": "sources/jemh1dd/jemh109.pdf",
+    "title": "Some Applications of Trigonometry",
+    "grade": 10,
+    "subject": "Math",
+    "chapterNo": "Some Applications of Trigonometry",
+    "offset": 8,
+    "anchors": []
+  },
+  {
+    "chapterId": "10M-CH10",
+    "file": "sources/jemh1dd/jemh110.pdf",
+    "title": "Circles",
+    "grade": 10,
+    "subject": "10",
+    "chapterNo": "mathematics",
+    "offset": 9,
+    "anchors": []
+  },
+  {
+    "chapterId": "10M-CH11",
+    "file": "sources/jemh1dd/jemh111.pdf",
+    "title": "Areas Related to Circles",
+    "grade": 10,
+    "subject": "Math",
+    "chapterNo": "Our 11",
+    "offset": 10,
+    "anchors": []
+  },
+  {
+    "chapterId": "10M-CH12",
+    "file": "sources/jemh1dd/jemh112.pdf",
+    "title": "Surface Areas and Volumes",
+    "grade": 10,
+    "subject": "Math",
+    "chapterNo": ": 12",
+    "offset": 11,
+    "anchors": []
+  },
+  {
+    "chapterId": "10M-CH13",
+    "file": "sources/jemh1dd/jemh113.pdf",
+    "title": "Statistics",
+    "grade": 10,
+    "subject": "Math",
+    "chapterNo": "13",
+    "offset": 11,
+    "anchors": [
+      {
+        "name": "Exercises",
+        "page": 28
+      },
+      {
+        "name": "Summary",
+        "page": 173
+      },
+      {
+        "name": "Example 1",
+        "page": 173
+      },
+      {
+        "name": "Example 2",
+        "page": 173
+      }
+    ]
+  },
+  {
+    "chapterId": "10M-CH14",
+    "file": "sources/jemh1dd/jemh114.pdf",
+    "title": "Probability",
+    "grade": 10,
+    "subject": "Math",
+    "chapterNo": "14",
+    "offset": 13,
+    "anchors": [
+      {
+        "name": "Exercises",
+        "page": 13
+      }
+    ]
+  },
+  {
+    "chapterId": "10S-CH01",
+    "file": "sources/jesc1dd/jesc101.pdf",
+    "title": "Chemical Reactions and Equations",
+    "grade": 10,
+    "subject": "Science",
+    "chapterNo": "One",
+    "offset": 0,
+    "anchors": []
+  },
+  {
+    "chapterId": "10S-CH02",
+    "file": "sources/jesc1dd/jesc102.pdf",
+    "title": "jesc102.pdf",
+    "grade": 10,
+    "subject": "Science",
+    "chapterNo": 2,
+    "offset": 1,
+    "anchors": []
+  },
+  {
+    "chapterId": "10S-CH03",
+    "file": "sources/jesc1dd/jesc103.pdf",
+    "title": "jesc103.pdf",
+    "grade": 10,
+    "subject": "Science",
+    "chapterNo": 3,
+    "offset": 2,
+    "anchors": []
+  },
+  {
+    "chapterId": "10S-CH04",
+    "file": "sources/jesc1dd/jesc104.pdf",
+    "title": "Carbon and its Compounds",
+    "grade": 10,
+    "subject": "Science",
+    "chapterNo": "I",
+    "offset": 3,
+    "anchors": []
+  },
+  {
+    "chapterId": "10S-CH05",
+    "file": "sources/jesc1dd/jesc105.pdf",
+    "title": "Life Processes",
+    "grade": 10,
+    "subject": "Science",
+    "chapterNo": ",",
+    "offset": 4,
+    "anchors": []
+  },
+  {
+    "chapterId": "10S-CH06",
+    "file": "sources/jesc1dd/jesc106.pdf",
+    "title": "Control and Coordination",
+    "grade": 10,
+    "subject": "Science",
+    "chapterNo": "I",
+    "offset": 5,
+    "anchors": []
+  },
+  {
+    "chapterId": "10S-CH07",
+    "file": "sources/jesc1dd/jesc107.pdf",
+    "title": "jesc107.pdf",
+    "grade": 10,
+    "subject": "Science",
+    "chapterNo": 7,
+    "offset": 6,
+    "anchors": []
+  },
+  {
+    "chapterId": "10S-CH08",
+    "file": "sources/jesc1dd/jesc108.pdf",
+    "title": "Heredity",
+    "grade": 10,
+    "subject": "Science",
+    "chapterNo": "How do Mendel’s experiments show that traits may be dominant or recessive?",
+    "offset": 7,
+    "anchors": []
+  },
+  {
+    "chapterId": "10S-CH09",
+    "file": "sources/jesc1dd/jesc109.pdf",
+    "title": "Light – Reflection and Refraction",
+    "grade": 10,
+    "subject": "Science",
+    "chapterNo": "L",
+    "offset": 8,
+    "anchors": []
+  },
+  {
+    "chapterId": "10S-CH10",
+    "file": "sources/jesc1dd/jesc110.pdf",
+    "title": "The Human Eye and the Colourful World",
+    "grade": 10,
+    "subject": "Science",
+    "chapterNo": "io",
+    "offset": 9,
+    "anchors": []
+  },
+  {
+    "chapterId": "10S-CH11",
+    "file": "sources/jesc1dd/jesc111.pdf",
+    "title": "Electricity",
+    "grade": 10,
+    "subject": "Science",
+    "chapterNo": "11",
+    "offset": 10,
+    "anchors": []
+  },
+  {
+    "chapterId": "10S-CH12",
+    "file": "sources/jesc1dd/jesc112.pdf",
+    "title": "Magnetic Effects of Electric Current",
+    "grade": 10,
+    "subject": "Science",
+    "chapterNo": "Magnetic Effects of Electric Current",
+    "offset": 11,
+    "anchors": []
+  },
+  {
+    "chapterId": "10S-CH13",
+    "file": "sources/jesc1dd/jesc113.pdf",
+    "title": "Our Environment",
+    "grade": 10,
+    "subject": "Science",
+    "chapterNo": "Our Environment",
+    "offset": 12,
+    "anchors": []
+  },
+  {
+    "chapterId": "10SS-CH01",
+    "file": "sources/jess4dd/jess401.pdf",
+    "title": "Power-sharing",
+    "grade": 10,
+    "subject": "Democratic Politics",
+    "chapterNo": "1",
+    "offset": 0,
+    "anchors": []
+  },
+  {
+    "chapterId": "10SS-CH02",
+    "file": "sources/jess4dd/jess402.pdf",
+    "title": "Federalism",
+    "grade": 10,
+    "subject": "Democratic Politics",
+    "chapterNo": "2",
+    "offset": 12,
+    "anchors": []
+  },
+  {
+    "chapterId": "10SS-CH03",
+    "file": "sources/jess4dd/jess403.pdf",
+    "title": "Gender, Religion and Caste",
+    "grade": 10,
+    "subject": "Social Science",
+    "chapterNo": ", ",
+    "offset": 28,
+    "anchors": []
+  },
+  {
+    "chapterId": "10SS-CH04",
+    "file": "sources/jess4dd/jess404.pdf",
+    "title": "Political Parties",
+    "grade": 10,
+    "subject": "Democratic Politics",
+    "chapterNo": "4",
+    "offset": 45,
+    "anchors": []
+  },
+  {
+    "chapterId": "10SS-CH05",
+    "file": "sources/jess4dd/jess405.pdf",
+    "title": "Outcomes of Democracy",
+    "grade": 10,
+    "subject": "Democratic Politics",
+    "chapterNo": ": 5",
+    "offset": 62,
+    "anchors": []
+  },
+  {
+    "chapterId": "10SS-CH06",
+    "file": "sources/jess1dd/jess106.pdf",
+    "title": "Manufacturing Industries",
+    "grade": 10,
+    "subject": "Social Science",
+    "chapterNo": ", ",
+    "offset": 57,
+    "anchors": []
+  },
+  {
+    "chapterId": "10SS-CH07",
+    "file": "sources/jess1dd/jess107.pdf",
+    "title": "Lifelines of National Economy",
+    "grade": 10,
+    "subject": "Geography",
+    "chapterNo": "Lifelines of National Economy",
+    "offset": 0,
+    "anchors": []
+  }
+]

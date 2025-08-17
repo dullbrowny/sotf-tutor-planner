@@ -1,4 +1,13 @@
-export function Button({ children, variant='ghost', ...props }) {
-  const cls = variant === 'primary' ? 'btn-primary' : 'btn-ghost'
-  return <button className={cls} {...props}>{children}</button>
+import React from "react";
+
+export function Button({ as: Comp = "button", variant = "primary", className = "", ...props }) {
+  const v =
+    variant === "secondary" ? "btn-secondary" :
+    variant === "ghost"     ? "btn-ghost" :
+    variant === "danger"    ? "btn-danger" : "btn-primary";
+  return <Comp className={`btn ${v} ${className}`} {...props} />;
 }
+
+// Backward-compat: both default + named export work
+export default Button;
+

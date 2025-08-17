@@ -1,0 +1,37 @@
+{
+  "topics": [
+    {
+      "topicId": "T8M-CQ-Percents",
+      "topic": "Percent change",
+      "lo": ["LO8M-CQ-01"],
+      "anchors": [
+        { "chapterId": "c8_math_chap08", "page": 109, "heading": "Percentage Increase/Decrease" }
+      ]
+    },
+    {
+      "topicId": "T8M-CQ-PLD",
+      "topic": "Profit, Loss and Discount",
+      "lo": ["LO8M-CQ-02"],
+      "anchors": [
+        { "chapterId": "c8_math_chap08", "page": 114, "heading": "Profit and Loss" }
+      ]
+    },
+    {
+      "topicId": "T9S-FM-N1",
+      "topic": "Newton’s First Law",
+      "lo": ["LO9S-FM-01"],
+      "anchors": [
+        { "chapterId": "c9_sci_chap09", "page": 118, "heading": "First Law of Motion" }
+      ]
+    },
+    {
+      "topicId": "T10M-QE-Std",
+      "topic": "Standard form of a quadratic",
+      "lo": ["LO10M-QE-01"],
+      "anchors": [
+        { "chapterId": "c10_math_chap04", "page": 80, "heading": "Quadratic Equations" }
+      ]
+    }
+  ]
+}
+

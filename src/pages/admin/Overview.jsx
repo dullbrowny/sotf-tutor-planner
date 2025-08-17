@@ -1,97 +1,152 @@
-import { useMemo } from 'react'
-import { Card } from '../../ui/Card'
+import React, { useEffect, useState } from "react";
+import { Card } from "../../ui/Card";
+import { api } from "../../api";
+import { getParentRequests } from "../../state/nudges";
+import { annotateWithChapter } from "../../services/chapterRef";
 
-const kpis = {
-  passRate: { label: 'Pass rate (G7 Science)', value: 72, delta: -8 },
-  attendance: { label: 'Attendance (Term-to-date)', value: 91, delta: -2 },
-  atRisk: { label: 'At-risk cohorts', value: 3, delta: +1 },
-}
-
-const watchlist = [
-  { cohort: '7B · Science', pass: 64, attendance: 88, flagged: ['Low mastery', 'High absence'] },
-  { cohort: '7C · Science', pass: 66, attendance: 90, flagged: ['Low mastery'] },
-  { cohort: '7A · Math',    pass: 69, attendance: 92, flagged: ['Dips post-unit test'] },
-]
-
-const interventions = [
-  { id: 'iv-001', title: 'Equivalent Fractions – visual-first block', owner: 'Dept: Science', status: 'Queued' },
-  { id: 'iv-002', title: 'Attendance outreach – 7B/7C', owner: 'Counsellor', status: 'In progress' },
-  { id: 'iv-003', title: 'After-school clinic – Tuesday/Thursday', owner: 'Admin', status: 'Queued' },
-]
-
-function Delta({ n }) {
-  const good = n >= 0
-  return (
-    <span className={(good ? 'text-emerald-300' : 'text-rose-300') + ' text-xs ml-1'}>
-      {good ? '▲' : '▼'} {Math.abs(n)}%
-    </span>
-  )
-}
-
-function Spark({ points = [72,70,69,73,74,72], height = 28 }) {
-  // tiny inline sparkline (no deps)
-  const w = 120
-  const max = Math.max(...points), min = Math.min(...points)
-  const norm = p => height - ((p - min) / Math.max(1, max - min)) * height
-  const step = w / (points.length - 1)
-  const d = points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${i*step},${norm(p)}`).join(' ')
-  return (
-    <svg width={w} height={height} className="opacity-80">
-      <path d={d} fill="none" stroke="currentColor" strokeWidth="2" />
-    </svg>
-  )
-}
+const CLASSES = [8, 9, 10];
+const SUBJECTS = ["Math", "Science"];
 
 export default function AdminOverview() {
-  const trend = useMemo(() => [74,73,75,74,73,72], [])
+  const [snapshot, setSnapshot] = useState([]);
+
+  useEffect(() => {
+    const out = [];
+    for (const klass of CLASSES) {
+      for (const subject of SUBJECTS) {
+        const los = api.cbse?.getLOs({ klass, subject }) || [];
+        let exCount = 0;
+        los.forEach(lo => {
+          const ex = api.cbse?.getExercisesByLO([lo.id], { limit: 50 }) || [];
+          exCount += ex.length;
+        });
+        out.push({ klass, subject, los: los.length, ex: exCount });
+      }
+    }
+    setSnapshot(out);
+  }, []);
+
+  function endOfTodayISO() {
+    const n = new Date();
+    return new Date(n.getFullYear(), n.getMonth(), n.getDate(), 23, 59, 0).toISOString();
+  }
+
+  function seedDemoData() {
+    const classId = "8A";
+    const subject = "Math";
+    const now = new Date();
+
+    const los = api.cbse?.getLOs({ klass: 8, subject }) || [];
+    const loIds = los.slice(0, 2).map(l => l.id);
+    const ex = (loIds.length ? (api.cbse?.getExercisesByLO(loIds, { limit: 6 }) || []) : []).slice(0, 2);
+
+    const baseItems = (ex.length ? ex : [
+      { qno: "8.1 Q3", preview: "Percentage increase word problem.", estMinutes: 5, citation: null },
+      { qno: "8.2 Q5", preview: "Profit percent word problem.",     estMinutes: 7, citation: null },
+    ]).map((x, i) => ({
+      id: `it${i + 1}`,
+      qno: x.qno,
+      preview: x.preview,
+      estMinutes: x.estMinutes ?? (i ? 7 : 5),
+      citation: x.citation || null,
+    }));
+
+    const annotated = annotateWithChapter(baseItems, loIds).map((x, i) => ({
+      ...x,
+      phase: ["warmup","teach","practice","reflect"][Math.min(i,3)] || "practice",
+    }));
+
+    const a = {
+      id: `dbg_${Date.now()}`,
+      classId,
+      subject,
+      createdAt: now.toISOString(),
+      dueISO: endOfTodayISO(),
+      items: annotated,
+    };
+
+    const AKEY = "sotf.assignments.v1";
+    const assignments = JSON.parse(localStorage.getItem(AKEY) || "[]");
+    assignments.unshift(a);
+    localStorage.setItem(AKEY, JSON.stringify(assignments));
+
+    // Flags / notices
+    const FKEY = "sotf.flags.v1";
+    const flags = JSON.parse(localStorage.getItem(FKEY) || "[]");
+    flags.unshift({ id: `flag_${Date.now()}_c`, ts: Date.now(), target: "class", classId, kind: "Attendance", text: "Attendance dip this week." });
+    flags.unshift({ id: `flag_${Date.now()}_s`, ts: Date.now(), target: "student", studentId: "s-arya", kind: "Concept", text: "Revisit Comparing Quantities." });
+    localStorage.setItem(FKEY, JSON.stringify(flags));
+
+    const NKEY = "sotf.nudges.v1";
+    const nudges = JSON.parse(localStorage.getItem(NKEY) || "[]");
+    nudges.unshift({ id: `n_${Date.now()}`, ts: Date.now(), fromParentGroup: "pg-8a", toStudentId: "s-arya", text: "Let’s finish today’s plan by 8pm!" });
+    localStorage.setItem(NKEY, JSON.stringify(nudges));
+
+    const RKEY = "sotf.requests.v1";
+    const reqs = JSON.parse(localStorage.getItem(RKEY) || "[]");
+    reqs.unshift({ id: `req_${Date.now()}`, ts: Date.now(), fromParentGroup: "pg-8a", classId, text: "Request teacher feedback on progress.", status: "open" });
+    localStorage.setItem(RKEY, JSON.stringify(reqs));
+
+    alert("🌱 Seeded demo data.");
+    location.reload();
+  }
+
+  function clearDemoData() {
+    ["sotf.assignments.v1", "sotf.attempts.v1", "sotf.flags.v1", "sotf.nudges.v1", "sotf.requests.v1", "classFeed:v1"]
+      .forEach(k => localStorage.removeItem(k));
+    alert("✅ Demo data cleared.");
+    location.reload();
+  }
 
   return (
     <>
-      <div data-testid="page-title" className="sr-only">Admin · Overview</div>
-
-      {/* KPI row */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
-        <Card title="Pass rate">
-          <div className="flex items-center justify-between">
-            <div className="text-3xl font-semibold">{kpis.passRate.value}% <Delta n={kpis.passRate.delta} /></div>
-            <Spark points={trend} />
+      <Card title="Admin · Overview (CBSE)">
+        <div className="flex items-center gap-2">
+          <div className="text-sm text-slate-300">
+            Coverage snapshot (demo): Classes 8–10 · Math/Science grounded to CBSE pack.
           </div>
-          <div className="text-xs text-slate-400 mt-1">{kpis.passRate.label}</div>
-        </Card>
 
-        <Card title="Attendance">
-          <div className="text-3xl font-semibold">{kpis.attendance.value}% <Delta n={kpis.attendance.delta} /></div>
-          <div className="h-2 mt-2 bg-slate-800 rounded">
-            <div className="h-2 rounded bg-emerald-600" style={{ width: `${kpis.attendance.value}%` }} />
-          </div>
-          <div className="text-xs text-slate-400 mt-1">{kpis.attendance.label}</div>
-        </Card>
+          {import.meta.env.VITE_USE_MOCKS === '1' && (
+            <div className="ml-auto flex items-center gap-2">
+              <button
+                type="button"
+                onClick={seedDemoData}
+                title="Seed demo data"
+                aria-label="Seed demo data"
+                className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-emerald-500 text-emerald-300 hover:bg-emerald-500/10 active:bg-emerald-500/20 transition"
+              >
+                <span className="text-xl leading-none" aria-hidden>＋</span>
+              </button>
+              <button
+                type="button"
+                onClick={clearDemoData}
+                title="Clear demo data"
+                aria-label="Clear demo data"
+                className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-rose-500 text-rose-300 hover:bg-rose-500/10 active:bg-rose-500/20 transition"
+              >
+                <span className="text-xl leading-none" aria-hidden>⟲</span>
+              </button>
+            </div>
+          )}
+        </div>
 
-        <Card title="At-risk cohorts">
-          <div className="text-3xl font-semibold">{kpis.atRisk.value} <Delta n={kpis.atRisk.delta} /></div>
-          <div className="text-xs text-slate-400 mt-1">Flagged by mastery/attendance</div>
-        </Card>
-      </div>
-
-      {/* Watchlist */}
-      <Card title="Cohort watchlist">
-        <div className="overflow-x-auto">
+        <div className="mt-3 overflow-auto">
           <table className="w-full text-sm">
-            <thead className="text-slate-300">
-              <tr className="text-left">
-                <th className="py-2 pr-4">Cohort</th>
-                <th className="py-2 pr-4">Pass %</th>
-                <th className="py-2 pr-4">Attendance %</th>
-                <th className="py-2 pr-4">Flags</th>
+            <thead>
+              <tr className="text-left text-slate-300">
+                <th className="py-2 pr-4">Class</th>
+                <th className="py-2 pr-4">Subject</th>
+                <th className="py-2 pr-4">LOs</th>
+                <th className="py-2 pr-4">Exercises</th>
               </tr>
             </thead>
             <tbody>
-              {watchlist.map((r, i) => (
+              {snapshot.map((r, i) => (
                 <tr key={i} className="border-t border-slate-800">
-                  <td className="py-2 pr-4">{r.cohort}</td>
-                  <td className="py-2 pr-4">{r.pass}</td>
-                  <td className="py-2 pr-4">{r.attendance}</td>
-                  <td className="py-2 pr-4 text-slate-300">{r.flagged.join(', ')}</td>
+                  <td className="py-2 pr-4">Class {r.klass}</td>
+                  <td className="py-2 pr-4">{r.subject}</td>
+                  <td className="py-2 pr-4">{r.los}</td>
+                  <td className="py-2 pr-4">{r.ex}</td>
                 </tr>
               ))}
             </tbody>
@@ -99,26 +154,43 @@ export default function AdminOverview() {
         </div>
       </Card>
 
-      {/* Interventions */}
-      <Card title="Interventions">
-        <div className="space-y-2">
-          {interventions.map(it => (
-            <div key={it.id} className="card p-3 flex items-center justify-between">
-              <div>
-                <div className="font-medium">{it.title}</div>
-                <div className="text-xs text-slate-400">{it.owner}</div>
-              </div>
-              <span className={
-                'text-xs px-2 py-0.5 rounded-full ' +
-                (it.status === 'Queued' ? 'bg-amber-700/40 text-amber-300' :
-                 it.status === 'In progress' ? 'bg-sky-700/40 text-sky-300' :
-                 'bg-emerald-700/40 text-emerald-300')
-              }>{it.status}</span>
+      {import.meta.env.VITE_USE_MOCKS === '1' && (
+        <Card title="Signals & Requests (stub)">
+          <div className="space-y-2 text-sm">
+            <div>
+              <div className="font-medium">Parent Requests</div>
+              {(() => {
+                const reqs = getParentRequests();
+                if (!reqs.length) return <div className="text-slate-400">No requests.</div>;
+                return (
+                  <ul className="list-disc pl-5">
+                    {reqs.map(r => (
+                      <li key={r.id}>
+                        {r.text} · <span className="opacity-70">{r.fromParentGroup}</span>
+                      </li>
+                    ))}
+                  </ul>
+                );
+              })()}
             </div>
-          ))}
-        </div>
-      </Card>
+            <div>
+              <div className="font-medium">Student Engagement (stub)</div>
+              {(() => {
+                const m = JSON.parse(localStorage.getItem("sotf.attempts.v1") || "{}");
+                const vals = Object.values(m);
+                const done = vals.filter(v => v === "done").length;
+                const started = vals.filter(v => v === "inprogress").length;
+                return <div>Total items started: <b>{started}</b> · Done: <b>{done}</b></div>;
+              })()}
+            </div>
+            <div>
+              <div className="font-medium">Teacher Coverage Signals (stub)</div>
+              <div className="text-slate-400">Hook: send coverage snapshot from Teacher page.</div>
+            </div>
+          </div>
+        </Card>
+      )}
     </>
-  )
+  );
 }
 

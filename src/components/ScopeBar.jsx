@@ -1,178 +1,231 @@
-import { useEffect, useMemo, useState } from 'react'
-import { useScope } from '../context/ScopeProvider'
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import { useScope } from "../context/ScopeProvider";
 
-function getSectionFromHash() {
-  const h = (window.location.hash || '#/').slice(1) // '/teachers/...'
-  const seg = h.split('/').filter(Boolean)[0] || 'teachers'
-  return seg
+/* Fallback from route (only if scope not set yet) */
+function kindFromHash() {
+  const h = (typeof window !== "undefined" ? window.location.hash : "") || "";
+  const seg = h.replace(/^#\//, "");
+  if (seg.startsWith("students")) return "student";
+  if (seg.startsWith("teachers")) return "teacherGroup";
+  if (seg.startsWith("parent"))   return "parentGroup";
+  if (seg.startsWith("admin"))    return "school";
+  return "class";
 }
 
-const defaultsBySection = {
-  teachers:  { kind: 'teacherGroup' },
-  students:  { kind: 'student' },
-  admin:     { kind: 'school' },
-  parent:    { kind: 'parentGroup' },
-}
+const LABELS = {
+  student: "Student",
+  class: "Class",
+  teacherGroup: "Teacher Group",
+  parentGroup: "Parent Group",
+  school: "School",
+};
 
-const allowedKindsBySection = {
-  teachers: ['teacherGroup', 'class', 'grade', 'school'],
-  students: ['student', 'class', 'grade', 'school'],
-  admin:    ['school', 'grade', 'class', 'teacherGroup', 'parentGroup'],
-  parent:   ['parentGroup', 'student', 'class', 'school'],
-}
+export default function ScopeBar({
+  allowedKinds = ["student", "class", "teacherGroup", "parentGroup", "school"],
+  className = "",
+}) {
+  const { scope, setScope, classes = [], teacherGroups = [], parentGroups = [] } = useScope();
 
-export default function ScopeBar() {
-  const { scope, setScope, Directory } = useScope()
-  const [section, setSection] = useState(getSectionFromHash())
+  // normalize + dedupe kinds; "grade" → "class"
+  const kinds = useMemo(() => {
+    const norm = (k) => (k === "grade" ? "class" : k);
+    return Array.from(new Set((allowedKinds || []).map(norm)));
+  }, [allowedKinds]);
 
-  // Track hash to know which stakeholder we're in
+  const [kind, setKind] = useState(scope?.kind ? (scope.kind === "grade" ? "class" : scope.kind) : kindFromHash());
   useEffect(() => {
-    const onHash = () => setSection(getSectionFromHash())
-    window.addEventListener('hashchange', onHash)
-    return () => window.removeEventListener('hashchange', onHash)
-  }, [])
+    if (!scope?.kind) return;
+    const k = scope.kind === "grade" ? "class" : scope.kind;
+    if (k !== kind) setKind(k);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [scope?.kind]);
 
-  const storageKey = useMemo(() => `scope:last:${section}`, [section])
-
-  // On section change: restore previous scope or apply sensible default
-  useEffect(() => {
-    const saved = localStorage.getItem(storageKey)
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved)
-        // Only apply if it matches allowed kinds for the section
-        if (allowedKindsBySection[section]?.includes(parsed.kind)) {
-          setScope(parsed)
-          return
-        }
-      } catch { /* noop */ }
+  // Build entity options for the second select
+  const entityOptions = useMemo(() => {
+    if (kind === "class")
+      return classes.map((c) => ({ value: c.id, label: c.name || (c.grade ? `Class ${c.grade}` : c.id), grade: c.grade }));
+    if (kind === "teacherGroup")
+      return teacherGroups.map((g) => ({ value: g.id, label: g.name || g.id }));
+    if (kind === "parentGroup")
+      return parentGroups.map((g) => ({ value: g.id, label: g.name || g.id }));
+    if (kind === "student") {
+      const list = [];
+      classes.forEach((c) => (c.studentIds || []).forEach((sid) => list.push({ value: sid, label: sid })));
+      return list;
     }
-    // No saved or not allowed -> set default for section
-    const def = defaultsBySection[section] || { kind: 'school' }
-    if (def.kind === 'student') {
-      setScope({ kind: 'student', studentId: (Directory.students[0] || {}).id })
-    } else if (def.kind === 'teacherGroup') {
-      setScope({ kind: 'teacherGroup', groupId: (Directory.teacherGroups[0] || {}).id })
-    } else if (def.kind === 'parentGroup') {
-      setScope({ kind: 'parentGroup', groupId: (Directory.parentGroups[0] || {}).id })
-    } else if (def.kind === 'class') {
-      setScope({ kind: 'class', classId: (Directory.classes[0] || {}).id })
-    } else if (def.kind === 'grade') {
-      setScope({ kind: 'grade', grade: (Directory.classes[0] || {}).grade })
+    return [];
+  }, [kind, classes, teacherGroups, parentGroups]);
+
+  // Selected entity ID from scope
+  const selectedEntityId = useMemo(() => {
+    if (kind === "class") return scope?.classId || null;
+    if (kind === "teacherGroup" || kind === "parentGroup") return scope?.groupId || null;
+    if (kind === "student") return scope?.studentId || null;
+    return null;
+  }, [kind, scope?.classId, scope?.groupId, scope?.studentId]);
+
+  // Auto-correct stale/invalid selections (e.g., legacy 7B) to first valid option
+  useEffect(() => {
+    if (!entityOptions.length) return;
+    const exists = entityOptions.some((o) => o.value === selectedEntityId);
+    if (exists) return;
+
+    const first = entityOptions[0]?.value || null;
+    if (!first) return;
+
+    if (kind === "class") {
+      const cls = entityOptions[0];
+      setScope({ kind: "class", classId: cls.value, grade: cls.grade || scope?.grade || "8" });
+    } else if (kind === "teacherGroup" || kind === "parentGroup") {
+      setScope({ kind, groupId: first });
+    } else if (kind === "student") {
+      setScope({ kind: "student", studentId: first });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [kind, entityOptions]);
+
+  const summaryText = useMemo(() => {
+    if (kind === "class") {
+      const item = classes.find((c) => c.id === selectedEntityId);
+      const label = item?.name || (item?.grade ? `Class ${item.grade}` : selectedEntityId || "—");
+      return `Class: ${label}`;
+    }
+    if (kind === "teacherGroup") {
+      const item = teacherGroups.find((g) => g.id === selectedEntityId);
+      return `Group: ${item?.name || selectedEntityId || "—"}`;
+    }
+    if (kind === "parentGroup") {
+      const item = parentGroups.find((g) => g.id === selectedEntityId);
+      return `Group: ${item?.name || selectedEntityId || "—"}`;
+    }
+    if (kind === "student") return `Student: ${selectedEntityId || "—"}`;
+    return `Scope: School`;
+  }, [kind, selectedEntityId, classes, teacherGroups, parentGroups]);
+
+  const onKind = (e) => {
+    const next = e.target.value === "grade" ? "class" : e.target.value;
+    setKind(next);
+    if (next === "class") {
+      const first = entityOptions[0] || classes[0];
+      setScope({ kind: "class", classId: first?.value || first?.id || null, grade: first?.grade || "8" });
+    } else if (next === "teacherGroup") {
+      const first = (teacherGroups[0] || {}).id || null;
+      setScope({ kind: "teacherGroup", groupId: first });
+    } else if (next === "parentGroup") {
+      const first = (parentGroups[0] || {}).id || null;
+      setScope({ kind: "parentGroup", groupId: first });
+    } else if (next === "student") {
+      let firstStudent = null;
+      classes.some((c) => {
+        if (c.studentIds?.length) { firstStudent = c.studentIds[0]; return true; }
+        return false;
+      });
+      setScope({ kind: "student", studentId: firstStudent || "s-arya" });
     } else {
-      setScope({ kind: 'school' })
+      setScope({ kind: "school" });
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [section])
+  };
 
-  // Persist any scope change for the current section
+  const onEntity = (e) => {
+    const val = e.target.value || null;
+    if (kind === "class") {
+      const cls = classes.find((c) => c.id === val);
+      setScope({ kind: "class", classId: cls?.id || val, grade: cls?.grade || scope?.grade || "8" });
+    } else if (kind === "teacherGroup" || kind === "parentGroup") {
+      setScope({ kind, groupId: val });
+    } else if (kind === "student") {
+      setScope({ kind: "student", studentId: val });
+    }
+  };
+
+  // ----- Alignment to tab row below -----
+  const wrapRef = useRef(null);
+  const innerRef = useRef(null);
+
   useEffect(() => {
-    localStorage.setItem(storageKey, JSON.stringify(scope))
-  }, [scope, storageKey])
+    function align() {
+      const wrap = wrapRef.current;
+      const inner = innerRef.current;
+      if (!wrap || !inner) return;
 
-  const allowedKinds = allowedKindsBySection[section] || ['school']
+      // Try common selectors for the tabs row in this page
+      const target =
+        document.querySelector('[data-page-tabs]') ||
+        document.querySelector('[role="tablist"]') ||
+        document.querySelector('.module-switcher') ||
+        null;
 
-  // Helpers to switch kinds while keeping the section rules
-  const changeKind = (kind) => {
-    if (!allowedKinds.includes(kind)) return
-    if (kind === 'student')
-      setScope({ kind, studentId: (Directory.students[0] || {}).id })
-    else if (kind === 'class')
-      setScope({ kind, classId: (Directory.classes[0] || {}).id })
-    else if (kind === 'grade')
-      setScope({ kind, grade: (Directory.classes[0] || {}).grade })
-    else if (kind === 'teacherGroup')
-      setScope({ kind, groupId: (Directory.teacherGroups[0] || {}).id })
-    else if (kind === 'parentGroup')
-      setScope({ kind, groupId: (Directory.parentGroups[0] || {}).id })
-    else
-      setScope({ kind: 'school' })
-  }
+      // Reset first
+      inner.style.paddingLeft = "";
+      inner.style.paddingRight = "";
 
-  // Nice label on the far right
-  const scopeLabel = useMemo(() => {
-    if (scope.kind === 'student') {
-      const s = Directory.students.find(x => x.id === scope.studentId)
-      return `Student: ${s?.name || '—'}`
+      if (!target) return;
+
+      const left = target.getBoundingClientRect().left;
+      const wrapLeft = wrap.getBoundingClientRect().left;
+      const deltaL = Math.max(0, left - wrapLeft);
+
+      const right = target.getBoundingClientRect().right;
+      const wrapRight = wrap.getBoundingClientRect().right;
+      const deltaR = Math.max(0, wrapRight - right);
+
+      // Pad so our left edge matches the tabs' left, and keep the right chip aligned
+      inner.style.paddingLeft = `${deltaL}px`;
+      inner.style.paddingRight = `${deltaR}px`;
     }
-    if (scope.kind === 'class') {
-      const c = Directory.classes.find(x => x.id === scope.classId)
-      return `Class: ${c?.name || '—'}`
-    }
-    if (scope.kind === 'grade') return `Grade: ${scope.grade || '—'}`
-    if (scope.kind === 'teacherGroup') {
-      const g = Directory.teacherGroups.find(x => x.id === scope.groupId)
-      return `Group: ${g?.name || '—'}`
-    }
-    if (scope.kind === 'parentGroup') {
-      const g = Directory.parentGroups.find(x => x.id === scope.groupId)
-      return `Group: ${g?.name || '—'}`
-    }
-    return 'School-wide'
-  }, [scope, Directory])
+
+    align();
+    const ro = new ResizeObserver(align);
+    ro.observe(document.body);
+    return () => ro.disconnect();
+  }, []);
+
+  // tokens that match your top-row inputs
+  const selectBase =
+    "h-9 min-w-[160px] bg-slate-900/50 border border-slate-700 rounded-lg px-2 text-sm " +
+    "focus:outline-none focus:ring-1 focus:ring-sky-600";
+  const selectEntity = selectBase + " min-w-[200px]";
 
   return (
-    <div className="mx-auto max-w-7xl px-4 pt-3">
-      <div className="card p-3 flex flex-wrap items-center gap-3">
-        <div className="text-sm">Scope:</div>
+    <div ref={wrapRef} className={`w-full mb-3 ${className}`}>
+      {/* Contained bar; inner gets dynamic left/right padding to match tabs row */}
+      <div ref={innerRef} className="relative rounded-2xl border border-slate-700 bg-slate-900/40 px-4 md:px-6 py-2">
+        <div className="grid grid-cols-[auto_auto_1fr] items-center gap-3">
+          {/* Left cluster */}
+          <div className="flex items-center gap-3">
+            <span className="text-xs text-slate-400 leading-9">Scope:</span>
+            <select aria-label="Scope kind" className={selectBase} value={kind} onChange={onKind}>
+              {kinds.map((k) => (
+                <option key={k} value={k}>{LABELS[k] || k}</option>
+              ))}
+            </select>
+            {kind !== "school" && (
+              <select
+                aria-label="Scope entity"
+                className={selectEntity}
+                value={selectedEntityId || ""}
+                onChange={onEntity}
+              >
+                {entityOptions.length === 0 ? (
+                  <option value="" disabled>No options</option>
+                ) : (
+                  entityOptions.map((o) => (
+                    <option key={o.value} value={o.value}>{o.label}</option>
+                  ))
+                )}
+              </select>
+            )}
+          </div>
 
-        {/* Kind selector filtered by current section */}
-        <select
-          value={scope.kind}
-          onChange={(e) => changeKind(e.target.value)}
-          className="bg-card rounded px-2 py-1 border border-card-ring text-sm"
-        >
-          {allowedKinds.includes('student') && <option value="student">Student</option>}
-          {allowedKinds.includes('class') && <option value="class">Class</option>}
-          {allowedKinds.includes('grade') && <option value="grade">Grade</option>}
-          {allowedKinds.includes('teacherGroup') && <option value="teacherGroup">Teacher Group</option>}
-          {allowedKinds.includes('parentGroup') && <option value="parentGroup">Parent Group</option>}
-          {allowedKinds.includes('school') && <option value="school">School</option>}
-        </select>
-
-        {/* Entity pickers (only show the one relevant to current kind) */}
-        {scope.kind === 'student' && (
-          <select value={scope.studentId || ''}
-                  onChange={(e)=> setScope({ kind: 'student', studentId: e.target.value })}
-                  className="bg-card rounded px-2 py-1 border border-card-ring text-sm">
-            {Directory.students.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
-          </select>
-        )}
-
-        {scope.kind === 'class' && (
-          <select value={scope.classId || ''}
-                  onChange={(e)=> setScope({ kind: 'class', classId: e.target.value })}
-                  className="bg-card rounded px-2 py-1 border border-card-ring text-sm">
-            {Directory.classes.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-          </select>
-        )}
-
-        {scope.kind === 'grade' && (
-          <select value={scope.grade || ''}
-                  onChange={(e)=> setScope({ kind: 'grade', grade: e.target.value })}
-                  className="bg-card rounded px-2 py-1 border border-card-ring text-sm">
-            {[...new Set(Directory.classes.map(c=>c.grade))].map(g => <option key={g} value={g}>{g}</option>)}
-          </select>
-        )}
-
-        {scope.kind === 'teacherGroup' && (
-          <select value={scope.groupId || ''}
-                  onChange={(e)=> setScope({ kind: 'teacherGroup', groupId: e.target.value })}
-                  className="bg-card rounded px-2 py-1 border border-card-ring text-sm">
-            {Directory.teacherGroups.map(g => <option key={g.id} value={g.id}>{g.name}</option>)}
-          </select>
-        )}
-
-        {scope.kind === 'parentGroup' && (
-          <select value={scope.groupId || ''}
-                  onChange={(e)=> setScope({ kind: 'parentGroup', groupId: e.target.value })}
-                  className="bg-card rounded px-2 py-1 border border-card-ring text-sm">
-            {Directory.parentGroups.map(g => <option key={g.id} value={g.id}>{g.name}</option>)}
-          </select>
-        )}
-
-        <div className="muted text-xs ml-auto">{scopeLabel}</div>
+          {/* Right scope chip */}
+          <div className="col-start-3 justify-self-end">
+            <div className="px-3 h-9 flex items-center border border-slate-700 bg-slate-900/60 rounded-lg text-xs text-slate-300">
+              {summaryText}
+            </div>
+          </div>
+        </div>
       </div>
     </div>
-  )
+  );
 }
+

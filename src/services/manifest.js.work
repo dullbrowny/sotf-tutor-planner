@@ -1,0 +1,103 @@
+// Lightweight manifest helper with caching + consistent exports
+let _cache = null;
+
+// Public: ensure the manifest is loaded and normalized
+export async function ensureManifest() {
+  if (_cache) return _cache;
+  const res = await fetch('/cbse-pdf/manifest.enriched.json', { cache: 'no-store' });
+  if (!res.ok) throw new Error('Manifest load failed');
+  const raw = await res.json();
+
+  // Normalize: coerce fields, trim junk, derive convenience fields
+  _cache = raw.map((r) => {
+    const chapterId = String(r.chapterId || '').trim();
+    const grade = Number(r.grade);
+    const subject = String(r.subject || '').trim();
+    const file = String(r.file || '').trim();
+    const title = String(r.title || '').trim() || chapterId;
+    const anchors = Array.isArray(r.anchors) ? r.anchors : [];
+    return { ...r, chapterId, grade, subject, file, title, anchors };
+  });
+  return _cache;
+}
+
+export async function getGrades() {
+  const m = await ensureManifest();
+  return [...new Set(m.map((r) => r.grade))].sort((a, b) => a - b);
+}
+
+export async function getSubjectsForGrade(grade) {
+  const m = await ensureManifest();
+  return [...new Set(m.filter(r => r.grade === Number(grade)).map(r => r.subject))].sort();
+}
+
+export async function getChaptersForGradeSubject(grade, subject) {
+  const m = await ensureManifest();
+  return m
+    .filter(r => r.grade === Number(grade) && r.subject === subject)
+    .map(r => ({
+      chapterId: r.chapterId,
+      label: `${chapterIdToPretty(r.chapterId)} · ${r.title}`,
+      file: r.file,
+      title: r.title,
+    }))
+    .sort((a, b) => a.chapterId.localeCompare(b.chapterId));
+}
+
+export async function getChapterById(chapterId) {
+  const m = await ensureManifest();
+  return m.find(r => r.chapterId === chapterId) || null;
+}
+
+export async function getTopicsForChapter(chapterId) {
+  const rec = await getChapterById(chapterId);
+  if (!rec) return [];
+  const names = [...new Set((rec.anchors || []).map(a => a.name).filter(Boolean))];
+  return names.length ? names : [];
+}
+
+export function chapterIdToPretty(ch) {
+  // 9M-CH03 -> 9M · CH03
+  try {
+    const [lhs, rhs] = String(ch).split('-');
+    return `${lhs} · ${rhs}`;
+  } catch { return String(ch); }
+}
+
+export function buildLocalPdfUrl(chapterOrId, { page = 1, zoom = "page-width" } = {}) {
+  const c = typeof chapterOrId === "object" ? chapterOrId : null;
+  const id = c?.chapterId ?? String(chapterOrId || "");
+  const file = c?.file || "";
+
+  // If manifest gives "sources/…/file.pdf", prefix /cbse-pdf/
+  let path = "";
+  if (file) {
+    path = file.startsWith("/cbse-pdf/")
+      ? file
+      : `/cbse-pdf/${file.replace(/^\/+/, "")}`;
+  } else {
+    // Fallback: chapterId-based path (kept for safety)
+    path = `/cbse-pdf/sources/${id}.pdf`;
+  }
+
+  return `${path}#page=${Number(page) || 1}&zoom=${encodeURIComponent(zoom)}`;
+}
+
+
+// (Optional) simple hook if you want to memoize in components
+export async function manifestOnce() {
+  return ensureManifest();
+}
+
+export default {
+  ensureManifest,
+  getGrades,
+  getSubjectsForGrade,
+  getChaptersForGradeSubject,
+  getTopicsForChapter,
+  getChapterById,
+  chapterIdToPretty,
+  buildLocalPdfUrl,
+  manifestOnce,
+};
+

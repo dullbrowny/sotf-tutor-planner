@@ -26,7 +26,7 @@ function suggestionsFor(contextKey = 'teachers/dashboard') {
     'admin/overview': [
       'Which cohorts are trending at-risk and why?',
       'Show top 3 KPIs to watch this week.',
-      'Draft an intervention plan outline for Grade 7 science.'
+      'Draft an intervention plan outline for Class 8 science.'
     ],
     'parent/portal': [
       'How is my child doing this week?',

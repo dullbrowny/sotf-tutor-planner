@@ -46,7 +46,7 @@ export function generateInsights(ctx, scopeMeta = {}) {
 
   if (k === 'admin/overview') {
     out.push(
-      base('g_adm_ovw_1', 'Grade 7 Science pass-rate trending down',
+      base('g_adm_ovw_1', 'Class 8 Science pass-rate trending down',
         '−8% vs last term; cluster in sections 7B/7C.',
         ['Schedule Dept Review', 'Create Intervention Plan'],
         ['admin'], ['admin/overview'], ['school'])
@@ -54,7 +54,7 @@ export function generateInsights(ctx, scopeMeta = {}) {
     out.push(
       base('g_adm_ovw_2', 'Attendance dip on Wednesdays',
         'Median −3% across grades; correlates with club timings.',
-        ['Adjust Timetable', 'Notify Grade Coordinators'],
+        ['Adjust Timetable', 'Notify Class Coordinators'],
         ['admin'], ['admin/overview'], ['school'])
     );
     out.push(

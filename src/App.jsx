@@ -1,49 +1,48 @@
 import { generateInsights } from './insights/generators'
 import { computeContext } from './utils/insightFilter'
-import { ScopeProvider, useScope } from './context/ScopeProvider'
+import { ScopeProvider } from "./context/ScopeProvider";
+import { useScopeCompat as useScope } from "./context/scopeCompat";
 import Shell from './layouts/Shell'
 import ModuleSwitcher from './components/ModuleSwitcher'
 import InsightsRail from './components/InsightsRail'
 import ChatPanel from './components/ChatPanel'
 import ClassFeedCard from './components/ClassFeedCard'
 import { dispatchAction } from './agents/dispatcher'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { useHashRoute } from './router/useHashRoute'
 import { Card } from './ui/Card'
+import { api } from './api';
+import CitationLink from './components/CitationLink';
+import { assignMicroplan } from './state/assignments'
 
-// Teachers: dashboard + planner bits
-import TeachersDashboard from './pages/teachers/Dashboard'
-import StudentProfile from './components/StudentProfile'
-import LessonBlockPicker from './components/LessonBlockPicker'
-import PlanPreview from './components/PlanPreview'
-import AITipsPanel from './components/AITipsPanel'
-
-// Teachers pages
+// Teachers
 import LessonPlanning from './pages/teachers/LessonPlanning'
+import TeacherDash from './pages/teachers/Dashboard'
 import Assessment from './pages/teachers/Assessment'
 import Grading from './pages/teachers/Grading'
 import FacultyEval from './pages/teachers/FacultyEval'
 
-// Students pages
+// Students
 import TutorPlan from './pages/students/TutorPlan'
 import Practice from './pages/students/Practice'
 import StudentDash from './pages/students/Dashboard'
 import StudentPlayback from './pages/students/Playback'
 
-// Admin pages
+// Admin / Parent / Dev
 import AdminOverview from './pages/admin/Overview'
 import Predictive from './pages/admin/Predictive'
-
-// Parent pages
 import ParentPortal from './pages/parent/Portal'
 import ParentComms from './pages/parent/Comms'
+import CbseAudit from './pages/dev/CbseAudit'
+import StudentToday from './pages/students/Today'
+import AdminInsights from './pages/admin/Insights'
+import ParentFeed from './pages/parent/Feed'
 
-// Map current route/hash → a stable chat context key
 function routeToContextKey(r = '') {
-  const route = r.startsWith('#') ? r : `#${r}`; // normalize "/parent/portal" → "#/parent/portal"
+  const route = r.startsWith('#') ? r : `#${r}`;
   if (route.startsWith('#/students/play')) return 'students/playback';
   if (route.startsWith('#/students'))      return 'students/dashboard';
-  if (route.startsWith('#/teachers/plan')) return 'teachers/lesson-planning';
+  if (route.startsWith('#/teachers/lesson')) return 'teachers/lesson-planning';
   if (route.startsWith('#/teachers'))      return 'teachers/dashboard';
   if (route.startsWith('#/admin'))         return 'admin/overview';
   if (route.startsWith('#/parent'))        return 'parent/portal';
@@ -51,26 +50,51 @@ function routeToContextKey(r = '') {
 }
 
 function RightRail({ path, scopeKind, selected, onToggle, onClear }) {
-  const ctx = computeContext(path, scopeKind);
+  const [insights, setInsights] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const ctx = useMemo(() => {
+    if (path.startsWith('/teachers/lesson')) return { section: 'teachers', page: 'Lesson Planning' };
+    if (path.startsWith('/teachers')) return { section: 'teachers', page: 'Dashboard' };
+    if (path.startsWith('/students/play')) return { section: 'students', page: 'Playback' };
+    if (path.startsWith('/students')) return { section: 'students', page: 'Dashboard' };
+    if (path.startsWith('/admin/insights')) return { section: 'admin', page: 'Insights' };
+    if (path.startsWith('/admin')) return { section: 'admin', page: 'Overview' };
+    if (path.startsWith('/parent/feed')) return { section: 'parent', page: 'Feed' };
+    if (path.startsWith('/parent')) return { section: 'parent', page: 'Portal' };
+    return { section: 'teachers', page: 'Dashboard' };
+  }, [path]);
 
-  const filtered = generateInsights(ctx);
+  const chatPlaceholder = useMemo(() => {
+    if (path.startsWith('/teachers/lesson')) return 'Ask to refine this lesson or generate blocks...';
+    if (path.startsWith('/admin')) return 'Ask about KPIs, trends, or at-risk flags...';
+    if (path.startsWith('/parent')) return 'Ask about your child’s progress or schedule...';
+    if (path.startsWith('/students')) return 'Ask about your progress or next steps';
+    return 'Type here...';
+  }, [path]);
 
-  // context-aware chat hint
-  const chatHintMap = {
-    'students/playback': 'Ask about this step or your plan…',
-    'students/dashboard': 'Ask about your progress or next steps…',
-    'teachers/lesson-planning': 'Ask to refine this lesson or generate blocks…',
-    'teachers/dashboard': 'Ask about classes, grading queue, or suggestions…',
-    'admin/overview': 'Ask about KPIs, trends, or at-risk flags…',
-    'parent/portal': 'Ask about your child’s progress or schedule…',
+  useEffect(() => {
+    let alive = true;
+    async function load() {
+      setLoading(true);
+      try {
+        const scoped = computeContext(path);
+        const res = await generateInsights(scoped);
+        if (alive) setInsights(res || []);
+      } catch (e) {
+        console.warn('Insights load failed', e);
+        if (alive) setInsights([]);
+      } finally {
+        if (alive) setLoading(false);
+      }
+    }
+    load();
+    return () => (alive = false);
+  }, [path]);
+
+  const onAction = async (insight) => {
+    alert(`(stub) Apply action: ${insight.title}`);
   };
-  const chatPlaceholder = chatHintMap[ctx.key] || 'Ask anything…';
-
-  const doAction = async (_ins, action) => {
-    const task = await dispatchAction({}, action);
-    alert(`✅ Action queued: ${action.label}\nTask: ${task.id}`);
-  };
-  const doBulkAction = async (insightsArr, action) => {
+  const onBulkAction = async (insightsArr, action) => {
     for (const _ of insightsArr) await dispatchAction({}, action);
     alert(`✅ Applied "${action.label}" to ${insightsArr.length} selected insights`);
   };
@@ -85,86 +109,50 @@ function RightRail({ path, scopeKind, selected, onToggle, onClear }) {
       </div>
 
       <InsightsRail
-        insights={filtered.length ? filtered : []}
+        insights={insights}
+        loading={loading}
         selected={selected}
         onToggle={onToggle}
         onClear={onClear}
-        onAction={doAction}
-        onBulkAction={doBulkAction}
+        onAction={onAction}
+        onBulkAction={onBulkAction}
       />
 
       <ChatPanel
-       selectedInsights={selected}
-       onAction={doAction}
-       placeholder={chatPlaceholder}
-       contextKey={routeToContextKey(path)}
-     />
+        selectedInsights={selected}
+        onAction={onAction}
+        placeholder={chatPlaceholder}
+        contextKey={routeToContextKey(path)}
+      />
 
-      <ClassFeedCard classId="7B" />
+      <ClassFeedCard classId="8A" />
     </>
   );
 }
 
-function TeachersLessonPlanner() {
-  const [plan, setPlan] = useState({ intro: [], practice: [], assessment: [] })
-  const onAdd = (stage, item) =>
-    setPlan(p => p[stage].some(x => x.id === item.id) ? p : { ...p, [stage]: [...p[stage], item] })
-  const onRemove = (stage, id) =>
-    setPlan(p => ({ ...p, [stage]: p[stage].filter(x => x.id !== id) }))
-  const onSend = () => alert('Lesson sent to student!\n' + JSON.stringify(plan, null, 2))
+function TeacherDashboard() {
   return (
-    <>
-      <div data-testid="page-title" className="sr-only">Lesson Planning</div>
-      <Card title="Tutor · Lesson Planner">
-        <StudentProfile />
-        <AITipsPanel style="visual" gaps={['equivalent fractions','verbal recall']} />
-      </Card>
-      <LessonBlockPicker onAdd={onAdd} />
-      <PlanPreview plan={plan} onRemove={onRemove} />
-      <div className="card p-4 flex justify-end gap-2">
-        <button className="btn-ghost">Revise</button>
-        <button className="btn-primary" onClick={onSend}>Send to Student</button>
-      </div>
-    </>
-  )
+    <Card title="Teacher · Dashboard">
+      <div className="muted">No assignments due today yet.</div>
+    </Card>
+  );
 }
 
+function StudentPractice() {
+  return (
+    <Card title="Practice (stub)">
+      <div className="muted">Practice content here.</div>
+    </Card>
+  );
+}
+
+/* ------------------------------- Router ------------------------------- */
+
 function MainArea() {
-  const { path } = useHashRoute('/teachers/dashboard');
+  const { path } = useHashRoute();
+  const { scopeKind } = useScope();
 
-  const [selected, setSelected] = useState([]);
-  const { scope, setScope, Directory } = useScope();
-
-  // Derive top section from hash route
-  const section = path.split('/').filter(Boolean)[0] || 'teachers';
-
-  // Auto-sync Scope with top section
-  useEffect(() => {
-    const desiredKind =
-      section === 'teachers' ? 'teacherGroup' :
-      section === 'students' ? 'student' :
-      section === 'admin'    ? 'school' :
-      section === 'parent'   ? 'parentGroup' : 'school';
-
-    if (scope.kind === desiredKind) return;
-
-    if (desiredKind === 'student') {
-      setScope({ kind: 'student', studentId: (Directory.students[0] || {}).id });
-    } else if (desiredKind === 'teacherGroup') {
-      setScope({ kind: 'teacherGroup', groupId: (Directory.teacherGroups[0] || {}).id });
-    } else if (desiredKind === 'parentGroup') {
-      setScope({ kind: 'parentGroup', groupId: (Directory.parentGroups[0] || {}).id });
-    } else {
-      setScope({ kind: 'school' });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [section]);
-
-  const onToggle = (ins) =>
-    setSelected(prev => prev.some(x => x.id === ins.id) ? prev.filter(x => x.id !== ins.id) : [...prev, ins]);
-  const onClear = () => setSelected([]);
-
-  // Menus (Dashboard first; Playback is deep-linked only)
+  // Menus
   const teacherMenu = [
     { label: 'Dashboard',        href: '/teachers/dashboard' },
     { label: 'Lesson Planning',  href: '/teachers/lesson-planning' },
@@ -174,15 +162,21 @@ function MainArea() {
   ];
   const studentMenu = [
     { label: 'Dashboard',  href: '/students/dashboard' },
+    { label: 'Today',      href: '/students/today' },
     { label: 'Tutor Plan', href: '/students/tutor-plan' },
     { label: 'Practice',   href: '/students/practice' },
   ];
   const adminMenu = [
     { label: 'Overview',   href: '/admin/overview' },
+    { label: 'Insights',   href: '/admin/insights' },
     { label: 'Predictive', href: '/admin/predictive' },
+    { label: 'CBSE QA',    href: '/dev/cbse-audit' },
+    { label: 'PDF Cal',    href: '/dev/pdf-cal' },
   ];
+
   const parentMenu = [
     { label: 'Portal', href: '/parent/portal' },
+    { label: 'Feed',   href: '/parent/feed' },
     { label: 'Comms',  href: '/parent/comms' },
   ];
 
@@ -191,38 +185,39 @@ function MainArea() {
   else if (path.startsWith('/admin')) menu = adminMenu;
   else if (path.startsWith('/parent')) menu = parentMenu;
 
-  // -------- Routing --------
+  // Routes
   let page = null;
-
-  // Teachers
-  if (path === '/teachers/lesson-planning') page = <TeachersLessonPlanner />;
-  else if (path === '/teachers/assessment') page = <Assessment />;
-  else if (path === '/teachers/grading') page = <Grading />;
+  if (path === '/teachers/lesson-planning') page = <LessonPlanning />;
+  else if (path === '/teachers/dashboard')   page = <TeacherDashboard />;
+  else if (path === '/teachers/assessment')  page = <Assessment />;
+  else if (path === '/teachers/grading')     page = <Grading />;
   else if (path === '/teachers/faculty-eval') page = <FacultyEval />;
-  else if (path === '/teachers/dashboard') page = <TeachersDashboard />;
 
-  // Students (order matters: playback before dashboard)
-  else if (path.startsWith('/students/play/')) {
-    const planId = path.split('/').pop();
-    page = <StudentPlayback planId={planId} />;
-  }
-  else if (path === '/students/tutor-plan') page = <TutorPlan />;
-  else if (path === '/students/practice') page = <Practice />;
   else if (path === '/students/dashboard') page = <StudentDash />;
+  else if (path === '/students/today')     page = <StudentToday />;
+  else if (path === '/students/tutor-plan') page = <TutorPlan />;
+  else if (path === '/students/practice')   page = <Practice />;
+  else if (path.startsWith('/students/play')) page = <StudentPlayback />;
 
-  // Admin
-  else if (path === '/admin/overview') page = <AdminOverview />;
+  else if (path === '/admin/overview')   page = <AdminOverview />;
+  else if (path === '/admin/insights')   page = <AdminInsights />;
   else if (path === '/admin/predictive') page = <Predictive />;
 
-  // Parent
-  else if (path === '/parent/portal') page = <ParentPortal />;
-  else if (path === '/parent/comms') page = <ParentComms />;
+  else if (path === '/parent/portal')  page = <ParentPortal />;
+  else if (path === '/parent/feed')    page = <ParentFeed />;
+  else if (path === '/parent/comms')   page = <ParentComms />;
 
-  // Fallback (default)
-  if (!page) page = <TeachersDashboard />;
+  // Default route
+  if (!page) page = <LessonPlanning />;
+
+  // Rail selection state (shared)
+  const [selected, setSelected] = useState([]);
+  const onToggle = (id) =>
+    setSelected((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
+  const onClear = () => setSelected([]);
 
   return (
-    <Shell rightRail={<RightRail path={path} scopeKind={scope.kind} selected={selected} onToggle={onToggle} onClear={onClear} />}>
+    <Shell rightRail={<RightRail path={path} scopeKind={scopeKind} selected={selected} onToggle={onToggle} onClear={onClear} />}>
       <ModuleSwitcher current={path} items={menu} />
       {page}
     </Shell>

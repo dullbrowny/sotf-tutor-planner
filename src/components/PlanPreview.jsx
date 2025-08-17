@@ -1,35 +1,65 @@
-export default function PlanPreview({ plan, onRemove }) {
-  const sections = Object.keys(plan)
-  return (
-    <div className="card p-4">
-      <h2 className="panel-title mb-3">Finalized Lesson Plan (Preview)</h2>
-      <div className="space-y-3">
-        {sections.map(sec => (
-          <div key={sec} className="bg-card border border-card-ring rounded-lg p-3">
-            <h3 className="font-semibold capitalize mb-2">{sec}</h3>
-            {plan[sec].length === 0 ? (
-              <div className="text-sm muted">No blocks selected.</div>
-            ) : (
-              <ul className="space-y-2">
-                {plan[sec].map(item => (
-                  <li key={item.id} className="flex items-center justify-between text-sm">
-                    <div>
-                      <div className="font-medium">{item.title}</div>
-                      <div className="muted">{item.type} • {item.duration}</div>
-                    </div>
-                    <button
-                      className="px-2 py-1 rounded bg-red-600 text-white text-xs"
-                      onClick={() => onRemove(sec, item.id)}
-                    >
-                      Remove
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-        ))}
+// src/components/PlanPreview.jsx
+import React from "react";
+
+export default function PlanPreview({
+  sections = [],
+  open = true,
+  onClose = () => {},
+  variant = "inline", // "inline" | "modal"
+  title = "Microplan Preview",
+}) {
+  if (!open) return null;
+
+  const body = (
+    <div className="rounded-2xl bg-[var(--panel)] border border-[var(--panelBorder)]">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--panelBorder)]">
+        <h3 className="text-lg font-semibold">{title}</h3>
+        <button
+          onClick={onClose}
+          className="px-3 py-1 rounded-md bg-[var(--btnSecondaryBg)] hover:opacity-90"
+        >
+          Close
+        </button>
+      </div>
+      <div className="p-4 space-y-4">
+        {sections.length === 0 ? (
+          <div className="text-sm opacity-70">Nothing to show yet.</div>
+        ) : (
+          sections.map((s, i) => (
+            <div key={i} className="space-y-2">
+              <div className="text-sm uppercase tracking-wide opacity-70">
+                {s.title}
+              </div>
+              <div className="rounded-xl bg-[var(--panelSoft)] px-4 py-3 text-[15px] leading-6">
+                {s.body}
+              </div>
+            </div>
+          ))
+        )}
       </div>
     </div>
-  )
+  );
+
+  if (variant === "modal") {
+    return (
+      <div
+        className="fixed inset-0 z-[60] flex items-center justify-center"
+        aria-modal="true"
+        role="dialog"
+      >
+        <div
+          className="absolute inset-0 bg-black/50"
+          onClick={onClose}
+          aria-hidden="true"
+        />
+        <div className="relative z-[61] w-[min(920px,92vw)] max-h-[88vh] overflow-auto shadow-2xl">
+          {body}
+        </div>
+      </div>
+    );
+  }
+
+  // inline
+  return <div className="w-full">{body}</div>;
 }
+
