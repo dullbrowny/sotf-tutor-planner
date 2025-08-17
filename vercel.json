@@ -1,5 +1,9 @@
 {
   "version": 2,
   "builds": [{ "src": "package.json", "use": "@vercel/static-build" }],
-  "routes": [{ "src": "/(.*)", "dest": "/" }]
+"rewrites": [
+  { "source": "/((?!assets/|cbse-pdf/|favicon\\.ico|robots\\.txt|manifest\\.json|.*\\.[a-z0-9]+$).*)", "destination": "/index.html" }
+]
 }
+
+
