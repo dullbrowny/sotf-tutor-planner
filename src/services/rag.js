@@ -81,6 +81,31 @@ export async function generateMicroplan({ chapterId, los = [], topicLabel }) {
   };
 }
 
+export async function finalizePlan({ los = [], microplan, topicLabel }) {
+  const blocks = Array.isArray(microplan) ? microplan : microplan?.blocks || [];
+  const only = (los && los.length) ? los : ["today's goal"];
+  return {
+    title: `Lesson Handout: ${topicLabel || "Lesson"}`,
+    intro: `We will work toward: ${only[0]}.`,
+    materials: ["Notebook", "Pen/Pencil", "Reader/Text"],
+    durationMinutes: 40,
+    sections: (blocks || []).filter(b => b.selected !== false).map(b => ({
+      title: b.title || "Activity",
+      instructions: b.body || "",
+      expectedOutcome: "You can explain or demonstrate the idea with a short example."
+    })),
+    exitTicket: {
+      prompt: "In 2–3 sentences, explain today’s main idea.",
+      rubric: ["Accurate", "Clear", "Uses vocabulary"]
+    }
+  };
+}
+
+export async function findPagesForQueries({ chapterId, queries }) {
+  // TODO: swap with a real text index; returning {} gracefully keeps UI working.
+  return {};
+}
+
 // Back-compat default export
 export default { enrichLOs, generateMicroplan, getChapterContext };
 

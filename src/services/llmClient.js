@@ -198,5 +198,43 @@ export async function generateMicroplanLLM({
   }
 }
 
+
+export async function finalizePlanLLM({
+  grade, subject, chapterLabel, topicLabel, los = [], microplan, mode = "Balanced"
+}) {
+  const temperature = mode === "Creative" ? 0.9 : mode === "Grounded" ? 0.2 : 0.5;
+
+  const system = [
+    "You are a precise curriculum designer.",
+    "Return ONLY JSON: { handout: { title, intro, materials:[], durationMinutes, sections:[{title, instructions, expectedOutcome}], exitTicket:{prompt,rubric[]} } }",
+    "All text must be student-facing and actionable."
+  ].join(" ");
+
+  const blocks = Array.isArray(microplan) ? microplan : microplan?.blocks || [];
+
+  const user = [
+    `Grade: ${grade || "(unspecified)"}`,
+    `Subject: ${subject || "(unspecified)"}`,
+    `Chapter: ${chapterLabel || "(none)"}`,
+    `Topic: ${topicLabel || "(none)"}`,
+    "",
+    `Learning Objectives (${los.length}):`,
+    ...los.map((x, i) => `- LO${i + 1}: ${x}`),
+    "",
+    "Microplan blocks:",
+    ...blocks.filter(b => b.selected !== false).map((b, i) => `- ${i + 1}. ${b.title}: ${b.body}`),
+    "",
+    "Produce a concrete student handout with exact tasks, examples, and timings."
+  ].join("\n");
+
+  const text = await callTogether(
+    [{ role: "system", content: system }, { role: "user", content: user }],
+    { json: true, temperature, max_tokens: 1400 }
+  );
+  const parsed = safeJsonParse(text);
+  return parsed?.handout;
+}
+
+
 export default { enrichLOsLLM, generateMicroplanLLM };
 
