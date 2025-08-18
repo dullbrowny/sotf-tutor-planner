@@ -6,6 +6,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
+    "vercel-build": "vite build",
     "ingest:ncert": "node scripts/ingest-ncert.mjs",
     "enrich:ncert": "node scripts/enrich-ncert.mjs",
     "enrich:ncert:llm": "DOTENV_CONFIG_PATH=.env.local node -r dotenv/config scripts/llm-enrich-ncert.mjs",

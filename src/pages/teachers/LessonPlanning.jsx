@@ -1,7 +1,11 @@
+// src/pages/teachers/LessonPlanning.jsx
 import React, { useEffect, useMemo, useState } from "react";
-import { Card } from "../../ui/Card";
-import { Button } from "../../ui/Button";
-import PDFPreview from "../../components/PDFPreview";
+import Card from "../../ui/Card.jsx";
+import Button from "../../ui/Button.jsx";
+import { useScope } from "../../context/ScopeProvider.jsx";
+import { publishPlanToToday } from "../../state/today.js";
+import PDFPreview from "../../components/PDFPreview.jsx";
+
 import {
   ensureManifest,
   getGrades,
@@ -10,51 +14,28 @@ import {
   getTopicsForChapter,
   getChapterById,
   buildLocalPdfUrl,
-} from "../../services/manifest";
+} from "../../services/manifest.js";
 
 import {
   enrichLOs as enrichLOsRAG,
   generateMicroplan as generateMicroplanRAG,
-} from "../../services/rag";
+} from "../../services/rag.js";
+
 import {
   enrichLOsLLM,
   generateMicroplanLLM,
   finalizePlanLLM,
-} from "../../services/llmClient";
-import { savePlan, postFeed } from "../../services/lessonStore";
+} from "../../services/llmClient.js";
+
+import { savePlan, postFeed, getLatest } from "../../services/lessonStore.js";
+
+// Teacher-facing inbox & review
+import SubmissionsInbox from "../../components/teacher/SubmissionsInbox.jsx";
+import SubmissionReviewPanel from "../../components/teacher/SubmissionReviewPanel.jsx";
 
 /* ------------------------------ helpers ------------------------------ */
 
-// Normalize any chapter-like item into {chapterId, chapterLabel}
-function toChapterOption(c, i = 0) {
-  if (!c) return null;
-  if (typeof c === "string") {
-    return { chapterId: `ch_${i}_${c.toLowerCase().replace(/\s+/g, "-")}`, chapterLabel: c };
-  }
-  const id =
-    c.chapterId ?? c.chapter_id ?? c.id ?? c.code ?? c.slug ?? null;
-  const label =
-    c.chapterLabel ?? c.label ?? c.title ?? c.name ?? (id ? `Chapter ${id}` : null);
-  if (!id && !label) return null;
-  return { chapterId: id || `ch_${i}`, chapterLabel: label || `Chapter ${i + 1}` };
-}
-
-// Show a button only-on-hover (used for Remove)
-function HoverReveal({ children, initial = 0.2 }) {
-  const [on, setOn] = useState(false);
-  return (
-    <span
-      onMouseEnter={() => setOn(true)}
-      onMouseLeave={() => setOn(false)}
-      style={{ opacity: on ? 1 : initial, transition: "opacity .15s ease" }}
-    >
-      {children}
-    </span>
-  );
-}
-
-// Normalize any iterable/object → array
-const asList = (x) => {
+const readList = (x) => {
   if (Array.isArray(x)) return x;
   if (!x) return [];
   if (typeof x[Symbol.iterator] === "function" && typeof x !== "string") return [...x];
@@ -62,25 +43,31 @@ const asList = (x) => {
   return [];
 };
 
-// Ensure grade options have {value,label}; keep value "8","9",...
 const toGradeOption = (g) => {
   if (g && typeof g === "object") {
-    const value =
-      g.value ?? g.id ?? String(g.label ?? "").match(/\d+/)?.[0] ?? String(g.label ?? g);
+    const value = g.value ?? g.id ?? String(g.label ?? "").match(/\d+/)?.[0] ?? String(g.label ?? g);
     const label = g.label ?? `Class ${value}`;
     return { value: String(value), label: String(label) };
   }
   const str = String(g);
-  const value = str.match(/\d+/)?.[0] ?? str; // "Class 8" -> "8"
+  const value = str.match(/\d+/)?.[0] ?? str;
   const label = /^class\s*\d+/i.test(str) ? str : `Class ${value}`;
   return { value: String(value), label: String(label) };
 };
 
-// Subject option to string (handles "English" or {label:"English"})
-const toSubject = (s) =>
-  typeof s === "object" ? s.label ?? s.name ?? String(s) : String(s);
+const toSubject = (s) => (typeof s === "object" ? s.label ?? s.name ?? String(s) : String(s));
 
-// LO normalization
+function toChapterOption(c, i = 0) {
+  if (!c) return null;
+  if (typeof c === "string") {
+    return { chapterId: `ch_${i}_${c.toLowerCase().replace(/\s+/g, "-")}`, chapterLabel: c };
+  }
+  const id = c.chapterId ?? c.chapter_id ?? c.id ?? c.code ?? c.slug ?? null;
+  const label = c.chapterLabel ?? c.label ?? c.title ?? c.name ?? (id ? `Chapter ${id}` : null);
+  if (!id && !label) return null;
+  return { chapterId: id || `ch_${i}`, chapterLabel: label || `Chapter ${i + 1}` };
+}
+
 function asLoObj(item, i) {
   if (item && typeof item === "object" && "text" in item) {
     return {
@@ -96,19 +83,15 @@ function asLoObj(item, i) {
   return { id: `lo_${i}`, text: String(item || ""), selected: true, origin: "seed", citations: [] };
 }
 
-// Lightweight “didn’t edit yet?” detector, so we can seed sane LOs
 function looksUntouched(los) {
   if (!Array.isArray(los) || los.length === 0) return true;
-  const texts = los
-    .map((x) => (typeof x === "string" ? x : x?.text || ""))
-    .map((s) => s.trim().toLowerCase());
+  const texts = los.map((x) => (typeof x === "string" ? x : x?.text || "")).map((s) => s.trim().toLowerCase());
   const joined = texts.join("|");
   const stems = ["explain the key", "identify", "solve", "summarize", "analyze", "interpret"];
   const hits = stems.filter((k) => joined.includes(k)).length;
   return hits >= Math.min(2, los.length);
 }
 
-// Seed LOs based on subject/topic
 function seedLos({ subjectLabel, topicLabel }) {
   const t = topicLabel ? ` in "${topicLabel}"` : "";
   if (/english|ela|language/i.test(subjectLabel)) {
@@ -135,7 +118,6 @@ function seedLos({ subjectLabel, topicLabel }) {
       "Summarize the main points from the section.",
     ];
   }
-  // math/default
   return [
     `Explain the key concept(s)${t}.`,
     "Identify real-life examples of the concept.",
@@ -144,37 +126,15 @@ function seedLos({ subjectLabel, topicLabel }) {
   ];
 }
 
-// RAG skeleton if LLM fails
 function skeletonFromLOs(los, topic) {
   return [
-    {
-      title: "Starter / Hook",
-      body: `Quick hook using ${topic ? `"${topic}"` : "a chapter cue"}.`,
-      origin: "RAG",
-      studentFacing: true,
-    },
-    {
-      title: "Teach / Model",
-      body: "Explain the core idea with one worked example.",
-      origin: "RAG",
-      studentFacing: false,
-    },
-    {
-      title: "Practice",
-      body: "3–5 targeted problems with immediate feedback.",
-      origin: "RAG",
-      studentFacing: true,
-    },
-    {
-      title: "Assess / Exit Ticket",
-      body: "1-minute exit ticket: one multiple-choice or short-answer question.",
-      origin: "RAG",
-      studentFacing: true,
-    },
+    { title: "Starter / Hook", body: `Quick hook using ${topic ? `"${topic}"` : "a chapter cue"}.`, origin: "RAG", studentFacing: true },
+    { title: "Teach / Model", body: "Explain the core idea with one worked example.", origin: "RAG", studentFacing: false },
+    { title: "Practice", body: "3–5 targeted problems with immediate feedback.", origin: "RAG", studentFacing: true },
+    { title: "Assess / Exit Ticket", body: "1-minute exit ticket: one multiple-choice or short-answer question.", origin: "RAG", studentFacing: true },
   ];
 }
 
-// Normalize blocks to strict shape
 function normalizeBlocks(plan, origin = "LLM") {
   const arr = Array.isArray(plan)
     ? plan
@@ -209,30 +169,39 @@ function normalizeBlocks(plan, origin = "LLM") {
   });
 }
 
+function compatPlanId(raw, { subjectLabel, chapterId }) {
+  const pid =
+    raw?.id ||
+    raw?.planId ||
+    raw?.uuid ||
+    raw?._id ||
+    `${(raw?.subjectId || raw?.subject || subjectLabel || "subject")}:${raw?.chapterId || chapterId || raw?.chapterLabel || "lesson"}`;
+  return String(pid);
+}
+
 /* ------------------------------ component ------------------------------ */
 
 export default function LessonPlanning() {
+  const { scope } = useScope();
+
   const [ready, setReady] = useState(false);
 
   // selectors
-  const [grade, setGrade] = useState("8"); // value only, like "8"
+  const [grade, setGrade] = useState("8");
   const [gradeOptions, setGradeOptions] = useState([]);
-
   const [subject, setSubject] = useState("");
   const [subjectOptions, setSubjectOptions] = useState([]);
-
   const [chapterId, setChapterId] = useState("");
   const [chapterOptions, setChapterOptions] = useState([]);
-
   const [topic, setTopic] = useState("");
   const [topicOptions, setTopicOptions] = useState([]);
 
   // mode + tabs
   const [mode, setMode] = useState("Balanced"); // Grounded | Balanced | Creative
-  const [tab, setTab] = useState("plan"); // plan | handout | pdf
+  const [tab, setTab] = useState("plan"); // plan | handout | pdf | inbox | responses
 
   // LOs + plan
-  const [los, setLos] = useState([]); // store as {id,text,selected,...}
+  const [los, setLos] = useState([]);
   const [microplan, setMicroplan] = useState([]);
   const [handout, setHandout] = useState(null);
 
@@ -241,67 +210,87 @@ export default function LessonPlanning() {
   const [planning, setPlanning] = useState(false);
   const [pdfExpanded, setPdfExpanded] = useState(true);
 
-  /* ------------ hydration chain: grades -> subjects -> chapters -> topics ------------ */
+  // drill-in preselect (from hash query params)
+  const [preselect, setPreselect] = useState(null);
 
-  // Load manifest + grades
-  
-  // Load manifest + grades
-useEffect(() => {
-  (async () => {
-    await ensureManifest();
-
-    // ⬅️ FIX: await getGrades()
-    const raw = await getGrades();
-
-    // normalize and add a small fallback if the manifest returns nothing
-    let list = asList(raw).map(toGradeOption).filter((o) => o.value);
-    if (!list.length) {
-      list = ["8", "9", "10"].map((v) => ({ value: String(v), label: `Class ${v}` }));
+  /* ------------ parse hash for drill-in once ------------ */
+  useEffect(() => {
+    function parseOnce() {
+      const h = window.location.hash || "";
+      const qi = h.indexOf("?");
+      if (qi < 0) return;
+      const q = new URLSearchParams(h.slice(qi + 1));
+      const wanted = {
+        tab: q.get("tab") || undefined,
+        grade: (q.get("classId") || "").match(/\d+/)?.[0], // supports "Class 8"
+        subject: q.get("subjectId") || undefined,
+        chapterId: q.get("chapterId") || undefined,
+        planId: q.get("planId") || undefined,
+      };
+      setPreselect(wanted);
     }
+    parseOnce();
+    const onChange = () => parseOnce();
+    window.addEventListener("hashchange", onChange);
+    return () => window.removeEventListener("hashchange", onChange);
+  }, []);
 
-    setGradeOptions(list);
+  /* ------------ hydration chain ------------ */
+  useEffect(() => {
+    (async () => {
+      await ensureManifest();
+      const raw = await getGrades();
+      let list = readList(raw).map(toGradeOption).filter((o) => o.value);
+      if (!list.length) list = ["8", "9", "10"].map((v) => ({ value: String(v), label: `Class ${v}` }));
+      setGradeOptions(list);
 
-    // ensure a concrete selection so the next effects fire
-    const exists = list.some((o) => o.value === grade);
-    if (!exists && list.length) setGrade(list[0].value);
+      // respect preselect if possible
+      if (preselect?.grade && list.some((o) => o.value === preselect.grade)) {
+        setGrade(preselect.grade);
+      } else if (!list.some((o) => o.value === grade) && list.length) {
+        setGrade(list[0].value);
+      }
+      setReady(true);
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [preselect?.grade]);
 
-    setReady(true);
-  })();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-}, []);
-
-  // Subjects when grade changes
   useEffect(() => {
     (async () => {
       if (!ready || !grade) return;
-      const subsRaw = await getSubjectsForGrade(grade); // grade VALUE ("8"), not label
-      const subs = asList(subsRaw).map(toSubject).filter(Boolean);
+      const subsRaw = await getSubjectsForGrade(grade);
+      const subs = readList(subsRaw).map(toSubject).filter(Boolean);
       setSubjectOptions(subs);
-      if (!subs.includes(subject)) setSubject(subs[0] || "");
+
+      if (preselect?.subject && subs.includes(preselect.subject)) {
+        setSubject(preselect.subject);
+      } else if (!subs.includes(subject)) {
+        setSubject(subs[0] || "");
+      }
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ready, grade]);
+  }, [ready, grade, preselect?.subject]);
 
-// Chapters when subject changes
-useEffect(() => {
-  (async () => {
-    if (!grade || !subject) {
-      setChapterOptions([]);
-      setChapterId("");
-      return;
-    }
-    const chsRaw = await getChaptersForGradeSubject(grade, subject); // grade value like "8"
-    const chs = asList(chsRaw).map((c, i) => toChapterOption(c, i)).filter(Boolean);
+  useEffect(() => {
+    (async () => {
+      if (!grade || !subject) {
+        setChapterOptions([]);
+        setChapterId("");
+        return;
+      }
+      const chsRaw = await getChaptersForGradeSubject(grade, subject);
+      const chs = readList(chsRaw).map((c, i) => toChapterOption(c, i)).filter(Boolean);
+      setChapterOptions(chs);
 
-    setChapterOptions(chs);
-    // ensure a selection so topics + LOs hydrate
-    const found = chs.find((c) => c.chapterId === chapterId);
-    if (!found) setChapterId(chs[0]?.chapterId || "");
-  })();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-}, [grade, subject]);
+      if (preselect?.chapterId && chs.some((c) => c.chapterId === preselect.chapterId)) {
+        setChapterId(preselect.chapterId);
+      } else if (!chs.find((c) => c.chapterId === chapterId)) {
+        setChapterId(chs[0]?.chapterId || "");
+      }
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [grade, subject, preselect?.chapterId]);
 
-  // Topics (and LO seeding) when chapter changes
   useEffect(() => {
     (async () => {
       if (!chapterId) {
@@ -310,12 +299,11 @@ useEffect(() => {
         return;
       }
       const topicsRaw = await getTopicsForChapter(chapterId);
-      const topics = asList(topicsRaw).map(String);
+      const topics = readList(topicsRaw).map(String);
       setTopicOptions(topics);
       const nextTopic = topics.includes(topic) ? topic : topics[0] || "";
       if (nextTopic !== topic) setTopic(nextTopic);
 
-      // Seed LOs only if untouched
       setLos((prev) => {
         if (looksUntouched(prev)) {
           const seeded = seedLos({ subjectLabel: subject, topicLabel: nextTopic });
@@ -327,12 +315,16 @@ useEffect(() => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chapterId, subject]);
 
+  // apply tab after the selectors are settled
+  useEffect(() => {
+    if (preselect?.tab === "responses") setTab("responses");
+  }, [preselect?.tab]);
+
   /* ------------ derived ------------ */
 
-  // Friendly grade label (for saving to other surfaces)
   const gradeLabel = useMemo(() => {
-    const list = asList(gradeOptions).map(toGradeOption);
-    return (list.find((o) => o.value === grade)?.label) || (grade ? `Class ${grade}` : "");
+    const list = readList(gradeOptions).map(toGradeOption);
+    return list.find((o) => o.value === grade)?.label || (grade ? `Class ${grade}` : "");
   }, [grade, gradeOptions]);
 
   const chapterLabel = useMemo(() => {
@@ -390,8 +382,6 @@ useEffect(() => {
         improved = await enrichLOsRAG({ chapterId, los: selectedLosOnly, topicLabel: topic });
       }
       if (!Array.isArray(improved) || !improved.length) return;
-
-      // replace only selected positions in order, keep others intact
       setLos((prev) => {
         const out = prev.map((x, i) => asLoObj(x, i));
         let k = 0;
@@ -401,9 +391,7 @@ useEffect(() => {
             k++;
           }
         }
-        for (; k < improved.length; k++) {
-          out.push(asLoObj(String(improved[k] || ""), out.length));
-        }
+        for (; k < improved.length; k++) out.push(asLoObj(String(improved[k] || ""), out.length));
         return out;
       });
     } finally {
@@ -429,7 +417,7 @@ useEffect(() => {
       if (mode === "Grounded") {
         plan = await generateMicroplanRAG(payload);
       } else if (mode === "Creative") {
-        plan = await generateMicroplanLLM(payload); // may throw
+        plan = await generateMicroplanLLM(payload);
       } else {
         try {
           plan = await generateMicroplanLLM(payload);
@@ -437,17 +425,14 @@ useEffect(() => {
           plan = await generateMicroplanRAG(payload);
         }
       }
-
       const origin = mode === "Grounded" ? "RAG" : "LLM";
       const blocks = normalizeBlocks(plan, origin);
-      const finalBlocks =
-        blocks.length ? blocks : normalizeBlocks(skeletonFromLOs(selectedLosOnly, topic), "RAG");
+      const finalBlocks = blocks.length ? blocks : normalizeBlocks(skeletonFromLOs(selectedLosOnly, topic), "RAG");
       setMicroplan(finalBlocks);
       setTab("plan");
 
-      // persist for Student/Admin/Parent
       savePlan({
-        grade: gradeLabel,              // pretty for the other pages
+        grade: gradeLabel,
         subject: subjectLabel || "",
         chapterId,
         chapterLabel,
@@ -482,13 +467,11 @@ useEffect(() => {
       };
       let out = null;
       if (mode === "Grounded") {
-        // Try RAG finalize (deterministic)
         try {
-          const mod = await import("../../services/rag");
+          const mod = await import("../../services/rag.js");
           out = mod.finalizePlan ? await mod.finalizePlan(payload) : null;
         } catch {}
         if (!out) {
-          // deterministic fallback
           out = {
             title: `Lesson Handout: ${topic || chapterLabel || "Lesson"}`,
             intro: selectedLosOnly.length ? `We will work toward: ${selectedLosOnly[0]}.` : "",
@@ -498,20 +481,18 @@ useEffect(() => {
               .map((b) => ({
                 title: b.title,
                 instructions: b.body,
-                expectedOutcome:
-                  "You can explain or demonstrate the idea with a short example.",
+                expectedOutcome: "You can explain or demonstrate the idea with a short example.",
               })),
             exitTicket: { prompt: "In 2–3 sentences, explain today’s main idea." },
           };
         }
       } else {
-        // Creative/Balanced → LLM finalize
         try {
           out = await finalizePlanLLM(payload);
         } catch {}
         if (!out && mode === "Balanced") {
           try {
-            const mod = await import("../../services/rag");
+            const mod = await import("../../services/rag.js");
             out = mod.finalizePlan ? await mod.finalizePlan(payload) : null;
           } catch {}
         }
@@ -520,7 +501,6 @@ useEffect(() => {
       setHandout(out);
       setTab("handout");
 
-      // persist & surface to other pages
       savePlan({
         grade: gradeLabel,
         subject: subjectLabel || "",
@@ -537,11 +517,7 @@ useEffect(() => {
           grade: gradeLabel,
           subject: subjectLabel || "",
           chapterId,
-          post: {
-            title: `New handout: ${out?.title || chapterLabel}`,
-            summary: out?.intro || "",
-            type: "handout",
-          },
+          post: { title: `New handout: ${out?.title || chapterLabel}`, summary: out?.intro || "", type: "handout" },
         });
       } catch {}
     } catch (e) {
@@ -559,12 +535,7 @@ useEffect(() => {
 <p>${h.intro || ""}</p>
 ${h.materials?.length ? `<p><b>Materials:</b> ${h.materials.join(", ")}</p>` : ""}
 ${(h.sections || [])
-  .map(
-    (s) =>
-      `<h3>${s.title}</h3><p>${s.instructions}</p><p><i>Outcome:</i> ${
-        s.expectedOutcome || ""
-      }</p>`
-  )
+  .map((s) => `<h3>${s.title}</h3><p>${s.instructions}</p><p><i>Outcome:</i> ${s.expectedOutcome || ""}</p>`)
   .join("")}
 ${h.exitTicket ? `<p><b>Exit Ticket:</b> ${h.exitTicket.prompt}</p>` : ""}`.trim();
     const blob = new Blob([html], { type: "text/html" });
@@ -576,6 +547,55 @@ ${h.exitTicket ? `<p><b>Exit Ticket:</b> ${h.exitTicket.prompt}</p>` : ""}`.trim
     a.click();
     a.remove();
     URL.revokeObjectURL(url);
+  }
+
+  /* ------------------------------ derived for Responses tab ------------------------------ */
+
+  const rawPlan = useMemo(() => {
+    // Prefer explicit preselected plan (if id matches a saved record), else latest for the cohort
+    const fromCohort = getLatest({ grade: gradeLabel, subject: subjectLabel, chapterId });
+    return fromCohort || getLatest();
+  }, [gradeLabel, subjectLabel, chapterId]);
+
+  const planId = useMemo(
+    () => (rawPlan ? compatPlanId(rawPlan, { subjectLabel, chapterId }) : null),
+    [rawPlan, subjectLabel, chapterId]
+  );
+
+  /* ------------------------------ Assign (Handout tab only) ------------------------------ */
+
+  function handleAssignFromHandout() {
+    const studentId = scope?.studentId;
+    if (!studentId) {
+      alert('Pick a student in “Open as…” (top bar) then click Assign.');
+      return;
+    }
+    const nowId =
+      rawPlan?.id ||
+      compatPlanId(rawPlan, { subjectLabel, chapterId }) ||
+      `${(subjectLabel || "Subject")}:${chapterId || "Chapter"}:${Date.now()}`;
+
+    const plan = {
+      id: String(nowId),
+      classId: gradeLabel,
+      subjectId: subjectLabel,
+      chapterId,
+      topic: topic || undefined,
+      mode,
+      los: selectedLosOnly,
+      blocks: (microplan || []).map((b) => ({
+        id: b.id,
+        title: b.title,
+        body: b.body,
+        studentFacing: b.studentFacing !== false,
+        selected: b.selected !== false,
+        citations: Array.isArray(b.citations) ? b.citations : [],
+      })),
+    };
+
+    publishPlanToToday({ plan, classId: plan.classId, studentIds: [studentId] });
+    try { localStorage.setItem("sof.assign.bump", String(Date.now())); } catch {}
+    alert(`Assigned to ${studentId}`);
   }
 
   /* ------------------------------ render ------------------------------ */
@@ -590,10 +610,10 @@ ${h.exitTicket ? `<p><b>Exit Ticket:</b> ${h.exitTicket.prompt}</p>` : ""}`.trim
         <div>
           <div className="label">Class</div>
           <select className="input" value={grade} onChange={(e) => setGrade(e.target.value)}>
-            {asList(gradeOptions).length === 0 ? (
+            {readList(gradeOptions).length === 0 ? (
               <option>Loading…</option>
             ) : (
-              asList(gradeOptions).map((g) => {
+              readList(gradeOptions).map((g) => {
                 const o = toGradeOption(g);
                 return (
                   <option value={o.value} key={o.value}>
@@ -607,10 +627,10 @@ ${h.exitTicket ? `<p><b>Exit Ticket:</b> ${h.exitTicket.prompt}</p>` : ""}`.trim
         <div>
           <div className="label">Subject</div>
           <select className="input" value={subject} onChange={(e) => setSubject(e.target.value)}>
-            {asList(subjectOptions).length === 0 ? (
+            {readList(subjectOptions).length === 0 ? (
               <option value="">(pick class)</option>
             ) : (
-              asList(subjectOptions).map((s) => {
+              readList(subjectOptions).map((s) => {
                 const name = toSubject(s);
                 return (
                   <option value={name} key={name}>
@@ -624,22 +644,24 @@ ${h.exitTicket ? `<p><b>Exit Ticket:</b> ${h.exitTicket.prompt}</p>` : ""}`.trim
         <div>
           <div className="label">Chapter</div>
           <select className="input" value={chapterId} onChange={(e) => setChapterId(e.target.value)}>
-  	{asList(chapterOptions).length === 0 ? (
-    	<option value="">(no chapters found for this class/subject)</option>
-  	) : (
-    	asList(chapterOptions).map((c) => (
-      	<option value={c.chapterId} key={c.chapterId}>{c.chapterLabel}</option>
-    	))
-  	)}
+            {readList(chapterOptions).length === 0 ? (
+              <option value="">(no chapters found for this class/subject)</option>
+            ) : (
+              readList(chapterOptions).map((c) => (
+                <option value={c.chapterId} key={c.chapterId}>
+                  {c.chapterLabel}
+                </option>
+              ))
+            )}
           </select>
         </div>
         <div>
           <div className="label">Topic</div>
           <select className="input" value={topic} onChange={(e) => setTopic(e.target.value)}>
-            {asList(topicOptions).length === 0 ? (
+            {readList(topicOptions).length === 0 ? (
               <option value="">(pick chapter)</option>
             ) : (
-              asList(topicOptions).map((t) => (
+              readList(topicOptions).map((t) => (
                 <option key={t} value={t}>
                   {t}
                 </option>
@@ -657,22 +679,21 @@ ${h.exitTicket ? `<p><b>Exit Ticket:</b> ${h.exitTicket.prompt}</p>` : ""}`.trim
             const lo = asLoObj(item, i);
             return (
               <div key={lo.id || i} className="flex gap-2 items-center">
-                <input
-                  type="checkbox"
-                  checked={lo.selected !== false}
-                  onChange={() => onToggleLO(i)}
-                />
+                <input type="checkbox" checked={lo.selected !== false} onChange={() => onToggleLO(i)} />
                 <input
                   className="input flex-1"
                   value={lo.text}
                   placeholder={`LO #${i + 1}`}
                   onChange={(e) => onChangeLO(i, e.target.value)}
                 />
-                <HoverReveal>
-                  <Button variant="danger" onClick={() => onRemoveLO(i)}>
-                    Remove
-                  </Button>
-                </HoverReveal>
+                <Button
+		variant="ghost"
+		className="text-slate-300 hover:text-red-400 hover:bg-red-500/10"
+		onClick={() => onRemoveLO(i)}
+		title="Remove LO"
+		>
+		Remove
+		</Button>
               </div>
             );
           })}
@@ -687,29 +708,16 @@ ${h.exitTicket ? `<p><b>Exit Ticket:</b> ${h.exitTicket.prompt}</p>` : ""}`.trim
             {planning ? "Generating…" : "Generate Microplan"}
           </Button>
 
-          {/* Mode buttons (spaced, not bunched) */}
           <div className="ml-auto flex items-center gap-2">
             <span className="muted">Mode:</span>
             <div className="flex items-center gap-1">
-              <Button
-                size="sm"
-                variant={mode === "Grounded" ? "primary" : "ghost"}
-                onClick={() => setMode("Grounded")}
-              >
+              <Button size="sm" variant={mode === "Grounded" ? "primary" : "ghost"} onClick={() => setMode("Grounded")}>
                 Grounded
               </Button>
-              <Button
-                size="sm"
-                variant={mode === "Balanced" ? "primary" : "ghost"}
-                onClick={() => setMode("Balanced")}
-              >
+              <Button size="sm" variant={mode === "Balanced" ? "primary" : "ghost"} onClick={() => setMode("Balanced")}>
                 Balanced
               </Button>
-              <Button
-                size="sm"
-                variant={mode === "Creative" ? "primary" : "ghost"}
-                onClick={() => setMode("Creative")}
-              >
+              <Button size="sm" variant={mode === "Creative" ? "primary" : "ghost"} onClick={() => setMode("Creative")}>
                 Creative
               </Button>
             </div>
@@ -721,20 +729,26 @@ ${h.exitTicket ? `<p><b>Exit Ticket:</b> ${h.exitTicket.prompt}</p>` : ""}`.trim
         </div>
       </div>
 
-      {/* plan/handout/pdf tabs */}
+      {/* tabs */}
       <div className="mt-4 flex gap-2">
+        <Button variant={tab === "pdf" ? "primary" : "ghost"} onClick={() => setTab("pdf")}>
+          PDF
+        </Button>
         <Button variant={tab === "plan" ? "primary" : "ghost"} onClick={() => setTab("plan")}>
           Plan
         </Button>
         <Button variant={tab === "handout" ? "primary" : "ghost"} onClick={() => setTab("handout")}>
           Handout
         </Button>
-        <Button variant={tab === "pdf" ? "primary" : "ghost"} onClick={() => setTab("pdf")}>
-          PDF
+        <Button variant={tab === "inbox" ? "primary" : "ghost"} onClick={() => setTab("inbox")}>
+          Inbox
+        </Button>
+        <Button variant={tab === "responses" ? "primary" : "ghost"} onClick={() => setTab("responses")}>
+          Responses
         </Button>
       </div>
 
-      {/* microplan */}
+      {/* Microplan */}
       {tab === "plan" && !!microplan?.length && (
         <div className="mt-4">
           <div className="card">
@@ -756,9 +770,7 @@ ${h.exitTicket ? `<p><b>Exit Ticket:</b> ${h.exitTicket.prompt}</p>` : ""}`.trim
                         checked={b.selected !== false}
                         onChange={() =>
                           setMicroplan((prev) =>
-                            prev.map((x) =>
-                              x.id === b.id ? { ...x, selected: !(x.selected ?? true) } : x
-                            )
+                            prev.map((x) => (x.id === b.id ? { ...x, selected: !(x.selected ?? true) } : x))
                           )
                         }
                       />
@@ -769,9 +781,7 @@ ${h.exitTicket ? `<p><b>Exit Ticket:</b> ${h.exitTicket.prompt}</p>` : ""}`.trim
                         variant={b.studentFacing ? "secondary" : "ghost"}
                         onClick={() =>
                           setMicroplan((prev) =>
-                            prev.map((x) =>
-                              x.id === b.id ? { ...x, studentFacing: !x.studentFacing } : x
-                            )
+                            prev.map((x) => (x.id === b.id ? { ...x, studentFacing: !x.studentFacing } : x))
                           )
                         }
                         title="Toggle student-facing"
@@ -779,9 +789,7 @@ ${h.exitTicket ? `<p><b>Exit Ticket:</b> ${h.exitTicket.prompt}</p>` : ""}`.trim
                         {b.studentFacing ? "Student-facing" : "Teacher notes"}
                       </Button>
                       <span className="badge">{b.origin}</span>
-                      {b.citations?.length ? (
-                        <span className="badge">{b.citations.length} cites</span>
-                      ) : null}
+                      {b.citations?.length ? <span className="badge">{b.citations.length} cites</span> : null}
                     </div>
                   </div>
                   <div className="mt-1">{b.body}</div>
@@ -792,12 +800,14 @@ ${h.exitTicket ? `<p><b>Exit Ticket:</b> ${h.exitTicket.prompt}</p>` : ""}`.trim
         </div>
       )}
 
-      {/* handout */}
+      {/* Handout */}
       {tab === "handout" && handout && (
         <div className="mt-4 card">
           <div className="card-header">
             <div className="title">{handout.title}</div>
             <div className="flex gap-2">
+              {/* Assign is ONLY shown after a handout exists */}
+              <Button onClick={handleAssignFromHandout}>Assign</Button>
               <Button variant="ghost" onClick={() => downloadHandoutAsHTML(handout)}>
                 Download
               </Button>
@@ -830,7 +840,7 @@ ${h.exitTicket ? `<p><b>Exit Ticket:</b> ${h.exitTicket.prompt}</p>` : ""}`.trim
         </div>
       )}
 
-      {/* pdf */}
+      {/* PDF */}
       {tab === "pdf" && (
         <div className="mt-6">
           <PDFPreview
@@ -839,6 +849,26 @@ ${h.exitTicket ? `<p><b>Exit Ticket:</b> ${h.exitTicket.prompt}</p>` : ""}`.trim
             expanded={pdfExpanded}
             onToggle={() => setPdfExpanded((v) => !v)}
           />
+        </div>
+      )}
+
+      {/* Inbox */}
+      {tab === "inbox" && (
+        <div className="mt-4">
+          <SubmissionsInbox />
+        </div>
+      )}
+
+      {/* Responses */}
+      {tab === "responses" && (
+        <div className="mt-4">
+          {!planId ? (
+            <div className="text-sm text-slate-400">
+              No active plan found for this Class/Subject/Chapter. Publish/Assign a plan, then check back.
+            </div>
+          ) : (
+            <SubmissionReviewPanel planId={planId} />
+          )}
         </div>
       )}
     </Card>

@@ -61,3 +61,6 @@ public/cbse-pdf/sources/**
 # keep compact RAG index in git
 !public/cbse-pdf/rag/
 !public/cbse-pdf/rag/index.json
+
+# Scratch work files
+*.work

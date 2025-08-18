@@ -216,8 +216,22 @@ function MainArea() {
     setSelected((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
   const onClear = () => setSelected([]);
 
+  // Hide the shell rail on Admin → Overview (the page renders its own rail)
+  const pageHasOwnRail = path === '/admin/overview';
+  const rail = pageHasOwnRail
+    ? null
+    : (
+      <RightRail
+        path={path}
+        scopeKind={scopeKind}
+        selected={selected}
+        onToggle={onToggle}
+        onClear={onClear}
+      />
+    );
+
   return (
-    <Shell rightRail={<RightRail path={path} scopeKind={scopeKind} selected={selected} onToggle={onToggle} onClear={onClear} />}>
+    <Shell rightRail={rail}>
       <ModuleSwitcher current={path} items={menu} />
       {page}
     </Shell>

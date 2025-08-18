@@ -119,3 +119,40 @@ header .header-actions { display: flex; align-items: center; gap: 12px; }
 .tabs a, .tabs button { padding: 6px 10px; border-radius: 8px; text-decoration: none; color: var(--text); opacity: .85; }
 .tabs a.active, .tabs button.active { opacity: 1; border-bottom: 2px solid var(--accent); padding-bottom: 4px; }
 
+
+:root{
+  --brand:        #3b82f6; /* primary blue */
+  --brand-600:    #2563eb;
+  --fg:           #e5e7eb;
+  --bg-elev:      #0f172a;
+  --muted:        #9ca3af;
+
+  --ok:           #22c55e;
+  --warn:         #f59e0b;
+  --danger:       #ef4444;
+
+  --chip-bg:      #111827;
+  --chip-ring:    #1f2937;
+}
+
+/* Buttons */
+.btn{ border-radius:10px; padding:.5rem .9rem; font-weight:600; }
+.btn-primary{ background:var(--brand); color:white; }
+.btn-primary:hover{ background:var(--brand-600); }
+.btn-outline{ background:transparent; color:var(--fg); border:1px solid #334155; }
+.btn-outline:hover{ border-color:var(--fg); }
+.btn-ghost{ background:transparent; color:var(--fg); }
+.btn-danger{ background:var(--danger); color:white; }
+.btn-warning{ background:var(--warn); color:black; }
+
+/* Tabs (share the same palette) */
+.tab{ padding:.4rem .8rem; border-radius:10px; color:var(--fg); }
+.tab-active{ background:var(--brand); color:white; }
+.tab:hover{ background:#1f2937; }
+
+/* Status chips */
+.chip{ border-radius:999px; padding:.15rem .6rem; font-weight:600; font-size:.8rem; border:1px solid var(--chip-ring); background:var(--chip-bg); }
+.chip-ok{    color:var(--ok); }
+.chip-warn{  color:var(--warn); }
+.chip-muted{ color:var(--muted); }
+

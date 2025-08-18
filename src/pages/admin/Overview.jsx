@@ -1,196 +1,256 @@
-import React, { useEffect, useState } from "react";
-import { Card } from "../../ui/Card";
-import { api } from "../../api";
-import { getParentRequests } from "../../state/nudges";
-import { annotateWithChapter } from "../../services/chapterRef";
+import React, { useEffect, useMemo, useState } from "react";
+import Card from "../../ui/Card.jsx";
+import Button from "../../ui/Button.jsx";
+import InsightsRail from "../../components/InsightsRail.jsx";
+import ChatPanel from "../../components/ChatPanel.jsx";
+import ClassFeedCard from "../../components/ClassFeedCard.jsx";
 
-const CLASSES = [8, 9, 10];
-const SUBJECTS = ["Math", "Science"];
+/* ---------- utils ---------- */
+const readJSON = (k, fb) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : fb; } catch { return fb; } };
+const todayISO = () => new Date().toISOString().slice(0,10);
+const download = (filename, dataObj) => {
+  const url = URL.createObjectURL(new Blob([JSON.stringify(dataObj, null, 2)], { type: "application/json" }));
+  const a = document.createElement("a");
+  a.href = url; a.download = filename; document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(url);
+};
 
-export default function AdminOverview() {
-  const [snapshot, setSnapshot] = useState([]);
+function flattenToday() {
+  const byStudent = readJSON("sof.today.v1", {});
+  const all = [];
+  for (const [studentId, arr] of Object.entries(byStudent || {})) (arr || []).forEach(t => all.push({ studentId, ...t }));
+  return all;
+}
+function readEvents() { return readJSON("sof.events.v1", []); }
+const countSubmissionsToday = (evts) => (evts || []).filter(e => e.name === "attempt.completed" && (new Date(e.ts)).toISOString().slice(0,10) === todayISO()).length;
+const countLiveEventsToday   = (evts) => (evts || []).filter(e => (new Date(e.ts)).toISOString().slice(0,10) === todayISO()).length;
+const countActiveStudentsToday = (allToday) => new Set((allToday || []).filter(t => t.date === todayISO()).map(t => t.studentId)).size;
 
-  useEffect(() => {
-    const out = [];
-    for (const klass of CLASSES) {
-      for (const subject of SUBJECTS) {
-        const los = api.cbse?.getLOs({ klass, subject }) || [];
-        let exCount = 0;
-        los.forEach(lo => {
-          const ex = api.cbse?.getExercisesByLO([lo.id], { limit: 50 }) || [];
-          exCount += ex.length;
-        });
-        out.push({ klass, subject, los: los.length, ex: exCount });
-      }
+/* coverage snapshot (demo) */
+const COVERAGE_ROWS = [
+  { cls: "Class 8", subject: "Math",     los: 2, ex: 2 },
+  { cls: "Class 8", subject: "Science",  los: 0, ex: 0 },
+  { cls: "Class 9", subject: "Math",     los: 0, ex: 0 },
+  { cls: "Class 9", subject: "Science",  los: 2, ex: 1 },
+  { cls: "Class 10", subject: "Math",    los: 2, ex: 1 },
+  { cls: "Class 10", subject: "Science", los: 0, ex: 0 },
+];
+
+/* insights from KPIs */
+function generateOverviewInsights({ submissionsToday, liveEvents, activeStudents }) {
+  const out = [];
+  if (submissionsToday === 0) {
+    out.push({
+      id: "no-submissions",
+      title: "Submissions today",
+      body: "No student submissions yet — consider a reminder for active cohorts.",
+      action: { label: "Open Responses", href: "#/teachers/lesson-planning?tab=responses" }
+    });
+  }
+  if (liveEvents > 20) {
+    out.push({
+      id: "high-activity",
+      title: "High activity spike",
+      body: "Lots of in-flight work in the last few hours — watch the return queue.",
+      action: { label: "Open Inbox", href: "#/teachers/lesson-planning?tab=inbox" }
+    });
+  }
+  if (activeStudents < 1) {
+    out.push({
+      id: "no-activity",
+      title: "No active students",
+      body: "No one has opened Today yet. Share handout links or post a nudge.",
+      action: { label: "Post to Class Feed", href: "#/teachers/lesson-planning" }
+    });
+  }
+  return out;
+}
+
+/* reset/export controls */
+function DemoResetPanel({ compact=false }) {
+  const [toast, setToast] = useState("");
+  const resetToday = () => {
+    localStorage.removeItem("sof.today.v1");
+    localStorage.removeItem("sof.events.v1");
+    setToast("Cleared sof.today.v1 (and sof.events.v1)");
+    setTimeout(() => setToast(""), 1600);
+  };
+  const resetAll = () => {
+    ["sof.today.v1","sof.events.v1","sof.lessonPlans.v1"].forEach(k => localStorage.removeItem(k));
+    setToast("Cleared today, events, lesson plans");
+    setTimeout(() => setToast(""), 1600);
+  };
+  const exportState = () => {
+    download(`sotf-state-${Date.now()}.json`, {
+      today: readJSON("sof.today.v1", {}),
+      events: readJSON("sof.events.v1", []),
+      plans: readJSON("sof.lessonPlans.v1", []),
+    });
+  };
+  return (
+    <div className={`flex items-center gap-2 ${compact ? "" : "mt-2"}`}>
+      <Button variant="warning" className="bg-amber-600 hover:bg-amber-500 text-black" onClick={resetToday}>Reset Today</Button>
+      <Button variant="danger" onClick={resetAll}>Reset ALL</Button>
+      <Button variant="secondary" onClick={exportState}>Export state</Button>
+      {toast && <span className="text-xs text-slate-400 ml-2">{toast}</span>}
+    </div>
+  );
+}
+
+/* remediation block (now in RIGHT rail) */
+function RemediationPanel({ insight }) {
+  const [toast, setToast] = useState("");
+  if (!insight) return null;
+
+  const seedChat = (text) => {
+    try { window.dispatchEvent(new CustomEvent("sotf.chat.seed", { detail: { text } })); } catch {}
+    try { navigator.clipboard.writeText(text); } catch {}
+    setToast("Prompt sent to chat (and copied).");
+    setTimeout(() => setToast(""), 1600);
+  };
+
+  const prompt = (() => {
+    if (insight.id === "no-submissions") {
+      return "Draft a short, kind reminder to Class 8 English students about today’s assignment; include where to find the handout and how to submit.";
     }
-    setSnapshot(out);
-  }, []);
-
-  function endOfTodayISO() {
-    const n = new Date();
-    return new Date(n.getFullYear(), n.getMonth(), n.getDate(), 23, 59, 0).toISOString();
-  }
-
-  function seedDemoData() {
-    const classId = "8A";
-    const subject = "Math";
-    const now = new Date();
-
-    const los = api.cbse?.getLOs({ klass: 8, subject }) || [];
-    const loIds = los.slice(0, 2).map(l => l.id);
-    const ex = (loIds.length ? (api.cbse?.getExercisesByLO(loIds, { limit: 6 }) || []) : []).slice(0, 2);
-
-    const baseItems = (ex.length ? ex : [
-      { qno: "8.1 Q3", preview: "Percentage increase word problem.", estMinutes: 5, citation: null },
-      { qno: "8.2 Q5", preview: "Profit percent word problem.",     estMinutes: 7, citation: null },
-    ]).map((x, i) => ({
-      id: `it${i + 1}`,
-      qno: x.qno,
-      preview: x.preview,
-      estMinutes: x.estMinutes ?? (i ? 7 : 5),
-      citation: x.citation || null,
-    }));
-
-    const annotated = annotateWithChapter(baseItems, loIds).map((x, i) => ({
-      ...x,
-      phase: ["warmup","teach","practice","reflect"][Math.min(i,3)] || "practice",
-    }));
-
-    const a = {
-      id: `dbg_${Date.now()}`,
-      classId,
-      subject,
-      createdAt: now.toISOString(),
-      dueISO: endOfTodayISO(),
-      items: annotated,
-    };
-
-    const AKEY = "sotf.assignments.v1";
-    const assignments = JSON.parse(localStorage.getItem(AKEY) || "[]");
-    assignments.unshift(a);
-    localStorage.setItem(AKEY, JSON.stringify(assignments));
-
-    // Flags / notices
-    const FKEY = "sotf.flags.v1";
-    const flags = JSON.parse(localStorage.getItem(FKEY) || "[]");
-    flags.unshift({ id: `flag_${Date.now()}_c`, ts: Date.now(), target: "class", classId, kind: "Attendance", text: "Attendance dip this week." });
-    flags.unshift({ id: `flag_${Date.now()}_s`, ts: Date.now(), target: "student", studentId: "s-arya", kind: "Concept", text: "Revisit Comparing Quantities." });
-    localStorage.setItem(FKEY, JSON.stringify(flags));
-
-    const NKEY = "sotf.nudges.v1";
-    const nudges = JSON.parse(localStorage.getItem(NKEY) || "[]");
-    nudges.unshift({ id: `n_${Date.now()}`, ts: Date.now(), fromParentGroup: "pg-8a", toStudentId: "s-arya", text: "Let’s finish today’s plan by 8pm!" });
-    localStorage.setItem(NKEY, JSON.stringify(nudges));
-
-    const RKEY = "sotf.requests.v1";
-    const reqs = JSON.parse(localStorage.getItem(RKEY) || "[]");
-    reqs.unshift({ id: `req_${Date.now()}`, ts: Date.now(), fromParentGroup: "pg-8a", classId, text: "Request teacher feedback on progress.", status: "open" });
-    localStorage.setItem(RKEY, JSON.stringify(reqs));
-
-    alert("🌱 Seeded demo data.");
-    location.reload();
-  }
-
-  function clearDemoData() {
-    ["sotf.assignments.v1", "sotf.attempts.v1", "sotf.flags.v1", "sotf.nudges.v1", "sotf.requests.v1", "classFeed:v1"]
-      .forEach(k => localStorage.removeItem(k));
-    alert("✅ Demo data cleared.");
-    location.reload();
-  }
+    if (insight.id === "high-activity") {
+      return "Suggest a triage plan for a spike in submissions: what to review first and how to batch feedback efficiently.";
+    }
+    if (insight.id === "no-activity") {
+      return "Draft a nudge telling students where to find Today’s tasks and a one-line get-started tip.";
+    }
+    return `Help with: ${insight.title}. Propose 2–3 concrete next steps.`;
+  })();
 
   return (
-    <>
-      <Card title="Admin · Overview (CBSE)">
-        <div className="flex items-center gap-2">
-          <div className="text-sm text-slate-300">
+    <Card title="Remediation">
+      <div className="text-slate-200 font-medium">{insight.title}</div>
+      <div className="text-slate-400 text-sm mt-1">{insight.body}</div>
+      <div className="flex flex-wrap gap-2 mt-4">
+        {insight.action?.href && (
+          <Button onClick={() => (window.location.hash = insight.action.href)}>
+            {insight.action.label}
+          </Button>
+        )}
+        <Button variant="secondary" onClick={() => seedChat(prompt)}>Ask in Chat</Button>
+        <Button variant="ghost" onClick={() => seedChat("Summarize the last 24h of student activity and flag anomalies.")}>
+          Summarize activity
+        </Button>
+      </div>
+      <div className="mt-3 text-xs text-slate-500">
+        Tip: the Chat panel picks up seeded prompts; if not, paste — it’s on your clipboard.
+        {toast && <span className="ml-2 text-slate-400">{toast}</span>}
+      </div>
+    </Card>
+  );
+}
+
+/* RIGHT rail wrapper: Insights → Chat → Feed → Remediation */
+function RightRail({ insights, onSelect, selectedInsight }) {
+  return (
+    <div className="col-span-12 xl:col-span-4 space-y-4">
+      <InsightsRail
+        title="AI Insights"
+        insights={insights}
+        onAction={(a) => a?.href && (window.location.hash = a.href)}
+        onSelect={onSelect}
+      />
+      <ChatPanel title="Chat" scope="Context" />
+      <ClassFeedCard />
+      <RemediationPanel insight={selectedInsight} />
+    </div>
+  );
+}
+
+/* ---------- PAGE ---------- */
+export default function Overview() {
+  const allToday = useMemo(() => flattenToday(), []);
+  const events   = useMemo(() => readEvents(), []);
+  const submissionsToday = useMemo(() => countSubmissionsToday(events), [events]);
+  const liveEvents       = useMemo(() => countLiveEventsToday(events), [events]);
+  const activeStudents   = useMemo(() => countActiveStudentsToday(allToday), [allToday]);
+
+  const insights = useMemo(
+    () => generateOverviewInsights({ submissionsToday, liveEvents, activeStudents }),
+    [submissionsToday, liveEvents, activeStudents]
+  );
+
+  const [selectedInsight, setSelectedInsight] = useState(null);
+  useEffect(() => { setSelectedInsight((prev) => prev || insights[0] || null); }, [insights]);
+
+  return (
+    <div className="grid grid-cols-12 gap-6">
+      {/* MAIN column: no Insights here (prevents duplicate rail) */}
+      <div className="col-span-12 xl:col-span-8">
+        <Card title="Admin · Overview (CBSE)">
+          <div className="text-slate-400 mb-3">
             Coverage snapshot (demo): Classes 8–10 · Math/Science grounded to CBSE pack.
           </div>
 
-          {import.meta.env.VITE_USE_MOCKS === '1' && (
-            <div className="ml-auto flex items-center gap-2">
-              <button
-                type="button"
-                onClick={seedDemoData}
-                title="Seed demo data"
-                aria-label="Seed demo data"
-                className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-emerald-500 text-emerald-300 hover:bg-emerald-500/10 active:bg-emerald-500/20 transition"
-              >
-                <span className="text-xl leading-none" aria-hidden>＋</span>
-              </button>
-              <button
-                type="button"
-                onClick={clearDemoData}
-                title="Clear demo data"
-                aria-label="Clear demo data"
-                className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-rose-500 text-rose-300 hover:bg-rose-500/10 active:bg-rose-500/20 transition"
-              >
-                <span className="text-xl leading-none" aria-hidden>⟲</span>
-              </button>
-            </div>
-          )}
-        </div>
+          <div className="flex items-center gap-2 mb-4">
+            <Button variant="ghost" title="Add (demo)" className="rounded-full w-9 h-9 text-xl">+</Button>
+            <Button variant="ghost" title="Refresh snapshot" className="rounded-full w-9 h-9">⟲</Button>
+            <DemoResetPanel compact />
+          </div>
 
-        <div className="mt-3 overflow-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="text-left text-slate-300">
-                <th className="py-2 pr-4">Class</th>
-                <th className="py-2 pr-4">Subject</th>
-                <th className="py-2 pr-4">LOs</th>
-                <th className="py-2 pr-4">Exercises</th>
-              </tr>
-            </thead>
-            <tbody>
-              {snapshot.map((r, i) => (
-                <tr key={i} className="border-t border-slate-800">
-                  <td className="py-2 pr-4">Class {r.klass}</td>
-                  <td className="py-2 pr-4">{r.subject}</td>
-                  <td className="py-2 pr-4">{r.los}</td>
-                  <td className="py-2 pr-4">{r.ex}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </Card>
+          {/* KPIs */}
+          <div className="grid grid-cols-3 gap-3">
+            <div className="p-4 rounded-xl bg-[#0f172a] border border-[#1f2937]">
+              <div className="text-slate-400 text-sm">Submissions today</div>
+              <div className="text-3xl font-semibold">{submissionsToday}</div>
+            </div>
+            <div className="p-4 rounded-xl bg-[#0f172a] border border-[#1f2937]">
+              <div className="text-slate-400 text-sm">Live events today</div>
+              <div className="text-3xl font-semibold">{liveEvents}</div>
+            </div>
+            <div className="p-4 rounded-xl bg-[#0f172a] border border-[#1f2937]">
+              <div className="text-slate-400 text-sm">Active students today</div>
+              <div className="text-3xl font-semibold">{activeStudents}</div>
+            </div>
+          </div>
 
-      {import.meta.env.VITE_USE_MOCKS === '1' && (
-        <Card title="Signals & Requests (stub)">
-          <div className="space-y-2 text-sm">
-            <div>
-              <div className="font-medium">Parent Requests</div>
-              {(() => {
-                const reqs = getParentRequests();
-                if (!reqs.length) return <div className="text-slate-400">No requests.</div>;
-                return (
-                  <ul className="list-disc pl-5">
-                    {reqs.map(r => (
-                      <li key={r.id}>
-                        {r.text} · <span className="opacity-70">{r.fromParentGroup}</span>
-                      </li>
-                    ))}
-                  </ul>
-                );
-              })()}
-            </div>
-            <div>
-              <div className="font-medium">Student Engagement (stub)</div>
-              {(() => {
-                const m = JSON.parse(localStorage.getItem("sotf.attempts.v1") || "{}");
-                const vals = Object.values(m);
-                const done = vals.filter(v => v === "done").length;
-                const started = vals.filter(v => v === "inprogress").length;
-                return <div>Total items started: <b>{started}</b> · Done: <b>{done}</b></div>;
-              })()}
-            </div>
-            <div>
-              <div className="font-medium">Teacher Coverage Signals (stub)</div>
-              <div className="text-slate-400">Hook: send coverage snapshot from Teacher page.</div>
+          {/* Coverage */}
+          <div className="mt-6">
+            <div className="text-lg font-semibold text-slate-200 mb-2">Coverage</div>
+            <div className="overflow-hidden rounded-xl border border-[#1f2937]">
+              <table className="w-full text-sm">
+                <thead className="bg-[#0b1220] text-slate-300">
+                  <tr>
+                    <th className="text-left px-3 py-2">Class</th>
+                    <th className="text-left px-3 py-2">Subject</th>
+                    <th className="text-left px-3 py-2">LOs</th>
+                    <th className="text-left px-3 py-2">Exercises</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[#1f2937]">
+                  {COVERAGE_ROWS.map((r, i) => (
+                    <tr key={i}
+                        className="hover:bg-[#0f172a] cursor-pointer"
+                        onClick={() => {
+                          const c = encodeURIComponent(r.cls);
+                          const s = encodeURIComponent(r.subject);
+                          window.location.hash = `#/teachers/lesson-planning?tab=responses&classId=${c}&subjectId=${s}`;
+                        }}>
+                      <td className="px-3 py-2">{r.cls}</td>
+                      <td className="px-3 py-2">{r.subject}</td>
+                      <td className="px-3 py-2">{r.los}</td>
+                      <td className="px-3 py-2">{r.ex}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </div>
         </Card>
-      )}
-    </>
+      </div>
+
+      {/* RIGHT rail: Insights → Chat → Feed → Remediation */}
+      <RightRail
+        insights={insights}
+        selectedInsight={selectedInsight}
+        onSelect={(ins) => setSelectedInsight(ins)}
+      />
+    </div>
   );
 }
 
