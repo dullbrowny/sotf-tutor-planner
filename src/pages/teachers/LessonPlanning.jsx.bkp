@@ -1,0 +1,401 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+import React, { useEffect, useMemo, useState } from "react";
+
+// --- small helpers -----------------------------------------------------------
+const SUBJECT_CODE = {
+  Math: "M",
+  Mathematics: "M",
+  Science: "S",
+  English: "E",
+  "Social Science": "SS",
+  "Social-Science": "SS",
+  Social: "SS",
+};
+
+function normSubject(s = "") {
+  const k = String(s).trim();
+  return SUBJECT_CODE[k] || k;
+}
+
+function byId(a, b) { return a.chapterId.localeCompare(b.chapterId); }
+
+// Try to load JSON from src (bundled) with a graceful fallback (optional)
+async function tryImportJson(staticPath /* like '../../domain/cbse/los.json' */) {
+  try {
+    // Vite supports JSON import; this will be tree-shaken if missing
+    const mod = await import(/* @vite-ignore */ staticPath);
+    return mod?.default || mod;
+  } catch {
+    return null;
+  }
+}
+
+function chapterMatches(klass, subjCode, entry) {
+  // Example id: '9S-CH02' or '8SS-CH03'
+  const id = entry.chapterId || "";
+  if (!/^\d/.test(id)) return false;
+  const gradeOk = String(id).startsWith(String(klass));
+  if (!gradeOk) return false;
+
+  // For 'SS' we expect both letters after grade; for others a single letter
+  if (subjCode === "SS") {
+    return id.slice(1, 3) === "SS";
+  }
+  return id.slice(1, 2) === subjCode;
+}
+
+// Build local PDF href with anchor/offset logic (manifest-based, local-only)
+function buildLocalPdfHref(entry, { anchor /* {type, code} */ } = {}) {
+  const base = import.meta.env.VITE_CBSE_PDF_BASE || "/cbse-pdf";
+  const file = entry?.file ? `${base}/${entry.file}` : null;
+  if (!file) return null;
+
+  // 1) Anchor beats everything
+  if (anchor && Array.isArray(entry.anchors)) {
+    const hit = entry.anchors.find(
+      (a) => a.type === anchor.type && String(a.code || "").trim() === String(anchor.code || "").trim()
+    );
+    if (hit?.page) return `${file}#page=${hit.page}`;
+  }
+
+  // 2) If offset exists but no anchor, open chapter start (book page = offset+1 -> local page 1)
+  if (Number.isFinite(entry.offset)) return `${file}#page=1`;
+
+  // 3) Fallback page 1
+  return `${file}#page=1`;
+}
+
+// --- main component ----------------------------------------------------------
+export default function LessonPlanning() {
+  // top-level selections
+  const [klass, setKlass] = useState(9);
+  const [subject, setSubject] = useState("Math");
+  const [chapterId, setChapterId] = useState("");
+  const [topicKey, setTopicKey] = useState(""); // e.g., 'exercise:2.2' or 'summary:CH02'
+  const [targetMin, setTargetMin] = useState(20);
+
+  // data
+  const [manifest, setManifest] = useState([]);
+  const [chapterEntry, setChapterEntry] = useState(null);
+  const [topics, setTopics] = useState([]); // [{label, key, anchor}]
+  const [previewUrl, setPreviewUrl] = useState("");
+
+  // LOs
+  const [loBank, setLoBank] = useState([]);          // [{ id, text, grade, subject, ... }]
+  const [loMap, setLoMap] = useState({});            // { loId: [chapterId, ...] }
+  const [visibleLOs, setVisibleLOs] = useState([]);  // filtered for current selections
+  const [selectedLOs, setSelectedLOs] = useState([]); // ids
+
+  // 1) load manifest
+  useEffect(() => {
+    let dead = false;
+    (async () => {
+      try {
+        const r = await fetch("/cbse-pdf/manifest.json", { cache: "no-store" });
+        const m = await r.json();
+        if (dead) return;
+        setManifest(Array.isArray(m) ? m : []);
+      } catch {
+        setManifest([]);
+      }
+    })();
+    return () => { dead = true; };
+  }, []);
+
+  // 2) load LO bank + mapping (if available)
+  useEffect(() => {
+    let dead = false;
+    (async () => {
+      // Try typical locations inside src/domain/cbse
+      const bank =
+        (await tryImportJson("../../domain/cbse/los.json")) ||
+        (await tryImportJson("../../domain/cbse/lo_bank.json")) || [];
+      const mapping =
+        (await tryImportJson("../../domain/cbse/lo_to_chapter.json")) || {};
+      if (!dead) {
+        setLoBank(Array.isArray(bank) ? bank : []);
+        setLoMap(mapping || {});
+      }
+    })();
+    return () => { dead = true; };
+  }, []);
+
+  // 3) chapters for current Class + Subject
+  const chapters = useMemo(() => {
+    const code = normSubject(subject);
+    const filtered = manifest.filter((e) => chapterMatches(klass, code, e));
+    return filtered.sort(byId);
+  }, [manifest, klass, subject]);
+
+  // ensure chapterId valid
+  useEffect(() => {
+    if (!chapterId && chapters.length) {
+      setChapterId(chapters[0].chapterId);
+    } else if (chapterId && !chapters.find((c) => c.chapterId === chapterId)) {
+      setChapterId(chapters[0]?.chapterId || "");
+    }
+  }, [chapters, chapterId]);
+
+  // pick chapter entry
+  useEffect(() => {
+    const e = chapters.find((c) => c.chapterId === chapterId) || null;
+    setChapterEntry(e || null);
+  }, [chapterId, chapters]);
+
+  // 4) build Topic list from anchors (plus a chapter-start)
+  useEffect(() => {
+    if (!chapterEntry) {
+      setTopics([]);
+      setTopicKey("");
+      return;
+    }
+    const list = [];
+    // chapter start
+    list.push({
+      label: "chapter start",
+      key: "start:CH",
+      anchor: null,
+    });
+
+    const anchors = Array.isArray(chapterEntry.anchors) ? chapterEntry.anchors : [];
+    const pretty = (a) => {
+      const t = a.type;
+      const code = a.code ? String(a.code) : "";
+      if (t === "exercises") return `exercises (end)`;
+      if (t === "exercise") return `exercise ${code}`;
+      if (t === "example") return `example ${code}`;
+      return t; // intext / summary / keywords
+    };
+    anchors.forEach((a) => {
+      list.push({
+        label: pretty(a),
+        key: `${a.type}:${a.code ?? chapterEntry.chapterNo ?? "CH"}`,
+        anchor: { type: a.type, code: a.code },
+      });
+    });
+
+    setTopics(list);
+    // keep selection stable if possible
+    if (!topicKey || !list.find((t) => t.key === topicKey)) {
+      setTopicKey(list[0]?.key || "");
+    }
+  }, [chapterEntry]);
+
+  // 5) update preview URL whenever chapter/topic changes
+  useEffect(() => {
+    const topic = topics.find((t) => t.key === topicKey);
+    if (!chapterEntry || !topic) { setPreviewUrl(""); return; }
+    const url = buildLocalPdfHref(chapterEntry, { anchor: topic.anchor || undefined });
+    setPreviewUrl(url || "");
+  }, [chapterEntry, topicKey, topics]);
+
+  // 6) visible LOs for current selections
+  useEffect(() => {
+    const subjCode = normSubject(subject);
+
+    // helper checks (robust to partial schema)
+    const hasChapter = (lo) => {
+      // lo_to_chapter mapping
+      if (lo?.id && Array.isArray(loMap[lo.id]) && loMap[lo.id].includes(chapterId)) return true;
+      // direct ref on the LO object
+      if (lo?.chapterRef?.chapterId === chapterId) return true;
+      return false;
+    };
+    const inGrade = (lo) => {
+      if (Number.isFinite(lo?.grade)) return Number(lo.grade) === Number(klass);
+      if (Array.isArray(lo?.grades)) return lo.grades.map(Number).includes(Number(klass));
+      return true; // if not declared, be permissive
+    };
+    const inSubject = (lo) => {
+      if (!lo?.subject) return true;
+      return normSubject(lo.subject) === subjCode;
+    };
+
+    let list = loBank.filter((lo) => inGrade(lo) && inSubject(lo) && hasChapter(lo));
+
+    // Fallback: synthesize topic-based LOs when none found
+    if (!list.length) {
+      const topic = topics.find((t) => t.key === topicKey);
+      if (topic?.anchor?.type === "exercise" && topic.anchor.code) {
+        // simple synthetic goals for practice sections
+        const code = String(topic.anchor.code);
+        list = [
+          { id: `practice:${chapterId}:${code}:q1-5`, text: `Practice: Exercise ${code}, solve Q1–Q5` },
+          { id: `discuss:${chapterId}:${code}:concepts`, text: `Discuss key concepts before Exercise ${code}` },
+        ];
+      } else if (topic?.anchor?.type === "example" && topic.anchor.code) {
+        const code = String(topic.anchor.code);
+        list = [
+          { id: `walkthrough:${chapterId}:${code}`, text: `Walkthrough: Example ${code}` },
+          { id: `apply:${chapterId}:${code}`, text: `Apply the method from Example ${code} to a new problem` },
+        ];
+      } else if (topic?.key?.startsWith("start:")) {
+        list = [
+          { id: `overview:${chapterId}`, text: `Chapter overview + recall prerequisites` },
+          { id: `intro:${chapterId}`, text: `Introduce learning objectives for this chapter` },
+        ];
+      }
+    }
+
+    setVisibleLOs(list);
+    // keep prior selections but drop those no longer visible
+    setSelectedLOs((prev) => prev.filter((id) => list.some((x) => x.id === id)));
+  }, [klass, subject, chapterId, topicKey, loBank, loMap, topics]);
+
+  // 7) microplan generation (simple for now; you likely already have this)
+  function generateMicroplan() {
+    const chosen = visibleLOs.filter((x) => selectedLOs.includes(x.id));
+    if (!chosen.length) return;
+
+    const estEach = Math.max(5, Math.round(targetMin / Math.max(1, chosen.length)));
+    // This is where you’d push to your existing state/store for the left card list.
+    // For now we just log:
+    console.log("[Microplan] target", targetMin, "mins; items", chosen.map((x) => x.text));
+    alert(`Generated ${chosen.length} item(s) at ~${estEach} min each (≈${targetMin} min total).`);
+  }
+
+  // --- render ----------------------------------------------------------------
+  return (
+    <div className="flex flex-col gap-6">
+      {/* Controls */}
+      <div className="rounded-2xl bg-slate-800/40 border border-slate-700 p-4">
+        <h2 className="text-lg font-semibold mb-4">Tutor · Lesson Planner</h2>
+
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-3 items-end">
+          <div>
+            <label className="text-xs block mb-1 opacity-75">Class</label>
+            <select
+              className="w-full rounded-lg bg-slate-900 border border-slate-700 p-2"
+              value={klass}
+              onChange={(e) => setKlass(Number(e.target.value))}
+            >
+              {[8,9,10].map((g) => <option key={g} value={g}>Class {g}</option>)}
+            </select>
+          </div>
+
+          <div>
+            <label className="text-xs block mb-1 opacity-75">Subject</label>
+            <select
+              className="w-full rounded-lg bg-slate-900 border border-slate-700 p-2"
+              value={subject}
+              onChange={(e) => setSubject(e.target.value)}
+            >
+              {["Math", "Science", "English", "Social Science"].map((s) => <option key={s} value={s}>{s}</option>)}
+            </select>
+          </div>
+
+          <div>
+            <label className="text-xs block mb-1 opacity-75">Chapter</label>
+            <select
+              className="w-full rounded-lg bg-slate-900 border border-slate-700 p-2"
+              value={chapterId}
+              onChange={(e) => setChapterId(e.target.value)}
+            >
+              {chapters.map((c) => (
+                <option key={c.chapterId} value={c.chapterId}>
+                  {c.chapterId.replace(/-.+/, "")} · {c.title || c.file?.split("/").pop()}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="text-xs block mb-1 opacity-75">Topic</label>
+            <select
+              className="w-full rounded-lg bg-slate-900 border border-slate-700 p-2"
+              value={topicKey}
+              onChange={(e) => setTopicKey(e.target.value)}
+            >
+              {topics.map((t) => (
+                <option key={t.key} value={t.key}>{t.label}</option>
+              ))}
+            </select>
+          </div>
+
+          <div className="flex gap-3 items-end">
+            <div className="flex gap-2">
+              {[15,20,30].map((m) => (
+                <label key={m} className="inline-flex items-center gap-2">
+                  <input
+                    type="radio"
+                    name="targetMin"
+                    checked={targetMin === m}
+                    onChange={() => setTargetMin(m)}
+                  />
+                  <span className="text-xs opacity-80">{m} min</span>
+                </label>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Inline preview */}
+        <div className="mt-3">
+          <label className="text-xs block mb-1 opacity-75">Preview</label>
+          {previewUrl ? (
+            <div className="rounded-xl overflow-hidden border border-slate-700 bg-black/20 h-[480px]">
+              <iframe
+                key={previewUrl} // force reload on change
+                src={previewUrl}
+                className="w-full h-full"
+                title="Chapter preview"
+              />
+            </div>
+          ) : (
+            <div className="text-xs opacity-60">Select a Chapter/Topic to preview the local PDF.</div>
+          )}
+        </div>
+      </div>
+
+      {/* LOs panel */}
+      <div className="rounded-2xl bg-slate-800/40 border border-slate-700 p-4">
+        <h3 className="font-semibold mb-2">Learning Objectives</h3>
+        {!visibleLOs.length ? (
+          <div className="text-sm opacity-60">No LOs found yet for this selection.</div>
+        ) : (
+          <div className="flex flex-col gap-2">
+            {visibleLOs.map((lo) => (
+              <label key={lo.id} className="inline-flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={selectedLOs.includes(lo.id)}
+                  onChange={(e) => {
+                    const on = e.target.checked;
+                    setSelectedLOs((prev) =>
+                      on ? [...new Set([...prev, lo.id])] : prev.filter((x) => x !== lo.id)
+                    );
+                  }}
+                />
+                <span className="text-sm">{lo.text || lo.title || lo.name || lo.id}</span>
+              </label>
+            ))}
+          </div>
+        )}
+
+        <div className="mt-4 flex items-center justify-between">
+          <button
+            onClick={generateMicroplan}
+            disabled={!selectedLOs.length}
+            className="rounded-full bg-cyan-500 hover:bg-cyan-400 text-black px-4 py-2 font-semibold disabled:opacity-50"
+            title={!selectedLOs.length ? "Select at least one LO" : ""}
+          >
+            Generate Microplan (≈{targetMin} min)
+          </button>
+
+          {/* quick open in a new tab (local) */}
+          {previewUrl ? (
+            <a
+              href={previewUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="text-xs underline opacity-80 hover:opacity-100"
+            >
+              Open source in new tab
+            </a>
+          ) : null}
+        </div>
+      </div>
+    </div>
+  );
+}
+

@@ -1,0 +1,246 @@
+// src/services/manifest.js
+// Manifest loader that prefers the "subject" string for grouping (works with your current data)
+
+import { useEffect, useMemo, useState } from "react";
+
+let _manifestCache = null;
+let _manifestPromise = null;
+
+async function fetchJson(url) {
+  const res = await fetch(url, { credentials: "same-origin", cache: "no-cache" });
+  if (!res.ok) throw new Error(`HTTP ${res.status} for ${url}`);
+  return res.json();
+}
+
+function parseChapterMeta(ch) {
+  // Accept both chapterId-style codes and explicit fields
+  const id = ch.id || ch.chapterId || ch.slug || ch.code || "";
+  let grade = ch.grade ?? ch.class ?? null;
+
+  // try to parse grade from chapterId if needed
+  if (!grade && typeof id === "string") {
+    const m = id.match(/^(\d{1,2})[A-Za-z]+-CH/);
+    if (m) grade = Number(m[1]);
+  }
+  grade = grade != null ? String(grade) : null;
+
+  // Prefer the verbose subject string from the manifest (your data), fallback to code in id
+  let subjectLabel = (ch.subject || "").toString().trim(); // e.g., "English", "Science", "Social Science"
+  let subjectKey = subjectLabel ? subjectLabel.toLowerCase() : null;
+
+  if (!subjectKey && typeof id === "string") {
+    const m2 = id.match(/^\d{1,2}([A-Za-z]+)-CH/); // e.g., 8SS-CH01
+    if (m2) {
+      const code = m2[1].toUpperCase();
+      const CODE_TO_LABEL = { M: "Mathematics", S: "Science", SS: "Social Science", E: "English" };
+      subjectLabel = CODE_TO_LABEL[code] || code;
+      subjectKey = subjectLabel.toLowerCase();
+    }
+  }
+
+  // chapter number (best-effort)
+  let chapterNum = ch.chapterNo;
+  if (typeof chapterNum === "string") {
+    const n = chapterNum.match(/\d+/);
+    chapterNum = n ? Number(n[0]) : null;
+  } else if (Number.isFinite(chapterNum)) {
+    chapterNum = Number(chapterNum);
+  } else {
+    chapterNum = null;
+  }
+
+  return { id, grade, subjectLabel, subjectKey, chapterNum };
+}
+
+function indexChapters(entries = []) {
+  const byId = {};
+  const subjectsByGradeLabels = {}; // grade -> Map(subjectKey -> subjectLabel)
+  const chaptersByGradeSubject = {}; // "grade::subjectKey" -> chapter[]
+
+  for (const ch of entries) {
+    const meta = parseChapterMeta(ch);
+    const id = meta.id || ch.file || crypto.randomUUID();
+    const full = { ...ch, id, __meta: meta };
+    byId[id] = full;
+
+    if (meta.grade && meta.subjectKey) {
+      subjectsByGradeLabels[meta.grade] ||= new Map();
+      if (!subjectsByGradeLabels[meta.grade].has(meta.subjectKey)) {
+        subjectsByGradeLabels[meta.grade].set(meta.subjectKey, meta.subjectLabel || meta.subjectKey);
+      }
+      const key = `${meta.grade}::${meta.subjectKey}`;
+      chaptersByGradeSubject[key] ||= [];
+      chaptersByGradeSubject[key].push(full);
+    }
+  }
+
+  // stable chapter sort
+  for (const key of Object.keys(chaptersByGradeSubject)) {
+    chaptersByGradeSubject[key].sort((a, b) => {
+      const na = a.__meta.chapterNum ?? 9999;
+      const nb = b.__meta.chapterNum ?? 9999;
+      if (na !== nb) return na - nb;
+      return (a.title || "").localeCompare(b.title || "");
+    });
+  }
+
+  // convert subjectsByGrade to arrays of display labels
+  const subjectsByGrade = {};
+  for (const [g, map] of Object.entries(subjectsByGradeLabels)) {
+    subjectsByGrade[g] = Array.from(map.values());
+  }
+
+  return { byId, chaptersByGradeSubject, subjectsByGrade, subjectsByGradeLabels };
+}
+
+async function loadManifestInternal() {
+  const base = import.meta.env.VITE_CBSE_PDF_BASE || "/cbse-pdf";
+  const candidates = [`${base}/manifest.enriched.json`, `${base}/manifest.json`];
+
+  let raw = null;
+  for (const u of candidates) {
+    try {
+      raw = await fetchJson(u);
+      break;
+    } catch {}
+  }
+  if (!raw) throw new Error("Unable to load CBSE manifest.");
+
+  const entries = Array.isArray(raw) ? raw : (raw.entries || raw.chapters || raw.items || []);
+  const indexed = indexChapters(entries);
+
+  return {
+    base,
+    enriched: { entries },
+    ...indexed,
+  };
+}
+
+export async function ensureManifest() {
+  if (_manifestCache) return _manifestCache;
+  if (_manifestPromise) return _manifestPromise;
+  _manifestPromise = loadManifestInternal()
+    .then((m) => (_manifestCache = m))
+    .finally(() => (_manifestPromise = null));
+  return _manifestPromise;
+}
+
+export function useManifest() {
+  const [state, setState] = useState({
+    ready: false,
+    error: null,
+    base: null,
+    enriched: null,
+    chaptersById: null,
+    subjectsByGrade: null,
+    subjectsByGradeLabels: null,
+    chaptersByGradeSubject: null,
+  });
+
+  useEffect(() => {
+    let alive = true;
+    ensureManifest()
+      .then((m) => alive && setState({ ready: true, error: null, ...m }))
+      .catch((err) => alive && setState((s) => ({ ...s, ready: false, error: err })));
+    return () => { alive = false; };
+  }, []);
+
+  const api = useMemo(() => {
+    const getSubjectsForGrade = (grade) =>
+      state.subjectsByGrade?.[String(grade)] || [];
+
+    // chapters list keyed by grade + *display* subject (case-insensitive)
+    const getChaptersFor = (grade, subjectLabel) => {
+      if (!grade || !subjectLabel) return [];
+      const key = `${grade}::${String(subjectLabel).toLowerCase()}`;
+      return state.chaptersByGradeSubject?.[key] || [];
+    };
+
+    const getChapterById = (id) => (id ? state.chaptersById?.[id] : null);
+
+    return { getSubjectsForGrade, getChaptersFor, getChapterById };
+  }, [state.subjectsByGrade, state.chaptersByGradeSubject, state.chaptersById]);
+
+  return { ...state, ...api };
+}
+
+// ---- Labels
+export function subjectNameFromCode(code) {
+  if (!code) return "Subject";
+  const c = String(code).toUpperCase();
+  const MAP = {
+    M: "Mathematics", MATH: "Mathematics",
+    S: "Science", SCI: "Science", SC: "Science",
+    SS: "Social Science", SST: "Social Science", SSOC: "Social Science",
+    E: "English", ENG: "English",
+  };
+  return MAP[c] || c;
+}
+
+export function chapterIdToPretty(chapterOrId, titleMaybe) {
+  if (typeof chapterOrId === "string") {
+    return titleMaybe ? `${chapterOrId} • ${titleMaybe}` : chapterOrId;
+  }
+  const ch = chapterOrId || {};
+  const id = ch.id || ch.chapterId || ch.slug || ch.code || "";
+  const title = ch.title || ch.name || ch.label || ch.chapterTitle || "";
+  return title ? `${id} • ${title}` : id || "Chapter";
+}
+
+// ---- PDF URL builder (prevents SPA fallback)
+function normalizePdfSrc(src = "") {
+  let s = String(src).trim();
+  if (/^https?:\/\//i.test(s)) return s; // already absolute
+  s = s.replace(/^public\//, "");
+  s = s.replace(/^\/?cbse-pdf\//, "");
+  s = s.replace(/^\/?/, "");
+  if (!s.startsWith("sources/")) s = `sources/${s}`;
+  return `/${s}`;
+}
+
+export function buildLocalPdfUrl(chapter, opts = {}) {
+  if (!chapter) return null;
+  const base = import.meta.env.VITE_CBSE_PDF_BASE || "/cbse-pdf";
+  const src =
+    chapter.src || chapter.pdf || chapter.file ||
+    (chapter.paths && (chapter.paths.pdf || chapter.paths.src));
+  if (!src) return null;
+
+  const hash = [];
+  if (opts.page) hash.push(`page=${opts.page}`);
+  hash.push(`zoom=${opts.zoom || "page-width"}`);
+  const path = normalizePdfSrc(src);
+  return `${base}${path}#${hash.join("&")}`;
+}
+
+// ---- Topics / anchors (tolerant)
+export function getTopicsForChapter(chapter) {
+  if (!chapter) return [];
+  let anchors =
+    chapter.anchors ??
+    chapter.enriched?.anchors ??
+    chapter.toc ??
+    chapter.enriched?.toc ??
+    chapter.topics ??
+    chapter.sections ??
+    chapter.anchorList ??
+    [];
+
+  if (!Array.isArray(anchors)) {
+    if (Array.isArray(anchors?.items)) anchors = anchors.items;
+    else if (typeof anchors === "object") anchors = Object.values(anchors);
+    else anchors = [];
+  }
+
+  const normalize = (a, i) => {
+    const id = a?.id || a?.anchor || a?.key || a?.slug || a?.name || `t${i + 1}`;
+    const label =
+      a?.label || a?.title || a?.name || a?.text || a?.heading || `Topic ${i + 1}`;
+    const page =
+      a?.page ?? a?.pg ?? a?.p ?? a?.startPage ?? a?.pageNumber ?? undefined;
+    return { id: String(id), label: String(label), page: page ? Number(page) : undefined };
+  };
+
+  return anchors.map(normalize).filter(Boolean);
+}
+
