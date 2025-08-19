@@ -1,66 +1,61 @@
-# dependencies
+# Node / tooling
 node_modules/
-
-# production
 dist/
-.vercel/
-
-# misc
-.DS_Store
-.env
-.env.local
-.env.*.local
+build/
+.cache/
+.eslintcache
 *.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+pnpm-debug.log*
 
-# editor
-.vscode/
+# Vite
+.vite/
+**/.vite/
+
+# Env & local (keep examples checked in)
+.env*
+!.env.example
+!.env.local.example
+
+# OS / editors
+.DS_Store
+*.swp
+*~
 .idea/
+.vscode/
+.history/
 
+# Vercel
+.vercel/
 
-# local keys
-.env.local
-public/cbse-pdf/rag/
+# Tests & coverage
+coverage/
+.nyc_output/
+.jest/
+.vitest/
 
-# local env
-.env
-.env.*
-.env.local
-.env.*.local
-# build output
-/dist
-# editor & scratch
-*.bak
-*.bkp
-*.log
-*.DS_Store
-# local-only utilities
-rag_copy.sh
-test_embed.sh
-together.logs
-# Local helper scripts / patches / backups
-apply-*.sh
-codemod-*.sh
-fix-tdz-*.sh
-patches/
-poc-backup-*.zip
-*.proposed
-*.bak.*
+# Playwright
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
+**/ms-playwright/
 
-# local backups & patches
-*.bak.*
-*.proposed
-patches/
+# Cypress (since you’ve run it before)
+cypress/videos/
+cypress/screenshots/
+cypress/downloads/
 
+# Storybook (if you spin it up later)
+storybook-static/
 
-# ignore local NCERT sources noise
-public/cbse-pdf/sources/**
+# Turbo / monorepo caches (no-op if unused)
+.turbo/
 
-# keep compact RAG index in git
-!public/cbse-pdf/rag/
-!public/cbse-pdf/rag/index.json
+# Misc package managers (ensure only one lockfile lives here)
+# (Keep package-lock.json committed)
+# yarn.lock
+# pnpm-lock.yaml
 
-# Scratch work files
-*.work
