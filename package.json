@@ -12,7 +12,10 @@
     "enrich:ncert:llm": "DOTENV_CONFIG_PATH=.env.local node -r dotenv/config scripts/llm-enrich-ncert.mjs",
     "rag:build": "DOTENV_CONFIG_PATH=.env.local node -r dotenv/config scripts/build-rag.mjs",
     "cy:open": "cypress open",
-    "cy:run": "cypress run"
+    "cy:run": "cypress run",
+    "prepare": "husky",
+    "check:node": "node -e \"const v=process.versions.node.split(`.`)[0]; if(+v<20)process.exit(1)\"",
+    "check:repo": "npm run check:node && npm -v && git status --porcelain"
   },
   "dependencies": {
     "prop-types": "^15.8.1",
@@ -20,14 +23,22 @@
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
+    "@commitlint/cli": "^19.8.1",
+    "@commitlint/config-conventional": "^19.8.1",
     "@vitejs/plugin-react": "^4.3.1",
     "autoprefixer": "^10.4.19",
     "cypress": "^14.5.4",
     "dotenv": "^17.2.1",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.1.5",
     "pdf-parse": "^1.1.1",
     "pdfjs-dist": "^5.4.54",
     "postcss": "^8.4.39",
+    "prettier": "^3.6.2",
     "tailwindcss": "^3.4.10",
     "vite": "^5.3.4"
+  },
+  "engines": {
+    "node": ">=20 <21"
   }
 }
